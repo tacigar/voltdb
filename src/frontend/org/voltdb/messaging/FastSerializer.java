@@ -233,7 +233,7 @@ public class FastSerializer implements DataOutput {
             return;
         }
 
-        byte[] strbytes = string.getBytes(Constants.UTF8ENCODING);
+        byte[] strbytes = string.getBytes(Constants.UTF8_ENCODING);
         int len = strbytes.length;
 
         buffer.putInt(len);
@@ -254,7 +254,7 @@ public class FastSerializer implements DataOutput {
             return;
         }
 
-        byte[]  strbytes = string.getBytes(Constants.UTF8ENCODING);
+        byte[]  strbytes = string.getBytes(Constants.UTF8_ENCODING);
         int len = strbytes.length;
 
         writeInt(len);

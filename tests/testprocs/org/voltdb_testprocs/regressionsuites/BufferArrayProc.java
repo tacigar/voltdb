@@ -36,7 +36,7 @@ public class BufferArrayProc extends VoltProcedure {
 
     public long run(byte[][] data1, String[] data2, byte[][] data3) {
         for (byte[] b : data1) {
-            if (new String(b, Constants.UTF8ENCODING).equals("Hello") == false) {
+            if (new String(b, Constants.UTF8_ENCODING).equals("Hello") == false) {
                 throw new VoltAbortException("bad match a");
             }
         }

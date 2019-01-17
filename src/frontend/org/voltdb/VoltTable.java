@@ -129,7 +129,7 @@ public final class VoltTable extends VoltTableRow implements JSONString {
 
     static final int NULL_STRING_INDICATOR = -1;
     static final Charset METADATA_ENCODING = Constants.US_ASCII_ENCODING;
-    static final Charset ROWDATA_ENCODING = Constants.UTF8ENCODING;
+    static final Charset ROWDATA_ENCODING = Constants.UTF8_ENCODING;
 
     boolean m_readOnly = false;
     int m_rowStart = -1; // the beginning of the row data (points to before the row count int)

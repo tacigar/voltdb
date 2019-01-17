@@ -132,7 +132,7 @@ public class AdHocPlannedStmtBatch implements Cloneable {
                 readOnly,
                 paramTypes,
                 catalogHash);
-        AdHocPlannedStatement s = new AdHocPlannedStatement(sql.getBytes(Constants.UTF8ENCODING),
+        AdHocPlannedStatement s = new AdHocPlannedStatement(sql.getBytes(Constants.UTF8_ENCODING),
                 core,
                 extractedValues == null ? ParameterSet.emptyParameterSet() :
                                           ParameterSet.fromArrayNoCopy(extractedValues),
@@ -164,7 +164,7 @@ public class AdHocPlannedStmtBatch implements Cloneable {
     public String toString() {
         String sql = "";
         for (AdHocPlannedStatement ahps : plannedStatements) {
-            sql += new String(ahps.sql, Constants.UTF8ENCODING) + "\n";
+            sql += new String(ahps.sql, Constants.UTF8_ENCODING) + "\n";
         }
 
         String retval = super.toString();
@@ -191,7 +191,7 @@ public class AdHocPlannedStmtBatch implements Cloneable {
     public List<String> getSQLStatements() {
         List<String> sqlStatements = new ArrayList<>(plannedStatements.size());
         for (AdHocPlannedStatement plannedStatement : plannedStatements) {
-            sqlStatements.add(new String(plannedStatement.sql, Constants.UTF8ENCODING));
+            sqlStatements.add(new String(plannedStatement.sql, Constants.UTF8_ENCODING));
         }
         return sqlStatements;
     }
@@ -351,7 +351,7 @@ public class AdHocPlannedStmtBatch implements Cloneable {
      */
     public String explainStatement(int i, Database db, boolean getJSONString) {
         AdHocPlannedStatement plannedStatement = plannedStatements.get(i);
-        String aggplan = new String(plannedStatement.core.aggregatorFragment, Constants.UTF8ENCODING);
+        String aggplan = new String(plannedStatement.core.aggregatorFragment, Constants.UTF8_ENCODING);
         PlanNodeTree pnt = new PlanNodeTree();
         try {
             String result = null;
@@ -363,7 +363,7 @@ public class AdHocPlannedStmtBatch implements Cloneable {
 
             if (plannedStatement.core.collectorFragment != null) {
                 // multi-partition query plan
-                String collplan = new String(plannedStatement.core.collectorFragment, Constants.UTF8ENCODING);
+                String collplan = new String(plannedStatement.core.collectorFragment, Constants.UTF8_ENCODING);
                 PlanNodeTree collpnt = new PlanNodeTree();
                 // reattach plan fragments
                 JSONObject jobMP = new JSONObject(collplan);

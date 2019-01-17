@@ -310,7 +310,7 @@ public class PlannerTool {
                                 params = ParameterSet.emptyParameterSet();
                             }
 
-                            AdHocPlannedStatement ahps = new AdHocPlannedStatement(sql.getBytes(Constants.UTF8ENCODING),
+                            AdHocPlannedStatement ahps = new AdHocPlannedStatement(sql.getBytes(Constants.UTF8_ENCODING),
                                                                                    core,
                                                                                    params,
                                                                                    null);

@@ -248,7 +248,7 @@ public class ExportGeneration implements Generation {
                         final int length = buf.getInt();
                         byte stringBytes[] = new byte[length];
                         buf.get(stringBytes);
-                        String signature = new String(stringBytes, Constants.UTF8ENCODING);
+                        String signature = new String(stringBytes, Constants.UTF8_ENCODING);
                         if (partitionSources == null) {
                             exportLog.error("Received an export ack for partition " + partition +
                                     " which does not exist on this node, partitions = " + m_dataSourcesByPartition);

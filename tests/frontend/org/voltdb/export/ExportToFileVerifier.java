@@ -114,7 +114,7 @@ public class ExportToFileVerifier {
 
                 FileInputStream fis = new FileInputStream(f);
                 BufferedInputStream bis = new BufferedInputStream(fis);
-                InputStreamReader isr = new InputStreamReader(bis, Constants.UTF8ENCODING);
+                InputStreamReader isr = new InputStreamReader(bis, Constants.UTF8_ENCODING);
                 CSVReader csvreader = new CSVReader(isr);
                 String next[] = null;
                 while ((next = csvreader.readNext()) != null) {

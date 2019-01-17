@@ -80,7 +80,7 @@ public class SwapTablesCore extends AdHocBase {
 
         String stmt = new String(
                 decodeSerializedBatchData(serializedBatchData).getSecond()[0].sql,
-                Constants.UTF8ENCODING);
+                Constants.UTF8_ENCODING);
         // stmt is of the format "@SwapTables <table1> <table2>"
         String[] stmtParams = stmt.split(" ");
         performSwapTablesCallback(stmtParams[1], stmtParams[2]);

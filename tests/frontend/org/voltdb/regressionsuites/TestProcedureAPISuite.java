@@ -144,7 +144,7 @@ public class TestProcedureAPISuite extends RegressionSuite {
         Client client = getClient();
         byte[][] data = new byte[10][];
         for (int i = 0; i < data.length; i++) {
-            data[i] = "Hello".getBytes(Constants.UTF8ENCODING);
+            data[i] = "Hello".getBytes(Constants.UTF8_ENCODING);
         }
         String[] data3 = new String[3];
         data3[0] = "AAbbff00";

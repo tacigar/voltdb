@@ -57,13 +57,13 @@ public final class DelegatePrincipal implements Principal {
                     bb.array(),
                     bb.arrayOffset() + bb.position(),
                     size,
-                    Constants.UTF8ENCODING
+                    Constants.UTF8_ENCODING
                     );
             bb.position(bb.position() + size);
         } else {
             byte [] namebuff = new byte[size];
             bb.get(namebuff);
-            m_name = new String(namebuff, Constants.UTF8ENCODING);
+            m_name = new String(namebuff, Constants.UTF8_ENCODING);
         }
     }
 
@@ -81,11 +81,11 @@ public final class DelegatePrincipal implements Principal {
     }
 
     public int wrappedSize() {
-        return 4 + 4 + m_name.getBytes(Constants.UTF8ENCODING).length;
+        return 4 + 4 + m_name.getBytes(Constants.UTF8_ENCODING).length;
     }
 
     public void wrap(ByteBuffer bb) {
-        byte [] bytes = m_name.getBytes(Constants.UTF8ENCODING);
+        byte [] bytes = m_name.getBytes(Constants.UTF8_ENCODING);
         bb.putInt(m_id);
         bb.putInt(bytes.length);
         bb.put(bytes);

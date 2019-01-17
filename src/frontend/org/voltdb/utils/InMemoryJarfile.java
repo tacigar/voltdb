@@ -255,11 +255,11 @@ public class InMemoryJarfile extends TreeMap<String, byte[]> {
                     index++;
                 }
                 byte[] newddlbytes = Arrays.copyOfRange(ddlbytes, index, ddlbytes.length);
-                crc.update(e.getKey().getBytes(Constants.UTF8ENCODING));
+                crc.update(e.getKey().getBytes(Constants.UTF8_ENCODING));
                 crc.update(newddlbytes);
             }
             else {
-                crc.update(e.getKey().getBytes(Constants.UTF8ENCODING));
+                crc.update(e.getKey().getBytes(Constants.UTF8_ENCODING));
                 crc.update(e.getValue());
             }
         }
@@ -289,11 +289,11 @@ public class InMemoryJarfile extends TreeMap<String, byte[]> {
                     index++;
                 }
                 byte[] newddlbytes = Arrays.copyOfRange(ddlbytes, index, ddlbytes.length);
-                md.update(e.getKey().getBytes(Constants.UTF8ENCODING));
+                md.update(e.getKey().getBytes(Constants.UTF8_ENCODING));
                 md.update(newddlbytes);
             }
             else {
-                md.update(e.getKey().getBytes(Constants.UTF8ENCODING));
+                md.update(e.getKey().getBytes(Constants.UTF8_ENCODING));
                 md.update(e.getValue());
             }
         }

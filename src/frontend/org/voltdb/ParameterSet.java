@@ -152,7 +152,7 @@ public class ParameterSet implements JSONString {
                             if (strings[zz] == null) {
                                 size += 4;
                             } else {
-                                arrayEncodedStrings[zz] = strings[zz].getBytes(Constants.UTF8ENCODING);
+                                arrayEncodedStrings[zz] = strings[zz].getBytes(Constants.UTF8_ENCODING);
                                 size += 4 + arrayEncodedStrings[zz].length;
                             }
                         }
@@ -246,7 +246,7 @@ public class ParameterSet implements JSONString {
                     size += 8;
                     break;
                 case STRING:
-                    byte encodedString[] = ((String)obj).getBytes(Constants.UTF8ENCODING);
+                    byte encodedString[] = ((String)obj).getBytes(Constants.UTF8_ENCODING);
                     size += 4 + encodedString.length;
                     encodedStrings[ii] = encodedString;
                     break;
@@ -579,7 +579,7 @@ public class ParameterSet implements JSONString {
                         sval[i] = null;
                     }
                     else {
-                        sval[i] = new String(encodedStringArray[i], Constants.UTF8ENCODING);
+                        sval[i] = new String(encodedStringArray[i], Constants.UTF8_ENCODING);
                     }
                 }
                 value = sval;
@@ -622,7 +622,7 @@ public class ParameterSet implements JSONString {
                     else {
                         encodedString = new byte[len];
                         in.get(encodedString);
-                        value = new String(encodedString, Constants.UTF8ENCODING);
+                        value = new String(encodedString, Constants.UTF8_ENCODING);
                     }
                     break;
                 case VARBINARY:

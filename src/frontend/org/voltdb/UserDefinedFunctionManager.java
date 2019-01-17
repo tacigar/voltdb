@@ -291,7 +291,7 @@ public class UserDefinedFunctionManager {
                 buffer.putDouble(((Double) value).doubleValue());
                 break;
             case STRING:
-                byte[] stringAsBytes = ((String)value).getBytes(Constants.UTF8ENCODING);
+                byte[] stringAsBytes = ((String)value).getBytes(Constants.UTF8_ENCODING);
                 SerializationHelper.writeVarbinary(stringAsBytes, buffer);
                 break;
             case VARBINARY:

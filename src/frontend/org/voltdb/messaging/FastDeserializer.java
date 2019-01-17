@@ -197,7 +197,7 @@ public class FastDeserializer implements DataInput {
         // now assume not null
         final byte[] strbytes = new byte[len];
         readFully(strbytes);
-        return new String(strbytes, Constants.UTF8ENCODING);
+        return new String(strbytes, Constants.UTF8_ENCODING);
     }
 
     /**

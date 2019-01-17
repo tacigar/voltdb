@@ -59,7 +59,7 @@ public class SQLStmtAdHocHelper {
 
     public static byte[] getSQLBytes(SQLStmt sqlStmt) {
         if (sqlStmt.sqlText == null) {
-            sqlStmt.sqlText = sqlStmt.sqlTextStr.getBytes(Constants.UTF8ENCODING);
+            sqlStmt.sqlText = sqlStmt.sqlTextStr.getBytes(Constants.UTF8_ENCODING);
         }
         return sqlStmt.sqlText;
     }

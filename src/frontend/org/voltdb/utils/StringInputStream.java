@@ -36,7 +36,7 @@ public class StringInputStream extends InputStream {
      * @param value The string value to turn into an InputStream.
      */
     public StringInputStream(String value) {
-        m_strBytes = value.getBytes(Constants.UTF8ENCODING);
+        m_strBytes = value.getBytes(Constants.UTF8_ENCODING);
     }
 
     /**

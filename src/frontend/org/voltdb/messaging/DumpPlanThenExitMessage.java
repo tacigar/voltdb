@@ -56,7 +56,7 @@ public class DumpPlanThenExitMessage extends VoltMessage
     {
         int msgsize = super.getSerializedSize();
         msgsize += 4 /*string length */
-                + m_procName.getBytes(Constants.UTF8ENCODING).length;
+                + m_procName.getBytes(Constants.UTF8_ENCODING).length;
         return msgsize;
     }
 

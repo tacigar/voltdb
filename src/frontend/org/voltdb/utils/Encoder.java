@@ -66,7 +66,7 @@ public class Encoder {
      */
     public static String hexEncode(String string) {
         // this will need to be less "western" in the future
-        return hexEncode(string.getBytes(Constants.UTF8ENCODING));
+        return hexEncode(string.getBytes(Constants.UTF8_ENCODING));
     }
 
     /**
@@ -103,7 +103,7 @@ public class Encoder {
      */
     public static String hexDecodeToString(String hexString) {
         byte[] decodedValue = hexDecode(hexString);
-        return new String(decodedValue, Constants.UTF8ENCODING);
+        return new String(decodedValue, Constants.UTF8_ENCODING);
     }
 
     public static boolean isHexEncodedString(String hexString) {
@@ -122,7 +122,7 @@ public class Encoder {
 
     public static String compressAndBase64Encode(String string) {
         try {
-            byte[] inBytes = string.getBytes(Constants.UTF8ENCODING);
+            byte[] inBytes = string.getBytes(Constants.UTF8_ENCODING);
             ByteArrayOutputStream baos = new ByteArrayOutputStream((int)(string.length() * 0.7));
             DeflaterOutputStream dos = new DeflaterOutputStream(baos);
             dos.write(inBytes);
@@ -154,7 +154,7 @@ public class Encoder {
             return "";
         }
         byte bytes[] = decodeBase64AndDecompressToBytes(string);
-        return new String(bytes, Constants.UTF8ENCODING);
+        return new String(bytes, Constants.UTF8_ENCODING);
     }
 
     public static byte[] decodeBase64AndDecompressToBytes(String string) {
@@ -180,7 +180,7 @@ public class Encoder {
 
     public static String base64Encode(String string) {
         try {
-            final byte[] inBytes = string.getBytes(Constants.UTF8ENCODING);
+            final byte[] inBytes = string.getBytes(Constants.UTF8_ENCODING);
             return Base64.encodeToString(inBytes, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -197,6 +197,6 @@ public class Encoder {
 
     public static String base64DecodeToString(String string) {
         byte[] decodedValue = base64Decode(string);
-        return new String(decodedValue, Constants.UTF8ENCODING);
+        return new String(decodedValue, Constants.UTF8_ENCODING);
     }
 }

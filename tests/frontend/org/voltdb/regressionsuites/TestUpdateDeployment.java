@@ -135,7 +135,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml");
             // Mix in various ways to specify no catalog.  Use java null here.
             String depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
-                    Constants.UTF8ENCODING);
+                    Constants.UTF8_ENCODING);
             VoltTable[] results = client.callProcedure("@UpdateApplicationCatalog", null, depBytes).getResults();
             //client.updateApplicationCatalog(null, new File(deploymentURL)).getResults();
             assertTrue(results.length == 1);
@@ -154,7 +154,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot.xml");
             // Mix in various ways to specify no catalog.  Use empty string here.
             depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
-                    Constants.UTF8ENCODING);
+                    Constants.UTF8_ENCODING);
             results = client.callProcedure("@UpdateApplicationCatalog", "", depBytes).getResults();
             assertTrue(results.length == 1);
             Thread.sleep(5000);
@@ -172,7 +172,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot_dir_not_exist.xml");
             // Mix in various ways to specify no catalog.  Use empty array here.
             depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
-                    Constants.UTF8ENCODING);
+                    Constants.UTF8_ENCODING);
             results = client.callProcedure("@UpdateApplicationCatalog", new byte[] {}, depBytes).getResults();
             assertTrue(results.length == 1);
 

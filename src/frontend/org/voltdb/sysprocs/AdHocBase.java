@@ -187,7 +187,7 @@ public abstract class AdHocBase extends VoltSystemProcedure {
                 String msg = String.format("AdHoc transaction %d wasn't planned " +
                         "against the current catalog version. Statement: %s",
                         DeprecatedProcedureAPIAccess.getVoltPrivateRealTransactionId(this),
-                        new String(statement.sql, Constants.UTF8ENCODING));
+                        new String(statement.sql, Constants.UTF8_ENCODING));
                 throw new VoltAbortException(msg);
             }
 

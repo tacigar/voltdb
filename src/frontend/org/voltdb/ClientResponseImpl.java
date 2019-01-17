@@ -224,11 +224,11 @@ public class ClientResponseImpl implements ClientResponse, JSONString {
             + 2; // number of result tables
 
         if (appStatusString != null) {
-            encodedAppStatusString = appStatusString.getBytes(Constants.UTF8ENCODING);
+            encodedAppStatusString = appStatusString.getBytes(Constants.UTF8_ENCODING);
             msgsize += encodedAppStatusString.length + 4;
         }
         if (statusString != null) {
-            encodedStatusString = statusString.getBytes(Constants.UTF8ENCODING);
+            encodedStatusString = statusString.getBytes(Constants.UTF8_ENCODING);
             msgsize += encodedStatusString.length + 4;
         }
         if (m_hashes != null) {

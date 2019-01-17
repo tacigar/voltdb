@@ -40,7 +40,7 @@ public class SerializationHelper {
         }
         else {
             memoizedString = value;
-            memoizedStringBytes = value.getBytes(Constants.UTF8ENCODING);
+            memoizedStringBytes = value.getBytes(Constants.UTF8_ENCODING);
         }
         return memoizedStringBytes.length + 4; // int length prefix
     }
@@ -51,7 +51,7 @@ public class SerializationHelper {
         }
         else {
             memoizedString = value;
-            memoizedStringBytes = value.getBytes(Constants.UTF8ENCODING);
+            memoizedStringBytes = value.getBytes(Constants.UTF8_ENCODING);
         }
         buf.putInt(memoizedStringBytes.length);
         buf.put(memoizedStringBytes);
@@ -75,7 +75,7 @@ public class SerializationHelper {
         // now assume not null
         final byte[] strbytes = new byte[len];
         buf.get(strbytes);
-        return new String(strbytes, Constants.UTF8ENCODING);
+        return new String(strbytes, Constants.UTF8_ENCODING);
     }
 
     public static byte[] getVarbinary(ByteBuffer buf) throws IOException {
@@ -238,7 +238,7 @@ public class SerializationHelper {
             return;
         }
 
-        byte[] strbytes = value.getBytes(Constants.UTF8ENCODING);
+        byte[] strbytes = value.getBytes(Constants.UTF8_ENCODING);
         int len = strbytes.length;
 
         buf.putInt(len);

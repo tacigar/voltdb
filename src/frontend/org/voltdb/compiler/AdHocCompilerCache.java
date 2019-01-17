@@ -282,7 +282,7 @@ public class AdHocCompilerCache implements Serializable {
         assert(parsedToken != null);
         assert(planIn != null);
         AdHocPlannedStatement plan = planIn;
-        assert(new String(plan.sql, Constants.UTF8ENCODING).equals(sql));
+        assert(new String(plan.sql, Constants.UTF8_ENCODING).equals(sql));
 
         // hasUserQuestionMarkParameters and hasAutoParameterizedException can not be true at the same time
         // it means that a query can not be both user parameterized query and auto parameterized query.

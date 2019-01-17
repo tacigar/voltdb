@@ -131,7 +131,7 @@ public class StoredProcedureInvocation implements JSONString {
     public String getProcName() {
         if (procName == null) {
             assert(m_procNameBytes != null);
-            procName = new String(m_procNameBytes, Constants.UTF8ENCODING);
+            procName = new String(m_procNameBytes, Constants.UTF8_ENCODING);
         }
         return procName;
     }
@@ -139,7 +139,7 @@ public class StoredProcedureInvocation implements JSONString {
     public byte[] getProcNameBytes() {
         if (m_procNameBytes == null) {
             assert(procName != null);
-            m_procNameBytes = procName.getBytes(Constants.UTF8ENCODING);
+            m_procNameBytes = procName.getBytes(Constants.UTF8_ENCODING);
         }
         return m_procNameBytes;
     }
@@ -299,7 +299,7 @@ public class StoredProcedureInvocation implements JSONString {
 
         // Magic size of @LoadVoltTable* StoredProcedureInvocation
         int tableNameLengthInBytes =
-                catTable.getTypeName().getBytes(Constants.UTF8ENCODING).length;
+                catTable.getTypeName().getBytes(Constants.UTF8_ENCODING).length;
         int metadataSize = 41 + // serialized size for original version
                            tableNameLengthInBytes;
         if (isPartitioned) {

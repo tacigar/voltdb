@@ -233,7 +233,7 @@ public class ConnectionUtil {
             System.exit(-1);
         }
         byte hashedPassword[] = null;
-        hashedPassword = md.digest(password.getBytes(Constants.UTF8ENCODING));
+        hashedPassword = md.digest(password.getBytes(Constants.UTF8_ENCODING));
         return hashedPassword;
     }
 
@@ -364,8 +364,8 @@ public class ConnectionUtil {
             }
 
             // encode strings
-            byte[] serviceBytes = service == null ? null : service.getBytes(Constants.UTF8ENCODING);
-            byte[] usernameBytes = username == null ? null : username.getBytes(Constants.UTF8ENCODING);
+            byte[] serviceBytes = service == null ? null : service.getBytes(Constants.UTF8_ENCODING);
+            byte[] usernameBytes = username == null ? null : username.getBytes(Constants.UTF8_ENCODING);
 
             // get the length of the data to serialize
             int requestSize = 4;
@@ -444,7 +444,7 @@ public class ConnectionUtil {
             int buildStringLength = loginResponse.getInt();
             byte buildStringBytes[] = new byte[buildStringLength];
             loginResponse.get(buildStringBytes);
-            returnArray[2] = new String(buildStringBytes, Constants.UTF8ENCODING);
+            returnArray[2] = new String(buildStringBytes, Constants.UTF8_ENCODING);
 
             synchronized(aChannel.blockingLock()) {
                 aChannel.configureBlocking(false);

@@ -217,7 +217,7 @@ public abstract class UpdateApplicationBase extends VoltNTSystemProcedure {
                 // Go get the deployment string from the current catalog context
                 byte[] deploymentBytes = context.getDeploymentBytes();
                 if (deploymentBytes != null) {
-                    deploymentString = new String(deploymentBytes, Constants.UTF8ENCODING);
+                    deploymentString = new String(deploymentBytes, Constants.UTF8_ENCODING);
                 }
                 if (deploymentBytes == null || deploymentString == null) {
                     retval.errorMsg = "No deployment file provided and unable to recover previous deployment settings.";
@@ -257,7 +257,7 @@ public abstract class UpdateApplicationBase extends VoltNTSystemProcedure {
 
             //Always get deployment after its adjusted.
             String newDeploymentString = CatalogUtil.getDeployment(dt, true);
-            retval.deploymentBytes = newDeploymentString.getBytes(Constants.UTF8ENCODING);
+            retval.deploymentBytes = newDeploymentString.getBytes(Constants.UTF8_ENCODING);
 
             // make deployment hash from string
             retval.deploymentHash = CatalogUtil.makeDeploymentHash(retval.deploymentBytes);

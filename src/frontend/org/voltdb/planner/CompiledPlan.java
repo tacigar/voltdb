@@ -222,7 +222,7 @@ public class CompiledPlan {
         }
 
         PlanNodeList planList = new PlanNodeList(planGraph, isLargeQuery);
-        return planList.toJSONString().getBytes(Constants.UTF8ENCODING);
+        return planList.toJSONString().getBytes(Constants.UTF8_ENCODING);
     }
 
     // A reusable step extracted from boundParamIndexes so it can be applied to two different

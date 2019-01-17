@@ -363,7 +363,7 @@ public class ParameterConverter {
             if (expectedClz == Byte[].class) return ArrayUtils.toObject((byte[]) param);
             // allow byte arrays to be passed into string parameters
             if (expectedClz == String.class) {
-                String value = new String((byte[]) param, Constants.UTF8ENCODING);
+                String value = new String((byte[]) param, Constants.UTF8_ENCODING);
                 if (value.equals(Constants.CSV_NULL)) {
                     return nullValueForType(expectedClz);
                 } else {

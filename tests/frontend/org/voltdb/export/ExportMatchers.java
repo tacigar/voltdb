@@ -123,7 +123,7 @@ public class ExportMatchers {
             int pSignatureLen = buf.getInt();
             byte [] pSignatureBytes = new byte[pSignatureLen];
             buf.get(pSignatureBytes);
-            signature = new String( pSignatureBytes, Constants.UTF8ENCODING);
+            signature = new String( pSignatureBytes, Constants.UTF8_ENCODING);
 
             seqNo = buf.getLong();
         }
@@ -150,7 +150,7 @@ public class ExportMatchers {
         }
 
         VoltMessage asVoltMessage() {
-            byte [] signatureBytes = signature.getBytes(Constants.UTF8ENCODING);
+            byte [] signatureBytes = signature.getBytes(Constants.UTF8_ENCODING);
             ByteBuffer buf = ByteBuffer.allocate(17 + signatureBytes.length);
             buf.put((byte)ExportManager.RELEASE_BUFFER);
             buf.putInt(partitionId);

@@ -226,7 +226,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
 
         // update deployment, no TUPLE_COUNT_EXPORT connector
         String deploymentURL = Configuration.getPathToCatalogForTest("stats_no_connector.xml");
-        String depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8ENCODING);
+        String depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8_ENCODING);
         client.callProcedure("@UpdateApplicationCatalog", null, depBytes);
         stats = client.callProcedure("@Statistics", "export", 0).getResults()[0];
         while (stats.advanceRow()) {
@@ -237,7 +237,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
 
         // add connector back
         deploymentURL = Configuration.getPathToCatalogForTest("stats_full.xml");
-        depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8ENCODING);
+        depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8_ENCODING);
         client.callProcedure("@UpdateApplicationCatalog", null, depBytes);
         stats = client.callProcedure("@Statistics", "export", 0).getResults()[0];
         while (stats.advanceRow()) {

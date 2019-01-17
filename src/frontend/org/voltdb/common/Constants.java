@@ -20,9 +20,8 @@ package org.voltdb.common;
 import java.io.File;
 import java.nio.charset.Charset;
 
-public class Constants
-{
-    public static final Charset UTF8ENCODING = Charset.forName("UTF-8");
+public class Constants {
+    public static final Charset UTF8_ENCODING = Charset.forName("UTF-8");
     public static final Charset US_ASCII_ENCODING = Charset.forName("US-ASCII");
 
     // ODBC Datetime Format

@@ -277,7 +277,7 @@ public abstract class CatalogUtil {
     public static String getSerializedCatalogStringFromJar(InMemoryJarfile jarfile)
     {
         byte[] serializedCatalogBytes = jarfile.get(CatalogUtil.CATALOG_FILENAME);
-        String serializedCatalog = new String(serializedCatalogBytes, Constants.UTF8ENCODING);
+        String serializedCatalog = new String(serializedCatalogBytes, Constants.UTF8_ENCODING);
         return serializedCatalog;
     }
 
@@ -300,7 +300,7 @@ public abstract class CatalogUtil {
 
         // Convert the bytes to a string and split by lines.
         String buildInfo;
-        buildInfo = new String(buildInfoBytes, Constants.UTF8ENCODING);
+        buildInfo = new String(buildInfoBytes, Constants.UTF8_ENCODING);
         String[] buildInfoLines = buildInfo.split("\n");
 
         // Sanity check the number of lines and the version string.
@@ -928,7 +928,7 @@ public abstract class CatalogUtil {
      */
     public static DeploymentType parseDeploymentFromString(String deploymentString) {
         ByteArrayInputStream byteIS;
-        byteIS = new ByteArrayInputStream(deploymentString.getBytes(Constants.UTF8ENCODING));
+        byteIS = new ByteArrayInputStream(deploymentString.getBytes(Constants.UTF8_ENCODING));
         // get deployment info from xml file
         return getDeployment(byteIS);
     }
@@ -3108,7 +3108,7 @@ public abstract class CatalogUtil {
             // compute hash for determinism check
             String sqlText = stmt.getSqltext();
             crc.reset();
-            crc.update(sqlText.getBytes(Constants.UTF8ENCODING));
+            crc.update(sqlText.getBytes(Constants.UTF8_ENCODING));
             int hash = (int) crc.getValue();
             sb.append("Statement Hash: ").append(hash);
             sb.append(", Statement SQL: ").append(sqlText);
@@ -3132,7 +3132,7 @@ public abstract class CatalogUtil {
         sb.append("Procedure:" + proc.getTypeName()).append("\n");
         String sqlText = DefaultProcedureManager.sqlForDefaultProc(proc);
         crc.reset();
-        crc.update(sqlText.getBytes(Constants.UTF8ENCODING));
+        crc.update(sqlText.getBytes(Constants.UTF8_ENCODING));
         int hash = (int) crc.getValue();
         sb.append("Statement Hash: ").append(hash);
         sb.append(", Statement SQL: ").append(sqlText);

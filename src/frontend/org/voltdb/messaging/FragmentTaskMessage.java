@@ -65,7 +65,7 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
             e.printStackTrace();
             System.exit(-1); // this means the jvm is broke
         }
-        md.update("".getBytes(Constants.UTF8ENCODING));
+        md.update("".getBytes(Constants.UTF8_ENCODING));
         EMPTY_HASH = md.digest();
     }
 
@@ -609,7 +609,7 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
         assert(index >= 0 && index < m_items.size());
         FragmentData item = m_items.get(index);
         assert(item != null);
-        return new String(item.m_stmtText, Constants.UTF8ENCODING);
+        return new String(item.m_stmtText, Constants.UTF8_ENCODING);
     }
 
     /*

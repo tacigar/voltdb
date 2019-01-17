@@ -554,7 +554,7 @@ public final class ClientImpl implements Client {
             params[0] = null;
         }
         if (deploymentPath != null) {
-            params[1] = new String(ClientUtils.fileToBytes(deploymentPath), Constants.UTF8ENCODING);
+            params[1] = new String(ClientUtils.fileToBytes(deploymentPath), Constants.UTF8_ENCODING);
         }
         else {
             params[1] = null;

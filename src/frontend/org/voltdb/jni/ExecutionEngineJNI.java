@@ -807,7 +807,7 @@ public class ExecutionEngineJNI extends ExecutionEngine {
                     }
                     break;
                 case STRING:
-                    sizeRequired += ((String)returnValue).getBytes(Constants.UTF8ENCODING).length;
+                    sizeRequired += ((String)returnValue).getBytes(Constants.UTF8_ENCODING).length;
                     break;
                 case GEOGRAPHY:
                     sizeRequired += ((GeographyValue)returnValue).getLengthInBytes();
@@ -835,7 +835,7 @@ public class ExecutionEngineJNI extends ExecutionEngine {
         // Getting here means the execution was not successful.
         try {
             assert(throwable != null);
-            byte[] errorMsg = throwable.toString().getBytes(Constants.UTF8ENCODING);
+            byte[] errorMsg = throwable.toString().getBytes(Constants.UTF8_ENCODING);
             // It is very unlikely that the size of a user's error message will exceed the UDF buffer size.
             // But you never know.
             if (errorMsg.length + 4 > m_udfBuffer.capacity()) {

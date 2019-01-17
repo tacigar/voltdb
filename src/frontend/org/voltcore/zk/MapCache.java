@@ -119,10 +119,10 @@ public class MapCache implements MapCacheReader, MapCacheWriter {
     @Override
     public void put(String key, JSONObject value) throws KeeperException, InterruptedException {
         try {
-            m_zk.create(ZKUtil.joinZKPath(m_rootNode, key), value.toString().getBytes(Constants.UTF8ENCODING),
+            m_zk.create(ZKUtil.joinZKPath(m_rootNode, key), value.toString().getBytes(Constants.UTF8_ENCODING),
                     Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
         } catch (KeeperException.NodeExistsException e) {
-            m_zk.setData(ZKUtil.joinZKPath(m_rootNode, key), value.toString().getBytes(Constants.UTF8ENCODING), -1);
+            m_zk.setData(ZKUtil.joinZKPath(m_rootNode, key), value.toString().getBytes(Constants.UTF8_ENCODING), -1);
         }
     }
 

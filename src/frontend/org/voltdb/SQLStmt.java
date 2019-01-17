@@ -93,7 +93,7 @@ public class SQLStmt {
      * @param joinOrder separated list of tables used by the query specifying the order they should be joined in
      */
     public SQLStmt(String sqlText, String joinOrder) {
-        this(canonicalizeStmt(sqlText).getBytes(Constants.UTF8ENCODING), joinOrder);
+        this(canonicalizeStmt(sqlText).getBytes(Constants.UTF8_ENCODING), joinOrder);
     }
 
     /**
@@ -200,7 +200,7 @@ public class SQLStmt {
      */
     public String getText() {
         if (sqlTextStr == null) {
-            sqlTextStr = new String(sqlText, Constants.UTF8ENCODING);
+            sqlTextStr = new String(sqlText, Constants.UTF8_ENCODING);
         }
         return sqlTextStr;
     }

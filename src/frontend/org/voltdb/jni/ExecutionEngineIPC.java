@@ -364,7 +364,7 @@ public class ExecutionEngineIPC extends ExecutionEngine {
                 if (throwable != null) {
                     // Exception thrown, put return code = -1.
                     m_data.putInt(-1);
-                    byte[] errorMsg = throwable.toString().getBytes(Constants.UTF8ENCODING);
+                    byte[] errorMsg = throwable.toString().getBytes(Constants.UTF8_ENCODING);
                     SerializationHelper.writeVarbinary(errorMsg, m_data);
                 }
                 m_data.flip();
@@ -756,7 +756,7 @@ public class ExecutionEngineIPC extends ExecutionEngine {
             }
             stringBytes.flip();
 
-            final String retval = new String(stringBytes.array(), Constants.UTF8ENCODING);
+            final String retval = new String(stringBytes.array(), Constants.UTF8_ENCODING);
             return retval;
         }
 

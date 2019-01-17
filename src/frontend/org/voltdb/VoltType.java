@@ -1152,7 +1152,7 @@ public enum VoltType {
             return (byte[]) obj;
         }
         if (obj instanceof String ) {
-            return ((String) obj).getBytes(Constants.UTF8ENCODING);
+            return ((String) obj).getBytes(Constants.UTF8_ENCODING);
         }
 
         long value = 0;
@@ -1192,7 +1192,7 @@ public enum VoltType {
         case BIGINT:
             return buf.getLong();
         case STRING:
-            return new String(value, Constants.UTF8ENCODING);
+            return new String(value, Constants.UTF8_ENCODING);
         case INTEGER:
             return buf.getInt();
         case SMALLINT:

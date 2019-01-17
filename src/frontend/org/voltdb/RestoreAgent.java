@@ -942,7 +942,7 @@ SnapshotCompletionInterest, Promotable
         String jsonData = toRestore != null ? toRestore.toJSONObject().toString() : "{}";
         LOG.debug("Sending snapshot ID " + txnId + " for restore to other nodes");
         try {
-            m_zk.create(VoltZK.restore_snapshot_id, jsonData.getBytes(Constants.UTF8ENCODING),
+            m_zk.create(VoltZK.restore_snapshot_id, jsonData.getBytes(Constants.UTF8_ENCODING),
                         Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         } catch (Exception e) {
             VoltDB.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
@@ -961,7 +961,7 @@ SnapshotCompletionInterest, Promotable
         try {
             byte[] data = m_zk.getData(VoltZK.restore_snapshot_id, false, null);
 
-            String jsonData = new String(data, Constants.UTF8ENCODING);
+            String jsonData = new String(data, Constants.UTF8_ENCODING);
             if (!jsonData.equals("{}")) {
                 m_hasRestored = true;
                 JSONObject jo = new JSONObject(jsonData);

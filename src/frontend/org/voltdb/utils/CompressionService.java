@@ -391,7 +391,7 @@ public final class CompressionService {
     }
 
     public static String compressAndBase64Encode(String string) {
-        byte[] inBytes = string.getBytes(Constants.UTF8ENCODING);
+        byte[] inBytes = string.getBytes(Constants.UTF8_ENCODING);
         return compressAndBase64Encode(inBytes);
     }
 
@@ -410,7 +410,7 @@ public final class CompressionService {
             return "";
         }
         byte bytes[] = decodeBase64AndDecompressToBytes(string);
-        return new String(bytes, Constants.UTF8ENCODING);
+        return new String(bytes, Constants.UTF8_ENCODING);
     }
 
     public static byte[] decodeBase64AndDecompressToBytes(String string) {

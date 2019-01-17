@@ -624,7 +624,7 @@ public class VoltCompiler {
         buildinfo.append(System.getProperty("user.dir")).append('\n');
         buildinfo.append(Long.toString(System.currentTimeMillis())).append('\n');
 
-        byte buildinfoBytes[] = buildinfo.toString().getBytes(Constants.UTF8ENCODING);
+        byte buildinfoBytes[] = buildinfo.toString().getBytes(Constants.UTF8_ENCODING);
         jarOutput.put(CatalogUtil.CATALOG_BUILDINFO_FILENAME, buildinfoBytes);
     }
 
@@ -763,7 +763,7 @@ public class VoltCompiler {
         String report = ReportMaker.report(catalog, minHeapRqt, isPro, hostcount, sitesPerHost, kfactor,
                 warnings, ddl);
         // put the compiler report into the jarfile
-        jarOutput.put(CATLOG_REPORT, report.getBytes(Constants.UTF8ENCODING));
+        jarOutput.put(CATLOG_REPORT, report.getBytes(Constants.UTF8_ENCODING));
     }
 
     /**
@@ -822,7 +822,7 @@ public class VoltCompiler {
             return null;
         }
 
-        jarOutput.put(AUTOGEN_DDL_FILE_NAME, m_canonicalDDL.getBytes(Constants.UTF8ENCODING));
+        jarOutput.put(AUTOGEN_DDL_FILE_NAME, m_canonicalDDL.getBytes(Constants.UTF8_ENCODING));
         if (DEBUG_VERIFY_CATALOG) {
             debugVerifyCatalog(jarOutput, catalog);
         }
@@ -830,7 +830,7 @@ public class VoltCompiler {
         // WRITE CATALOG TO JAR HERE
         final String catalogCommands = catalog.serialize();
 
-        byte[] catalogBytes = catalogCommands.getBytes(Constants.UTF8ENCODING);
+        byte[] catalogBytes = catalogCommands.getBytes(Constants.UTF8_ENCODING);
 
         try {
             // Don't update buildinfo if it's already present, e.g. while upgrading.
@@ -868,7 +868,7 @@ public class VoltCompiler {
                 s += "COST: " + Integer.toString(stmt.getCost()) + "\n";
                 s += "PLAN:\n\n";
                 s += Encoder.hexDecodeToString(stmt.getExplainplan()) + "\n";
-                byte[] b = s.getBytes(Constants.UTF8ENCODING);
+                byte[] b = s.getBytes(Constants.UTF8_ENCODING);
                 retval.put(proc.getTypeName() + "_" + stmt.getTypeName() + ".txt", b);
             }
         }
@@ -1867,7 +1867,7 @@ public class VoltCompiler {
     public void compileInMemoryJarfileWithNewDDL(InMemoryJarfile jarfile, String newDDL, Catalog oldCatalog) throws IOException, VoltCompilerException
     {
         String oldDDL = new String(jarfile.get(VoltCompiler.AUTOGEN_DDL_FILE_NAME),
-                Constants.UTF8ENCODING);
+                Constants.UTF8_ENCODING);
         compilerLog.trace("OLD DDL: " + oldDDL);
 
         VoltCompilerStringReader canonicalDDLReader = null;
@@ -1945,7 +1945,7 @@ public class VoltCompiler {
 
         // Get DDL from InMemoryJar
         byte[] ddlBytes = jarOutput.get(AUTOGEN_DDL_FILE_NAME);
-        String canonicalDDL = new String(ddlBytes, Constants.UTF8ENCODING);
+        String canonicalDDL = new String(ddlBytes, Constants.UTF8_ENCODING);
 
         try {
             CatalogMap<Procedure> procedures = db.getProcedures();
@@ -2042,7 +2042,7 @@ public class VoltCompiler {
         // WRITE CATALOG TO JAR HERE
         final String catalogCommands = catalog.serialize();
 
-        byte[] catalogBytes = catalogCommands.getBytes(Constants.UTF8ENCODING);
+        byte[] catalogBytes = catalogCommands.getBytes(Constants.UTF8_ENCODING);
 
         // Don't update buildinfo if it's already present, e.g. while upgrading.
         // Note when upgrading the version has already been updated by the caller.

@@ -232,7 +232,7 @@ public class TestMemoryResourceMonitor extends TestCase
 
         // update server with rss limit
         String newDepFile = getDeploymentPathWithRss("1");
-        String depBytes = new String(ClientUtils.fileToBytes(new File(newDepFile)), Constants.UTF8ENCODING);
+        String depBytes = new String(ClientUtils.fileToBytes(new File(newDepFile)), Constants.UTF8_ENCODING);
         VoltTable[] results = m_client.callProcedure("@UpdateApplicationCatalog", null, depBytes).getResults();
         assertTrue(results.length == 1);
         Thread.sleep(5000); // wait to make sure new deployment file takes effect
@@ -250,7 +250,7 @@ public class TestMemoryResourceMonitor extends TestCase
 
         // update server with rss limit
         String newDepFile = getDeploymentPathWithRss("0");
-        String depBytes = new String(ClientUtils.fileToBytes(new File(newDepFile)), Constants.UTF8ENCODING);
+        String depBytes = new String(ClientUtils.fileToBytes(new File(newDepFile)), Constants.UTF8_ENCODING);
         VoltTable[] results = m_client.callProcedure("@UpdateApplicationCatalog", null, depBytes).getResults();
         assertTrue(results.length == 1);
         Thread.sleep(5000); // wait to make sure new deployment file takes effect
