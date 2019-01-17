@@ -241,7 +241,7 @@ public class Poisoner {
 
     public static String crashMessage;
 
-    public static boolean verboseCrash = false;
+    public static boolean verboseCrash = true;
     /**
      * Exit the process with an error message, optionally with a stack trace.
      * Also notify all connected peers that the node is going down.
