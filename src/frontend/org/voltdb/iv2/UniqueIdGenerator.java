@@ -23,6 +23,7 @@ import org.voltcore.TransactionIdManager;
 import org.voltcore.logging.Level;
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.VoltDB;
+import org.voltdb.common.Constants;
 
 /**
  * <p>The UniqueIdGenerator creates unique ids that
@@ -84,7 +85,7 @@ public class UniqueIdGenerator {
      */
     private long m_backwardsTimeAdjustmentOffset = 0;
 
-    private final long BACKWARD_TIME_FORGIVENESS_WINDOW_MS = VoltDB.BACKWARD_TIME_FORGIVENESS_WINDOW_MS;
+    private final long BACKWARD_TIME_FORGIVENESS_WINDOW_MS = Constants.BACKWARD_TIME_FORGIVENESS_WINDOW_MS;
 
     static private VoltLogger log = new VoltLogger("HOST");
 
@@ -163,8 +164,9 @@ public class UniqueIdGenerator {
             // for this particular millisecond (feels unlikely)
             if (counterValue > COUNTER_MAX_VALUE) {
                 // spin until the next millisecond
-                while (currentTime == lastUsedTime)
+                while (currentTime == lastUsedTime) {
                     currentTime = m_clock.get();
+                }
                 // reset the counter and lastUsedTime for the new millisecond
                 lastUsedTime = currentTime;
                 counterValue = 0;
@@ -340,8 +342,11 @@ public class UniqueIdGenerator {
         String retval = "";
         long mask = 0x8000000000000000L;
         for(int i = 0; i < 64; i++) {
-            if ((uniqueId & mask) == 0) retval += "0";
-            else retval += "1";
+            if ((uniqueId & mask) == 0) {
+                retval += "0";
+            } else {
+                retval += "1";
+            }
             mask >>>= 1;
         }
         return retval;

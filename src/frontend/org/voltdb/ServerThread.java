@@ -20,7 +20,7 @@ package org.voltdb;
 import java.io.File;
 import java.net.URL;
 
-import org.voltcore.common.Constants;
+import org.voltdb.common.Constants;
 import org.voltcore.utils.InstanceId;
 import org.voltdb.probe.MeshProber;
 import org.voltdb.utils.MiscUtils;
@@ -43,7 +43,7 @@ public class ServerThread extends Thread {
             m_config.m_coordinators = MeshProber.hosts(m_config.m_internalPort);
         }
         if (m_config.m_startAction != StartAction.PROBE) {
-            m_config.m_hostCount = VoltDB.UNDEFINED;
+            m_config.m_hostCount = Constants.UNDEFINED;
         }
 
         if (!m_config.validate()) {

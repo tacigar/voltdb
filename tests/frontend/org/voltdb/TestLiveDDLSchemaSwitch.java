@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcCallException;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.InMemoryJarfile;
@@ -149,7 +150,7 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
     void verifyDeploymentOnlyUAC() throws Exception
     {
         int timeout = getHeartbeatTimeout();
-        assertEquals(org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
+        assertEquals(Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
         ClientResponse results =
             m_client.updateApplicationCatalog(null, new File(m_pathToOtherDeployment));
         assertEquals(ClientResponse.SUCCESS, results.getStatus());

@@ -76,18 +76,6 @@ import io.netty.handler.ssl.SslContext;
  */
 public class VoltDB {
 
-    /** Global constants */
-    public static final int DISABLED_PORT = Constants.UNDEFINED;
-    public static final int UNDEFINED = Constants.UNDEFINED;
-    public static final int DEFAULT_PORT = 21212;
-    public static final int DEFAULT_ADMIN_PORT = 21211;
-    public static final int DEFAULT_IPC_PORT = 10000;
-    public static final String DEFAULT_EXTERNAL_INTERFACE = "";
-    public static final int DEFAULT_DR_PORT = 5555;
-    public static final int DEFAULT_HTTP_PORT = 8080;
-    public static final int DEFAULT_HTTPS_PORT = 8443;
-    public static final int BACKWARD_TIME_FORGIVENESS_WINDOW_MS = 3000;
-
     // Staged filenames for advanced deployments
     public static final String INITIALIZED_MARKER = ".initialized";
     public static final String TERMINUS_MARKER = ".shutdown_snapshot";
@@ -124,7 +112,7 @@ public class VoltDB {
     public static class Configuration {
         private boolean m_validateSuccess;
 
-        public int m_ipcPort = DEFAULT_IPC_PORT;
+        public int m_ipcPort = Constants.DEFAULT_IPC_PORT;
 
         protected static final VoltLogger hostLog = new VoltLogger("HOST");
 
@@ -151,14 +139,14 @@ public class VoltDB {
          */
         public boolean m_noLoadLibVOLTDB = false;
 
-        public String m_zkInterface = "127.0.0.1:" + org.voltcore.common.Constants.DEFAULT_ZK_PORT;
+        public String m_zkInterface = "127.0.0.1:" + Constants.DEFAULT_ZK_PORT;
 
         /** port number for the first client interface for each server */
-        public int m_port = DEFAULT_PORT;
+        public int m_port = Constants.DEFAULT_PORT;
         public String m_clientInterface = "";
 
         /** override for the admin port number in the deployment file */
-        public int m_adminPort = DISABLED_PORT;
+        public int m_adminPort = Constants.DISABLED_PORT;
         public String m_adminInterface = "";
 
         /** ssl context factory */
@@ -179,21 +167,21 @@ public class VoltDB {
         public boolean m_sslInternal = Boolean.valueOf(System.getenv("ENABLE_INTERNAL_SSL") == null ? Boolean.toString(Boolean.getBoolean("ENABLE_INTERNAL_SSL")) : System.getenv("ENABLE_INTERNAL_SSL"));
 
         /** port number to use to build intra-cluster mesh */
-        public int m_internalPort = org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT;
+        public int m_internalPort = Constants.DEFAULT_INTERNAL_PORT;
 
         /** interface to listen to clients on (default: any) */
-        public String m_externalInterface = DEFAULT_EXTERNAL_INTERFACE;
+        public String m_externalInterface = Constants.DEFAULT_EXTERNAL_INTERFACE;
 
         /** interface to use for backchannel comm (default: any) */
-        public String m_internalInterface = org.voltcore.common.Constants.DEFAULT_INTERNAL_INTERFACE;
+        public String m_internalInterface = Constants.DEFAULT_INTERNAL_INTERFACE;
 
         /** port number to use for DR channel (override in the deployment file) */
-        public int m_drAgentPortStart = DISABLED_PORT;
+        public int m_drAgentPortStart = Constants.DISABLED_PORT;
         public String m_drInterface = "";
 
         /** interface and port used for consumers to connect to DR on this cluster. Used in hosted env primarily **/
         public String m_drPublicHost;
-        public int m_drPublicPort = DISABLED_PORT;
+        public int m_drPublicPort = Constants.DISABLED_PORT;
 
         /** HTTP port can't be set here, but eventually value will be reflected here */
         public int m_httpPort = Constants.HTTP_PORT_DISABLED;
@@ -205,7 +193,7 @@ public class VoltDB {
         public final boolean m_isEnterprise = org.voltdb.utils.MiscUtils.isPro();
 
         public int m_deadHostTimeoutMS =
-            org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS * 1000;
+            Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS * 1000;
 
         public boolean m_partitionDetectionEnabled = true;
 
@@ -310,13 +298,13 @@ public class VoltDB {
         public NavigableSet<String> m_coordinators = ImmutableSortedSet.of();
 
         /** number of hosts that participate in a VoltDB cluster */
-        public int m_hostCount = UNDEFINED;
+        public int m_hostCount = Constants.UNDEFINED;
 
         /** number of hosts that will be missing when the cluster is started up */
         public int m_missingHostCount = 0;
 
         /** not sites per host actually, number of local sites in this node */
-        public int m_sitesperhost = UNDEFINED;
+        public int m_sitesperhost = Constants.UNDEFINED;
 
         /** allow elastic joins */
         public boolean m_enableAdd = false;
@@ -331,7 +319,7 @@ public class VoltDB {
         public File m_stagedClassesPath = null;
 
         public int getZKPort() {
-            return MiscUtils.getPortFromHostnameColonPort(m_zkInterface, org.voltcore.common.Constants.DEFAULT_ZK_PORT);
+            return MiscUtils.getPortFromHostnameColonPort(m_zkInterface, Constants.DEFAULT_ZK_PORT);
         }
 
         public Configuration(PortGenerator ports) {
@@ -408,7 +396,7 @@ public class VoltDB {
                 } else if (arg.equals("adminport")) {
                     String portStr = args[++i];
                     if (portStr.indexOf(':') != -1) {
-                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, VoltDB.DEFAULT_ADMIN_PORT);
+                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, Constants.DEFAULT_ADMIN_PORT);
                         m_adminInterface = hap.getHost();
                         m_adminPort = hap.getPort();
                     } else {
@@ -426,7 +414,7 @@ public class VoltDB {
                 } else if (arg.equals("drpublic")) {
                     String publicStr = args[++i];
                     if (publicStr.indexOf(':') != -1) {
-                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(publicStr, VoltDB.DEFAULT_DR_PORT);
+                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(publicStr, Constants.DEFAULT_DR_PORT);
                         m_drPublicHost = hap.getHost();
                         m_drPublicPort = hap.getPort();
                     } else {
@@ -435,7 +423,7 @@ public class VoltDB {
                 } else if (arg.equals("replicationport")) {
                     String portStr = args[++i];
                     if (portStr.indexOf(':') != -1) {
-                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, VoltDB.DEFAULT_DR_PORT);
+                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, Constants.DEFAULT_DR_PORT);
                         m_drInterface = hap.getHost();
                         m_drAgentPortStart = hap.getPort();
                     } else {
@@ -444,7 +432,7 @@ public class VoltDB {
                 } else if (arg.equals("httpport")) {
                     String portStr = args[++i];
                     if (portStr.indexOf(':') != -1) {
-                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, VoltDB.DEFAULT_HTTP_PORT);
+                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, Constants.DEFAULT_HTTP_PORT);
                         m_httpPortInterface = hap.getHost();
                         m_httpPort = hap.getPort();
                     } else {
@@ -454,7 +442,7 @@ public class VoltDB {
                     //zkport should be default to loopback but for openshift needs to be specified as loopback is unavalable.
                     String portStr = args[++i];
                     if (portStr.indexOf(':') != -1) {
-                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, org.voltcore.common.Constants.DEFAULT_ZK_PORT);
+                        HostAndPort hap = MiscUtils.getHostAndPortFromHostnameColonPort(portStr, Constants.DEFAULT_ZK_PORT);
                         m_zkInterface = hap.getHost() + ":" + hap.getPort();
                     } else {
                         m_zkInterface = "127.0.0.1:" + portStr.trim();
@@ -783,7 +771,7 @@ public class VoltDB {
                     m_leader = m_coordinators.first();
                 }
             }
-            if (m_startAction == StartAction.PROBE && m_hostCount == UNDEFINED && m_coordinators.size() > 1) {
+            if (m_startAction == StartAction.PROBE && m_hostCount == Constants.UNDEFINED && m_coordinators.size() > 1) {
                 m_hostCount = m_coordinators.size();
             }
         }
@@ -1012,13 +1000,13 @@ public class VoltDB {
                 generateFatalLog("List of hosts is missing");
             }
 
-            if (m_startAction != StartAction.PROBE && m_hostCount != UNDEFINED) {
+            if (m_startAction != StartAction.PROBE && m_hostCount != Constants.UNDEFINED) {
                 generateFatalLog("Option \"--count\" may only be specified when using start");
             }
-            if (m_startAction == StartAction.PROBE && m_hostCount != UNDEFINED && m_hostCount < m_coordinators.size()) {
+            if (m_startAction == StartAction.PROBE && m_hostCount != Constants.UNDEFINED && m_hostCount < m_coordinators.size()) {
                 generateFatalLog("List of hosts is greater than option \"--count\"");
             }
-            if (m_startAction == StartAction.PROBE && m_hostCount != UNDEFINED && m_hostCount < 0) {
+            if (m_startAction == StartAction.PROBE && m_hostCount != Constants.UNDEFINED && m_hostCount < 0) {
                 generateFatalLog("\"--count\" may not be specified with negative values");
             }
             if (m_startAction == StartAction.JOIN && !m_enableAdd) {

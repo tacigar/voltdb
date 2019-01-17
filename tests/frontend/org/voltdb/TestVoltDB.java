@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.catalog.Catalog;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder.RoleInfo;
 import org.voltdb.compiler.VoltProjectBuilder.UserInfo;
 import org.voltdb.utils.BuildDirectoryUtils;
@@ -67,7 +68,7 @@ final public class TestVoltDB {
         assertEquals(BackendTarget.NATIVE_EE_JNI, blankConfig.m_backend);
         assertEquals(null, blankConfig.m_pathToCatalog);
         assertEquals(null, blankConfig.m_pathToDeployment);
-        assertEquals(VoltDB.DEFAULT_PORT, blankConfig.m_port);
+        assertEquals(Constants.DEFAULT_PORT, blankConfig.m_port);
 
         String args1[] = { "create", "noloadlib" };
         assertTrue(new VoltDB.Configuration(args1).m_noLoadLibVOLTDB);

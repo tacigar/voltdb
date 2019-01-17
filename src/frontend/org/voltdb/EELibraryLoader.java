@@ -17,8 +17,6 @@
 
 package org.voltdb;
 
-import static org.voltcore.common.Constants.VOLT_TMP_DIR;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +24,7 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import org.voltcore.logging.VoltLogger;
+import org.voltdb.common.Constants;
 
 public class EELibraryLoader {
 
@@ -130,7 +129,7 @@ public class EELibraryLoader {
             }
         }
 
-        File tmpFilePath = new File(System.getProperty(VOLT_TMP_DIR, System.getProperty("java.io.tmpdir")));
+        File tmpFilePath = new File(System.getProperty(Constants.VOLT_TMP_DIR, System.getProperty("java.io.tmpdir")));
         if (hostLog.isDebugEnabled()) {
             hostLog.debug("Temp directory to which shared libs are extracted is: " + tmpFilePath.getAbsolutePath());
         }

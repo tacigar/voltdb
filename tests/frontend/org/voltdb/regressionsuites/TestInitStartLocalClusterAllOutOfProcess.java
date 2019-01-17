@@ -47,6 +47,7 @@ import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.NoConnectionsException;
 import org.voltdb.client.ProcCallException;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.deploymentfile.DeploymentType;
@@ -126,7 +127,7 @@ public class TestInitStartLocalClusterAllOutOfProcess extends JUnit4LocalCluster
             }
         }
         assertTrue(found);
-        assertEquals(org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
+        assertEquals(Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
 
         if (!cluster.isNewCli()) {
             // get command is not supported in legacy cli as voltdbroot
@@ -144,7 +145,9 @@ public class TestInitStartLocalClusterAllOutOfProcess extends JUnit4LocalCluster
     // Test get deployment
     public void testGetDeployment() throws Exception {
         File deployment = File.createTempFile("get_deployment", ".xm");
-        if (deployment.exists()) deployment.delete();
+        if (deployment.exists()) {
+            deployment.delete();
+        }
 
         Configuration config = new VoltDB.Configuration(new String[]{"get", "deployment",
             "getvoltdbroot", voltDBRootParentPath,

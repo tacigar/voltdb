@@ -56,6 +56,7 @@ import org.voltdb.catalog.Column;
 import org.voltdb.catalog.Database;
 import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.deploymentfile.DeploymentType;
 import org.voltdb.compiler.deploymentfile.PathsType;
 import org.voltdb.dtxn.SiteTracker;
@@ -101,7 +102,7 @@ public class MockVoltDB implements VoltDBInterface
     private int m_kfactor;
 
     public MockVoltDB() {
-        this(VoltDB.DEFAULT_PORT, VoltDB.DEFAULT_ADMIN_PORT, -1, VoltDB.DEFAULT_DR_PORT);
+        this(Constants.DEFAULT_PORT, Constants.DEFAULT_ADMIN_PORT, -1, Constants.DEFAULT_DR_PORT);
     }
 
     /*
@@ -124,7 +125,7 @@ public class MockVoltDB implements VoltDBInterface
             obj.put("drPort", drPort);
             obj.put("drInterface", "127.0.0.1");
             obj.put(VoltZK.drPublicHostProp, "");
-            obj.put(VoltZK.drPublicPortProp, Integer.toString(VoltDB.DISABLED_PORT));
+            obj.put(VoltZK.drPublicPortProp, Integer.toString(Constants.DISABLED_PORT));
 
             m_localMetadata = obj.toString(4);
 

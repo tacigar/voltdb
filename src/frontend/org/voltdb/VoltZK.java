@@ -39,6 +39,7 @@ import org.voltcore.utils.Pair;
 import org.voltcore.zk.CoreZK;
 import org.voltcore.zk.ZKUtil;
 import org.voltcore.zk.ZooKeeperLock;
+import org.voltdb.common.Constants;
 import org.voltdb.iv2.LeaderCache;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
 import org.voltdb.iv2.MigratePartitionLeaderInfo;
@@ -242,10 +243,10 @@ public class VoltZK {
      */
     public static void createPersistentZKNodes(ZooKeeper zk) {
         LinkedList<ZKUtil.StringCallback> callbacks = new LinkedList<ZKUtil.StringCallback>();
-        for (int i=0; i < VoltZK.ZK_HIERARCHY.length; i++) {
+        for (String element : VoltZK.ZK_HIERARCHY) {
             ZKUtil.StringCallback cb = new ZKUtil.StringCallback();
             callbacks.add(cb);
-            zk.create(VoltZK.ZK_HIERARCHY[i], null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT, cb, null);
+            zk.create(element, null, Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT, cb, null);
         }
         for (ZKUtil.StringCallback cb : callbacks) {
             try {
@@ -338,7 +339,7 @@ public class VoltZK {
             assert(hostName.length() > 0);
 
             int port = obj.getInt(drPublicPortProp);
-            if (port == VoltDB.DISABLED_PORT) {
+            if (port == Constants.DISABLED_PORT) {
                 port = obj.getInt("drPort");
             }
 

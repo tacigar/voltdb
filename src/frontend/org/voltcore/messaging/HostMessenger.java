@@ -62,7 +62,7 @@ import org.json_voltpatches.JSONObject;
 import org.json_voltpatches.JSONStringer;
 import org.voltcore.agreement.AgreementSite;
 import org.voltcore.agreement.InterfaceToMessenger;
-import org.voltcore.common.Constants;
+import org.voltdb.common.Constants;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.network.CipherExecutor;
 import org.voltcore.network.PicoNetwork;
@@ -168,7 +168,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
 
         //Only used by tests.
         public Config(boolean paused) {
-            this(null, org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT, paused);
+            this(null, Constants.DEFAULT_INTERNAL_PORT, paused);
             acceptor = org.voltdb.probe.MeshProber.builder()
                     .coordinators(":" + internalPort)
                     .build();
@@ -189,7 +189,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
             String [] coordinators = new String[hostCount];
 
             for (int i = 0; i < hostCount; ++i) {
-                Config cnf = new Config(null, org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT, false);
+                Config cnf = new Config(null, Constants.DEFAULT_INTERNAL_PORT, false);
                 cnf.zkInterface = "127.0.0.1:" + ports.next();
                 cnf.internalPort = ports.next();
                 coordinators[i] = ":" + cnf.internalPort;
@@ -212,7 +212,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
 
         public int getZKPort() {
             return HostAndPort.fromString(zkInterface)
-                    .getPortOrDefault(org.voltcore.common.Constants.DEFAULT_ZK_PORT);
+                    .getPortOrDefault(Constants.DEFAULT_ZK_PORT);
         }
 
         private void initNetworkThreads() {

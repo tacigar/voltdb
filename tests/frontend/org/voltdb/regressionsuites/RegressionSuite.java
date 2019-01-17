@@ -494,7 +494,7 @@ public class RegressionSuite extends TestCase {
      * @return port number
      */
     public int port(int hostId) {
-        return isLocalCluster() ? ((LocalCluster)m_config).port(hostId) : VoltDB.DEFAULT_PORT+hostId;
+        return isLocalCluster() ? ((LocalCluster)m_config).port(hostId) : Constants.DEFAULT_PORT +hostId;
     }
 
     /**
@@ -503,7 +503,7 @@ public class RegressionSuite extends TestCase {
      * @return admin port number
      */
     public int adminPort(int hostId) {
-        return isLocalCluster() ? ((LocalCluster)m_config).adminPort(hostId) : VoltDB.DEFAULT_ADMIN_PORT+hostId;
+        return isLocalCluster() ? ((LocalCluster)m_config).adminPort(hostId) : Constants.DEFAULT_ADMIN_PORT+hostId;
     }
 
     /**
@@ -512,7 +512,7 @@ public class RegressionSuite extends TestCase {
      * @return internal port number
      */
     public int internalPort(int hostId) {
-        return isLocalCluster() ? ((LocalCluster)m_config).internalPort(hostId) : org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT+hostId;
+        return isLocalCluster() ? ((LocalCluster)m_config).internalPort(hostId) : Constants.DEFAULT_INTERNAL_PORT + hostId;
     }
 
     static protected void validateDMLTupleCount(Client c, String sql, long modifiedTupleCount)

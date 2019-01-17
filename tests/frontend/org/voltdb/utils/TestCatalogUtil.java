@@ -46,6 +46,7 @@ import org.voltdb.catalog.Systemsettings;
 import org.voltdb.catalog.Table;
 import org.voltdb.catalog.TestCatalogDiffs;
 import org.voltdb.catalog.User;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.deploymentfile.DeploymentType;
@@ -178,7 +179,7 @@ public class TestCatalogUtil extends TestCase {
         Cluster cluster = catalog.getClusters().add("cluster");
         cluster.getDatabases().add("database");
         msg = CatalogUtil.compileDeployment(catalog, tmpDef.getPath(), false);
-        assertEquals(org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS,
+        assertEquals(Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS,
                 catalog.getClusters().get("cluster").getHeartbeattimeout());
 
         // This returns -1 on schema violation

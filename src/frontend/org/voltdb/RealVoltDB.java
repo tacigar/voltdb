@@ -988,7 +988,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
                 return;
             }
 
-            if (config.m_hostCount == VoltDB.UNDEFINED) {
+            if (config.m_hostCount == Constants.UNDEFINED) {
                 config.m_hostCount = readDepl.deployment.getCluster().getHostcount();
             }
 
@@ -2734,7 +2734,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
                 return new ReadDeploymentResults(deploymentBytes, deployment);
             }
             // Override local sites count if possible
-            if (config.m_sitesperhost == VoltDB.UNDEFINED) {
+            if (config.m_sitesperhost == Constants.UNDEFINED) {
                 config.m_sitesperhost = deployment.getCluster().getSitesperhost();
             } else {
                 hostLog.info("Set the local sites count to " + config.m_sitesperhost);
@@ -2786,7 +2786,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
 
             if (config.m_startAction == StartAction.PROBE) {
                 // once initialized the path properties contain the true path values
-                if (config.m_hostCount == VoltDB.UNDEFINED) {
+                if (config.m_hostCount == Constants.UNDEFINED) {
                     config.m_hostCount = 1;
                 }
             } else {

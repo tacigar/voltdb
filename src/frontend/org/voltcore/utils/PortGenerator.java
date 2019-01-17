@@ -17,14 +17,14 @@
 
 package org.voltcore.utils;
 
-import org.voltdb.VoltDB;
+import org.voltdb.common.Constants;
 import org.voltdb.utils.MiscUtils;
 
 public class PortGenerator {
     private int nextPort = 12000;
     private static int portOffset = 100;    // Shift ports away from defaults for testing
-    private int nextCport = VoltDB.DEFAULT_PORT+portOffset;
-    private int nextAport = VoltDB.DEFAULT_ADMIN_PORT+portOffset;
+    private int nextCport = Constants.DEFAULT_PORT + portOffset;
+    private int nextAport = Constants.DEFAULT_ADMIN_PORT + portOffset;
 
     final int MIN_STATIC_PORT = 10000;
     final int MAX_STATIC_PORT = 49151;
@@ -73,7 +73,7 @@ public class PortGenerator {
     }
 
     public synchronized void reset() {
-        nextCport = VoltDB.DEFAULT_PORT+portOffset;
-        nextAport = VoltDB.DEFAULT_ADMIN_PORT+portOffset;
+        nextCport = Constants.DEFAULT_PORT + portOffset;
+        nextAport = Constants.DEFAULT_ADMIN_PORT + portOffset;
     }
 }

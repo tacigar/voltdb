@@ -39,6 +39,7 @@ import org.voltdb.TableHelper;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.CatalogBuilder;
 import org.voltdb.compiler.DeploymentBuilder;
 
@@ -417,7 +418,7 @@ public class TestClientFeatures extends TestCase {
         client.createConnection("localhost");
         addrs = client.getConnectedHostList();
         assertEquals(1, addrs.size());
-        assertEquals(VoltDB.DEFAULT_PORT, addrs.get(0).getPort());
+        assertEquals(Constants.DEFAULT_PORT, addrs.get(0).getPort());
         client.close();
         addrs = client.getConnectedHostList();
         assertEquals(0, addrs.size());

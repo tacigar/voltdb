@@ -574,7 +574,7 @@ public class Inits {
                     sslEnabled = true;
                 }
                 httpPort = (m_deployment.getHttpd().getPort()==null) ?
-                        (sslEnabled ? VoltDB.DEFAULT_HTTPS_PORT : VoltDB.DEFAULT_HTTP_PORT) :
+                        (sslEnabled ? Constants.DEFAULT_HTTPS_PORT : Constants.DEFAULT_HTTP_PORT) :
                         m_deployment.getHttpd().getPort();
                 if (m_deployment.getHttpd().getJsonapi() != null) {
                     m_rvdb.m_jsonEnabled = m_deployment.getHttpd().getJsonapi().isEnabled();
@@ -586,7 +586,7 @@ public class Inits {
                 // if not set by the user, just find a free port
             } else if (httpPort == Constants.HTTP_PORT_AUTO) {
                 // if not set scan for an open port starting with the default
-                httpPort = sslEnabled ? VoltDB.DEFAULT_HTTPS_PORT : VoltDB.DEFAULT_HTTP_PORT;
+                httpPort = sslEnabled ? Constants.DEFAULT_HTTPS_PORT : Constants.DEFAULT_HTTP_PORT;
                 setupHttpServer("", "", httpPort, true, false);
             } else if (httpPort != Constants.HTTP_PORT_DISABLED) {
                 if (!m_deployment.getHttpd().isEnabled()) {
@@ -603,7 +603,7 @@ public class Inits {
 
         @Override
         public void run() {
-            int adminPort = VoltDB.DEFAULT_ADMIN_PORT;
+            int adminPort = Constants.DEFAULT_ADMIN_PORT;
 
             // allow command line override
             if (m_config.m_adminPort > 0) {

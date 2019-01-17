@@ -29,6 +29,7 @@ import org.voltdb.BackendTarget;
 import org.voltdb.ServerThread;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltDB.Configuration;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
 
@@ -43,8 +44,8 @@ public class SimpleServer {
         int sites = 1;
         int k_factor = 0;
 
-        for (int i=0; i < args.length; ++i) {
-            arg = args[i].split("=");
+        for (String arg2 : args) {
+            arg = arg2.split("=");
             if (arg[0].equals("schema")) {
                 schemaFileName = arg[1];
             } else if (arg[0].equals("backend")) {
@@ -62,9 +63,9 @@ public class SimpleServer {
             {
                 k_factor = Integer.valueOf(arg[1]);
             }
-            else if (args[i] != null)
+            else if (arg2 != null)
             {
-                host_manager_args.add(args[i]);
+                host_manager_args.add(arg2);
             }
         }
 
@@ -92,7 +93,7 @@ public class SimpleServer {
         System.out.println("catalog path: " + config.m_pathToCatalog);
         config.m_pathToDeployment = Configuration.getPathToCatalogForTest("simple.xml");
         System.out.println("deployment path: " + config.m_pathToDeployment);
-        config.m_port = VoltDB.DEFAULT_PORT;
+        config.m_port = Constants.DEFAULT_PORT;
         ServerThread server = new ServerThread(config);
         server.start();
 

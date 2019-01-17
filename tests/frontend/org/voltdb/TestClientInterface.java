@@ -79,6 +79,7 @@ import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable.ColumnInfo;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.client.ClientResponse;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.iv2.Cartographer;
 import org.voltdb.messaging.InitiateResponseMessage;
@@ -189,7 +190,7 @@ public class TestClientInterface {
             }
         }).when(m_volt).scheduleWork(any(Runnable.class), anyLong(), anyLong(), (TimeUnit)anyObject());
 
-        m_ci = spy(new ClientInterface(null, VoltDB.DEFAULT_PORT, null, VoltDB.DEFAULT_ADMIN_PORT,
+        m_ci = spy(new ClientInterface(null, Constants.DEFAULT_PORT, null, Constants.DEFAULT_ADMIN_PORT,
                 m_context, m_messenger, ReplicationRole.NONE,
                 m_cartographer));
         m_ci.bindAdapter(m_cxn, null);

@@ -299,7 +299,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         assertTrue(found);
 
         if (cb1.getResponse().getStatus() == ClientResponse.SUCCESS) {
-            assertEquals(org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
+            assertEquals(Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
 
             // Verify that table A exists
             ClientResponse response = client3.callProcedure("@AdHoc", "insert into NEWTABLE values (100);");

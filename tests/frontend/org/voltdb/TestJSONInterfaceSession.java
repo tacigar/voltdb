@@ -68,6 +68,7 @@ import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -79,6 +80,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.entity.ContentType;
@@ -86,18 +88,16 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.junit.Test;
 import org.voltdb.client.Client;
+import org.voltdb.client.ClientAuthScheme;
 import org.voltdb.client.ClientConfig;
+import org.voltdb.common.Constants;
+import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.Base64;
 import org.voltdb.utils.Encoder;
 
 import junit.framework.TestCase;
-import static junit.framework.TestCase.assertTrue;
-import org.apache.http.Header;
-import org.apache.http.conn.HttpHostConnectException;
-import org.junit.Test;
-import org.voltdb.client.ClientAuthScheme;
-import org.voltdb.compiler.VoltProjectBuilder;
 
 public class TestJSONInterfaceSession extends TestCase {
     final static ContentType utf8ApplicationFormUrlEncoded =
@@ -128,7 +128,9 @@ public class TestJSONInterfaceSession extends TestCase {
 
     static String getHTTPVarString(Map<String, String> params) throws UnsupportedEncodingException {
         String s = "";
-        if (params == null) return s;
+        if (params == null) {
+            return s;
+        }
         for (Entry<String, String> e : params.entrySet()) {
             String encodedValue = URLEncoder.encode(e.getValue(), "UTF-8");
             s += "&" + e.getKey() + "=" + encodedValue;
@@ -139,7 +141,7 @@ public class TestJSONInterfaceSession extends TestCase {
 
     static String getHTTPURL(Integer port, String path) {
         if (port == null) {
-            port = VoltDB.DEFAULT_HTTP_PORT;
+            port = Constants.DEFAULT_HTTP_PORT;
         }
         return String.format(protocolPrefix + "localhost:%d/%s", port, path);
     }

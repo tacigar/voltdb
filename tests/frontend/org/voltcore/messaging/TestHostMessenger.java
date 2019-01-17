@@ -44,7 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.voltcore.common.Constants;
+import org.voltdb.common.Constants;
 import org.voltcore.zk.CoreZK;
 import org.voltdb.StartAction;
 import org.voltdb.VoltDB;

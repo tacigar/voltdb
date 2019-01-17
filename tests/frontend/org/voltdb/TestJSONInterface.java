@@ -110,6 +110,7 @@ import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcedureCallback;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.VoltProjectBuilder.ProcedureInfo;
 import org.voltdb.compiler.VoltProjectBuilder.RoleInfo;
@@ -187,7 +188,7 @@ public class TestJSONInterface extends TestCase {
 
     static String getHTTPURL(Integer port, String path) {
         if (port == null) {
-            port = VoltDB.DEFAULT_HTTP_PORT;
+            port = Constants.DEFAULT_HTTP_PORT;
         }
         return String.format(protocolPrefix + "localhost:%d/%s", port, path);
     }

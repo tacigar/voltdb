@@ -20,16 +20,42 @@ package org.voltdb.common;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import org.voltdb.iv2.UniqueIdGenerator;
+
 public class Constants {
+
     public static final Charset UTF8_ENCODING = Charset.forName("UTF-8");
     public static final Charset US_ASCII_ENCODING = Charset.forName("US-ASCII");
 
-    // ODBC Datetime Format
-    // if you need microseconds, you'll have to change this code or
-    //  export a bigint representing microseconds since an epoch
+    /**
+     * ODBC DateTime Format
+     * If you need microseconds, you'll have to change this code or
+     * export a BIGINT representing microseconds since an epoch
+     */
     public static final String ODBC_DATE_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss.SSS";
 
+ // The default heart beat timeout value
+    public static final int DEFAULT_HEARTBEAT_TIMEOUT_SECONDS = 90;
+    public static final String VOLT_TMP_DIR = "volt.tmpdir";
+    public static final int DEFAULT_INTERNAL_PORT = 3021;
+    public static final int DEFAULT_ZK_PORT = 7181;
+    public static final String DEFAULT_INTERNAL_INTERFACE = "";
+
+    // Network constants
     public static final int DEFAULT_PORT = 21212;
+    public static final int DISABLED_PORT = Constants.UNDEFINED;
+    public static final int DEFAULT_ADMIN_PORT = 21211;
+    public static final int DEFAULT_IPC_PORT = 10000;
+    public static final int DEFAULT_DR_PORT = 5555;
+    public static final int DEFAULT_HTTP_PORT = 8080;
+    public static final int DEFAULT_HTTPS_PORT = 8443;
+    public static final String DEFAULT_EXTERNAL_INTERFACE = "";
+
+    /**
+     * For generating the unique ID.
+     * @see UniqueIdGenerator#getNextUniqueId()
+     */
+    public static final int BACKWARD_TIME_FORGIVENESS_WINDOW_MS = 3000;
 
     // authentication handshake codes
     public static final byte AUTH_HANDSHAKE_VERSION = 2;

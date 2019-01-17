@@ -33,7 +33,7 @@ import org.apache.zookeeper_voltpatches.WatchedEvent;
 import org.apache.zookeeper_voltpatches.Watcher;
 import org.apache.zookeeper_voltpatches.Watcher.Event.KeeperState;
 import org.apache.zookeeper_voltpatches.ZooKeeper;
-import org.voltcore.common.Constants;
+import org.voltdb.common.Constants;
 import org.voltcore.messaging.HostMessenger;
 import org.voltcore.utils.PortGenerator;
 import org.voltdb.StartAction;

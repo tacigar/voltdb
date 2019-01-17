@@ -24,6 +24,10 @@
 package org.voltdb.regressionsuites;
 
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,31 +35,28 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
 import org.voltdb.SQLStmt;
-import org.voltdb.VoltTable;
-import org.voltdb.client.Client;
-import org.voltdb.utils.MiscUtils;
-
 import org.voltdb.ServerThread;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltProcedure;
+import org.voltdb.VoltTable;
+import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.NoConnectionsException;
 import org.voltdb.client.ProcCallException;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.deploymentfile.DeploymentType;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.InMemoryJarfile;
+import org.voltdb.utils.MiscUtils;
 
 
 /**
@@ -124,7 +125,7 @@ public class TestInitStartLocalClusterInProcess extends JUnit4LocalClusterTest {
             }
         }
         assertTrue(found);
-        assertEquals(org.voltcore.common.Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
+        assertEquals(Constants.DEFAULT_HEARTBEAT_TIMEOUT_SECONDS, timeout);
 
 
         if (!cluster.isNewCli()) {
@@ -248,9 +249,13 @@ public class TestInitStartLocalClusterInProcess extends JUnit4LocalClusterTest {
     static boolean anyCatalogDefaultArtifactsExists(InMemoryJarfile jarFile) {
         Set<String> files = jarFile.keySet();
         // if empty, none
-        if (files.size() == 0) return false;
+        if (files.size() == 0) {
+            return false;
+        }
         for (String artifacts : CatalogUtil.CATALOG_DEFAULT_ARTIFACTS) {
-            if (files.contains(artifacts)) return true;
+            if (files.contains(artifacts)) {
+                return true;
+            }
         }
         return false;
     }

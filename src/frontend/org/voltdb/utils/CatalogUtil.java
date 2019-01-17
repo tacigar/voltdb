@@ -2305,9 +2305,9 @@ public abstract class CatalogUtil {
         Cluster cluster = catalog.getClusters().get("cluster");
 
         // set the catalog info
-        int defaultPort = VoltDB.DEFAULT_HTTP_PORT;
+        int defaultPort = Constants.DEFAULT_HTTP_PORT;
         if (ssl !=null && ssl.isEnabled()) {
-            defaultPort = VoltDB.DEFAULT_HTTPS_PORT;
+            defaultPort = Constants.DEFAULT_HTTPS_PORT;
         }
         cluster.setHttpdportno(httpd.getPort()==null ? defaultPort : httpd.getPort());
         cluster.setJsonapi(httpd.getJsonapi().isEnabled());

@@ -34,7 +34,6 @@ import org.apache.zookeeper_voltpatches.data.Stat;
 import org.json_voltpatches.JSONArray;
 import org.json_voltpatches.JSONException;
 import org.json_voltpatches.JSONObject;
-import org.voltcore.common.Constants;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.CoreZK;
@@ -56,6 +55,7 @@ import org.voltdb.catalog.GroupRef;
 import org.voltdb.catalog.SnapshotSchedule;
 import org.voltdb.catalog.Systemsettings;
 import org.voltdb.catalog.User;
+import org.voltdb.common.Constants;
 import org.voltdb.dtxn.DtxnConstants;
 import org.voltdb.settings.ClusterSettings;
 import org.voltdb.settings.NodeSettings;
@@ -345,17 +345,17 @@ public class SystemInformation extends VoltSystemProcedure
         // try to get the external interface first, if none was set, use local addresses
         InetAddress addr = null;
         String clientInterface = null;
-        int clientPort = VoltDB.DEFAULT_PORT;
+        int clientPort = Constants.DEFAULT_PORT;
         String adminInterface = null;
-        int adminPort = VoltDB.DEFAULT_ADMIN_PORT;
+        int adminPort = Constants.DEFAULT_ADMIN_PORT;
         String httpInterface = null;
-        int httpPort = VoltDB.DEFAULT_HTTP_PORT;
+        int httpPort = Constants.DEFAULT_HTTP_PORT;
         String internalInterface = null;
         int internalPort = Constants.DEFAULT_INTERNAL_PORT;
         String zkInterface = null;
         int zkPort = Constants.DEFAULT_ZK_PORT;
         String drInterface = null;
-        int drPort = VoltDB.DEFAULT_DR_PORT;
+        int drPort = Constants.DEFAULT_DR_PORT;
         String publicInterface = null;
         String drPublicInterface = null;
         int drPublicPort = 0;
@@ -415,14 +415,16 @@ public class SystemInformation extends VoltSystemProcedure
         vt.addRow(hostId, "VERSION", VoltDB.instance().getVersionString());
         // catalog path
         String path = VoltDB.instance().getConfig().m_pathToCatalog;
-        if (path != null && !path.startsWith("http"))
+        if (path != null && !path.startsWith("http")) {
             path = (new File(path)).getAbsolutePath();
+        }
         vt.addRow(hostId, "CATALOG", path);
 
         // deployment path
         path = VoltDB.instance().getConfig().m_pathToDeployment;
-        if (path != null && !path.startsWith("http"))
+        if (path != null && !path.startsWith("http")) {
             path = (new File(path)).getAbsolutePath();
+        }
         vt.addRow(hostId, "DEPLOYMENT", path);
 
         String cluster_state = VoltDB.instance().getMode().toString();
@@ -451,8 +453,9 @@ public class SystemInformation extends VoltSystemProcedure
         SocketHubAppender hubAppender =
             (SocketHubAppender) Logger.getRootLogger().getAppender("hub");
         int port = 0;
-        if (hubAppender != null)
+        if (hubAppender != null) {
             port = hubAppender.getPort();
+        }
         vt.addRow(hostId, "LOG4JPORT", Integer.toString(port));
         //Add license information
         if (MiscUtils.isPro()) {

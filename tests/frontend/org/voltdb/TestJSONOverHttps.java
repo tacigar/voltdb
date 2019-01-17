@@ -61,10 +61,7 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLContext;
 
-import junit.framework.TestCase;
-import static junit.framework.TestCase.assertTrue;
 import org.apache.http.Header;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -86,7 +83,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.voltdb.VoltDB.Configuration;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
+
+import junit.framework.TestCase;
 
 public class TestJSONOverHttps extends TestCase {
     private static final ContentType utf8ApplicationFormUrlEncoded =
@@ -268,7 +268,7 @@ public class TestJSONOverHttps extends TestCase {
             System.setProperty(KEYSTORE_PASSWD_SYSPROP, "");
             System.setProperty(TRUSTSTORE_SYSPROP, "");
             System.setProperty(TRUSTSTORE_PASSWD_SYSPROP, "");
-            m_port = VoltDB.DEFAULT_HTTPS_PORT;
+            m_port = Constants.DEFAULT_HTTPS_PORT;
             startServer(KEYSTORE_RESOURCE, KEYSTORE_PASSWD, KEYSTORE_RESOURCE, KEYSTORE_PASSWD, 0);
 
             String varString = "Procedure=foocount";

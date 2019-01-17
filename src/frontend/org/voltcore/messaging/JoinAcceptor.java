@@ -25,6 +25,7 @@ import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.json_voltpatches.JSONObject;
 import org.json_voltpatches.JSONString;
 import org.voltcore.utils.VersionChecker;
+import org.voltdb.common.Constants;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.base.Suppliers;
@@ -153,7 +154,7 @@ public interface JoinAcceptor extends JSONString {
      */
     default HostAndPort getLeader() {
         return HostAndPort.fromString(getCoordinators().first())
-                .withDefaultPort(org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT);
+                .withDefaultPort(Constants.DEFAULT_INTERNAL_PORT);
     }
 
     @Override

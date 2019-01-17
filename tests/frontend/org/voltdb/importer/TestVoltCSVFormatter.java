@@ -23,9 +23,9 @@
 
 package org.voltdb.importer;
 
-import static org.voltcore.common.Constants.VOLT_TMP_DIR;
-
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,8 +48,6 @@ import com.google_voltpatches.common.base.Joiner;
 import com.google_voltpatches.common.collect.FluentIterable;
 import com.google_voltpatches.common.collect.ImmutableList;
 import com.google_voltpatches.common.collect.ImmutableMap;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import junit.framework.TestCase;
 
@@ -83,7 +81,7 @@ public class TestVoltCSVFormatter extends TestCase {
                 .add("com.google_voltpatches.common.io")
                 .add("com.google_voltpatches.common.util.concurrent")
                 .build();
-        String tmpFilePath = System.getProperty(VOLT_TMP_DIR, System.getProperty("java.io.tmpdir"));
+        String tmpFilePath = System.getProperty(org.voltdb.common.Constants.VOLT_TMP_DIR, System.getProperty("java.io.tmpdir"));
         //Create a directory in temp + username
         File f = new File(tmpFilePath, System.getProperty("user.name"));
         String systemPackagesSpec = FluentIterable.from(packages).transform(appendVersion).join(COMMA_JOINER);

@@ -39,6 +39,7 @@ import org.voltdb.ClientResponseImpl;
 import org.voltdb.HTTPClientInterface;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
+import org.voltdb.common.Constants;
 import org.voltdb.compilereport.ReportMaker;
 
 /**
@@ -73,7 +74,7 @@ public class VoltBaseServlet extends HttpServlet {
         }
 
         InetAddress addr = null;
-        int httpPort = VoltDB.DEFAULT_HTTP_PORT;
+        int httpPort = Constants.DEFAULT_HTTP_PORT;
         try {
             String localMetadata = VoltDB.instance().getLocalMetadata();
             JSONObject jsObj = new JSONObject(localMetadata);

@@ -59,6 +59,7 @@ import org.voltdb.VoltTable.ColumnInfo;
 import org.voltdb.VoltType;
 import org.voltdb.VoltZK;
 import org.voltdb.VoltZK.MailboxType;
+import org.voltdb.common.Constants;
 import org.voltdb.export.ExportManager;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
 
@@ -580,7 +581,7 @@ public class Cartographer extends StatsSource
     public List<Integer> getIv2PartitionsToReplace(int kfactor, int sitesPerHost, int localHostId, Map<Integer, String> hostGroups)
         throws JSONException
     {
-        Preconditions.checkArgument(sitesPerHost != VoltDB.UNDEFINED);
+        Preconditions.checkArgument(sitesPerHost != Constants.UNDEFINED);
         List<Integer> partitionsToReplace = new ArrayList<Integer>();
         Map<Integer, Integer> repsPerPart = new HashMap<Integer, Integer>();
         List<Collection<Integer>> sortedHosts = AbstractTopology.sortHostIdByHGDistance(localHostId, hostGroups);
@@ -968,8 +969,7 @@ public class Cartographer extends StatsSource
         Map<Integer, Host> hostsMap = Maps.newHashMap();
         Set<Integer> allMasters = new HashSet<Integer>();
         allMasters.addAll(m_iv2Masters.pointInTimeCache().keySet());
-        for ( Iterator<Integer> it = allMasters.iterator(); it.hasNext();) {
-            Integer partitionId = it.next();
+        for (Integer partitionId : allMasters) {
             int leaderHostId = CoreUtils.getHostIdFromHSId(m_iv2Masters.pointInTimeCache().get(partitionId));
 
             //sanity check to make sure that the topology is not in the middle of leader promotion

@@ -34,6 +34,7 @@ import org.voltcore.network.ReverseDNSCache;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
+import org.voltdb.common.Constants;
 
 /**
  * Polls a Volt cluster via the statistics sysproc and Exports the results to a database via JDBC.
@@ -130,7 +131,7 @@ public class ClusterMonitor {
                 int port;
                 if (hostnport.length < 2)
                 {
-                    port = VoltDB.DEFAULT_PORT;
+                    port = Constants.DEFAULT_PORT;
                 }
                 else
                 {

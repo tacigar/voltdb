@@ -40,7 +40,7 @@ import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.voltcore.common.Constants;
+import org.voltdb.common.Constants;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.messaging.HostMessenger;
 import org.voltdb.StartAction;

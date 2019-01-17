@@ -55,6 +55,7 @@ import org.voltcore.utils.VersionChecker;
 import org.voltcore.utils.ssl.MessagingChannel;
 import org.voltcore.utils.ssl.SSLConfiguration;
 import org.voltdb.client.TLSHandshaker;
+import org.voltdb.common.Constants;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSet;
@@ -204,7 +205,7 @@ public class SocketJoiner {
                 break;
             }
             HostAndPort host = HostAndPort.fromString(coordHost)
-                    .withDefaultPort(org.voltcore.common.Constants.DEFAULT_INTERNAL_PORT);
+                    .withDefaultPort(Constants.DEFAULT_INTERNAL_PORT);
 
             InetSocketAddress ip = !host.getHost().isEmpty() ?
                       new InetSocketAddress(host.getHost(), host.getPort())

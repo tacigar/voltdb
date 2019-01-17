@@ -409,7 +409,7 @@ public class CommandLine extends VoltDB.Configuration
     }
 
     public CommandLine hostCount(int hostCount) {
-        m_hostCount = hostCount <= 0 ? VoltDB.UNDEFINED : hostCount;
+        m_hostCount = hostCount <= 0 ? Constants.UNDEFINED : hostCount;
         return this;
     }
 
@@ -701,10 +701,10 @@ public class CommandLine extends VoltDB.Configuration
         {
             cmdline.add("replicationport"); cmdline.add(Integer.toString(m_drAgentPortStart));
         }
-        if (m_drPublicHost != null || m_drPublicPort != VoltDB.DISABLED_PORT) {
+        if (m_drPublicHost != null || m_drPublicPort != Constants.DISABLED_PORT) {
             cmdline.add("drpublic");
             String param = (m_drPublicHost != null && !m_drPublicHost.isEmpty()) ? m_drPublicHost : "";
-            if (m_drPublicPort != VoltDB.DISABLED_PORT) {
+            if (m_drPublicPort != Constants.DISABLED_PORT) {
                 param = (param.isEmpty()) ? Integer.toString(m_drPublicPort)
                                           : param + ":" + Integer.toString(m_drPublicPort);
             }
@@ -782,7 +782,7 @@ public class CommandLine extends VoltDB.Configuration
             cmdline.add("paused");
         }
 
-        if (m_sitesperhost != VoltDB.UNDEFINED) {
+        if (m_sitesperhost != Constants.UNDEFINED) {
             cmdline.add("sitesperhost");
             cmdline.add(Integer.toString(m_sitesperhost));
         }
