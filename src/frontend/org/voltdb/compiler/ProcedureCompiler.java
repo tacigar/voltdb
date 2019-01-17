@@ -29,7 +29,6 @@ import org.hsqldb_voltpatches.HSQLInterface;
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.SQLStmt;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltNonTransactionalProcedure;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
@@ -45,6 +44,7 @@ import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.StmtParameter;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler.ProcedureDescriptor;
 import org.voltdb.compiler.VoltCompiler.VoltCompilerException;
 import org.voltdb.compilereport.ProcedureAnnotation;
@@ -95,14 +95,16 @@ public abstract class ProcedureCompiler {
         Field[] fields = procClass.getDeclaredFields();
         for (Field f : fields) {
             // skip non SQL fields
-            if (f.getType() != SQLStmt.class)
+            if (f.getType() != SQLStmt.class) {
                 continue;
+            }
 
             int modifiers = f.getModifiers();
 
             // skip private fields if asked (usually a superclass)
-            if (Modifier.isPrivate(modifiers) && (!withPrivate))
+            if (Modifier.isPrivate(modifiers) && (!withPrivate)) {
                 continue;
+            }
 
             // don't allow non-final SQLStmts
             if (Modifier.isFinal(modifiers) == false) {
@@ -111,10 +113,11 @@ public abstract class ProcedureCompiler {
                     msg = "Superclass " + procClass.getSimpleName() + " of procedure " +
                           procName + " contains a non-final SQLStmt field.";
                 }
-                if (compiler != null)
+                if (compiler != null) {
                     throw compiler.new VoltCompilerException(msg);
-                else
+                } else {
                     new VoltLogger("HOST").warn(msg);
+                }
             }
 
             f.setAccessible(true);
@@ -138,8 +141,9 @@ public abstract class ProcedureCompiler {
         if (superClass != null) {
             Map<String, SQLStmt> superStmts = getValidSQLStmts(compiler, procName, superClass, procInstance, false);
             for (Entry<String, SQLStmt> e : superStmts.entrySet()) {
-                if (retval.containsKey(e.getKey()) == false)
+                if (retval.containsKey(e.getKey()) == false) {
                     retval.put(e.getKey(), e.getValue());
+                }
             }
         }
 
@@ -240,7 +244,9 @@ public abstract class ProcedureCompiler {
         // Determine if the procedure is read-only or read-write by checking if the procedure contains any write SQL statements.
         boolean readWrite = false;
         for (Object field : fields.values()) {
-            if (!(field instanceof SQLStmt)) continue;
+            if (!(field instanceof SQLStmt)) {
+                continue;
+            }
             SQLStmt stmt = (SQLStmt)field;
             QueryType qtype = QueryType.getFromSQL(stmt.getText());
             if (!qtype.isReadOnly()) {
@@ -254,7 +260,9 @@ public abstract class ProcedureCompiler {
         final DeterminismMode detMode = readWrite ? DeterminismMode.SAFER : DeterminismMode.FASTER;
 
         for (Entry<String, Object> entry : fields.entrySet()) {
-            if (!(entry.getValue() instanceof SQLStmt)) continue;
+            if (!(entry.getValue() instanceof SQLStmt)) {
+                continue;
+            }
 
             String stmtName = entry.getKey();
             SQLStmt stmt = (SQLStmt)entry.getValue();
@@ -385,9 +393,9 @@ public abstract class ProcedureCompiler {
             if (cls.isArray()) {
                 param.setIsarray(true);
                 cls = cls.getComponentType();
-            }
-            else
+            } else {
                 param.setIsarray(false);
+            }
 
             if ((cls == Float.class) || (cls == float.class)) {
                 String msg = "Procedure: " + shortName + " has a parameter with type: ";
@@ -443,8 +451,9 @@ public abstract class ProcedureCompiler {
         };
         boolean found = false;
         for (Class<?> candidate : validPartitionClzzes) {
-            if (partitionType == candidate)
+            if (partitionType == candidate) {
                 found = true;
+            }
         }
         if (!found) {
             String msg = "Partition parameter must be a String or Number for procedure: " + procedure.getClassname();
@@ -630,9 +639,9 @@ public abstract class ProcedureCompiler {
             if (cls.isArray()) {
                 param.setIsarray(true);
                 cls = cls.getComponentType();
-            }
-            else
+            } else {
                 param.setIsarray(false);
+            }
 
             // boxed types are not supported parameters at this time
             if ((cls == Long.class) || (cls == Integer.class) || (cls == Short.class) ||
@@ -755,7 +764,9 @@ public abstract class ProcedureCompiler {
 
         for (String curStmt : stmts) {
             // Skip processing 'END' statement in multi-statement procedures
-            if (curStmt.equalsIgnoreCase("end")) continue;
+            if (curStmt.equalsIgnoreCase("end")) {
+                continue;
+            }
 
             // ENG-14487 truncate statement is not allowed for single partitioned procedures.
             if (info.isSinglePartition() && curStmt.toUpperCase().startsWith("TRUNCATE")) {
@@ -764,7 +775,7 @@ public abstract class ProcedureCompiler {
             }
 
             // Add the statement to the catalog
-            Statement catalogStmt = procedure.getStatements().add(VoltDB.ANON_STMT_NAME + String.valueOf(stmtNum));
+            Statement catalogStmt = procedure.getStatements().add(Constants.ANON_STMT_NAME + String.valueOf(stmtNum));
             stmtNum++;
 
             // Compile the statement

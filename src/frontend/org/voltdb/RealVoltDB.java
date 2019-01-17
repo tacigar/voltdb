@@ -947,7 +947,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
 
             if (config.m_startAction.isLegacy()) {
                 File rootFH = CatalogUtil.getVoltDbRoot(readDepl.deployment.getPaths());
-                File inzFH = new VoltFile(rootFH, VoltDB.INITIALIZED_MARKER);
+                File inzFH = new VoltFile(rootFH, Constants.INITIALIZED_MARKER);
                 if (inzFH.exists()) {
                     VoltDB.crashLocalVoltDB("Cannot use legacy start action "
                             + config.m_startAction + " on voltdbroot "
@@ -959,8 +959,8 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
                 File cfile = (new File(config.m_pathToDeployment)).getParentFile();
                 if (cfile != null) {
                     rootFH = cfile.getParentFile();
-                    if ("config".equals(cfile.getName()) && VoltDB.DBROOT.equals(rootFH.getName())) {
-                        inzFH = new VoltFile(rootFH, VoltDB.INITIALIZED_MARKER);
+                    if ("config".equals(cfile.getName()) && Constants.VOLTDB_ROOT.equals(rootFH.getName())) {
+                        inzFH = new VoltFile(rootFH, Constants.INITIALIZED_MARKER);
                         if (inzFH.exists()) {
                             VoltDB.crashLocalVoltDB("Can not use legacy start action "
                                     + config.m_startAction + " on voltdbroot "
@@ -2378,7 +2378,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
                 dt.getPaths().getVoltdbroot().setPath(cnfrootFH.getPath());
             }
             // root in deployment conflicts with command line voltdbroot
-            if (!VoltDB.DBROOT.equals(deprootFN)) {
+            if (!Constants.VOLTDB_ROOT.equals(deprootFN)) {
                 consoleLog.info("Ignoring voltdbroot \"" + deprootFN + "\" specified in the deployment file");
                 hostLog.info("Ignoring voltdbroot \"" + deprootFN + "\" specified in the deployment file");
             }
@@ -2468,7 +2468,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
     }
 
     private void stageInitializedMarker(Configuration config) {
-        File depFH = new VoltFile(config.m_voltdbRoot, VoltDB.INITIALIZED_MARKER);
+        File depFH = new VoltFile(config.m_voltdbRoot, Constants.INITIALIZED_MARKER);
         try (PrintWriter pw = new PrintWriter(new FileWriter(depFH), true)) {
             pw.println(config.m_clusterName);
         } catch (IOException e) {
@@ -4402,7 +4402,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         /*
          * Remove the terminus file if it is there, which is written on shutdown --save
          */
-        new File(m_nodeSettings.getVoltDBRoot(), VoltDB.TERMINUS_MARKER).delete();
+        new File(m_nodeSettings.getVoltDBRoot(), Constants.TERMINUS_MARKER).delete();
 
         /*
          * Command log is already initialized if this is a rejoin or a join
@@ -4987,7 +4987,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
     private final Supplier<String> terminusNonceSupplier = Suppliers.memoize(new Supplier<String>() {
         @Override
         public String get() {
-            File markerFH = new File(m_nodeSettings.getVoltDBRoot(), VoltDB.TERMINUS_MARKER);
+            File markerFH = new File(m_nodeSettings.getVoltDBRoot(), Constants.TERMINUS_MARKER);
             // file needs to be both writable and readable as it will be deleted onRestoreComplete
             if (!markerFH.exists() || !markerFH.isFile() || !markerFH.canRead() || !markerFH.canWrite()) {
                 return null;

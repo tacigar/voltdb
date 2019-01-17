@@ -31,7 +31,6 @@ import org.voltdb.ParameterSet;
 import org.voltdb.ProcedureRunner;
 import org.voltdb.SQLStmt;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTable.ColumnInfo;
@@ -42,6 +41,7 @@ import org.voltdb.catalog.Index;
 import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.sysprocs.LowImpactDeleteNT.ComparisonOperation;
 
 public class NibbleDeleteBase extends VoltSystemProcedure {
@@ -53,10 +53,12 @@ public class NibbleDeleteBase extends VoltSystemProcedure {
             new ColumnInfo("LEFT_ROWS", VoltType.BIGINT) /* number of rows to be deleted after this invocation */
     };
 
+    @Override
     public long[] getPlanFragmentIds() {
         return new long[]{};
     }
 
+    @Override
     public DependencyPair executePlanFragment(
             Map<Integer, List<VoltTable>> dependencies, long fragmentId,
             ParameterSet params, SystemProcedureExecutionContext context) {
@@ -92,7 +94,9 @@ public class NibbleDeleteBase extends VoltSystemProcedure {
         for (Index catIndexIterator : table.getIndexes()) {
             for (ColumnRef colRef : catIndexIterator.getColumns()) {
                 // we only care about the first index
-                if (colRef.getIndex() != 0) continue;
+                if (colRef.getIndex() != 0) {
+                    continue;
+                }
                 if (colRef.getColumn() == column) {
                     candidates.add(catIndexIterator);
                 }
@@ -192,9 +196,9 @@ public class NibbleDeleteBase extends VoltSystemProcedure {
                 tableName + "." + DefaultProcedureManager.NIBBLE_DELETE_PROC, catTable, column, op);
         Procedure newCatProc = pr.getCatalogProcedure();
 
-        Statement countStmt = newCatProc.getStatements().get(VoltDB.ANON_STMT_NAME + "0");
-        Statement deleteStmt = newCatProc.getStatements().get(VoltDB.ANON_STMT_NAME + "1");
-        Statement valueAtStmt = newCatProc.getStatements().get(VoltDB.ANON_STMT_NAME + "2");
+        Statement countStmt = newCatProc.getStatements().get(Constants.ANON_STMT_NAME + "0");
+        Statement deleteStmt = newCatProc.getStatements().get(Constants.ANON_STMT_NAME + "1");
+        Statement valueAtStmt = newCatProc.getStatements().get(Constants.ANON_STMT_NAME + "2");
         if (countStmt == null || deleteStmt == null || valueAtStmt == null) {
             throw new VoltAbortException(
                     String.format("Unable to find SQL statement for found table %s: BAD",

@@ -20,13 +20,11 @@ package org.voltdb.sysprocs;
 import java.util.List;
 import java.util.Map;
 
-import org.voltcore.logging.VoltLogger;
 import org.voltdb.DependencyPair;
 import org.voltdb.DeprecatedProcedureAPIAccess;
 import org.voltdb.ParameterSet;
 import org.voltdb.SQLStmt;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltType;
@@ -34,6 +32,7 @@ import org.voltdb.catalog.Constraint;
 import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.dtxn.DtxnConstants;
 import org.voltdb.types.ConstraintType;
 
@@ -115,9 +114,10 @@ public class LoadMultipartitionTable extends VoltSystemProcedure
                     modifiedTuples[partitionId] = rowsModified;
                 }
                 else {
-                    if (modifiedTuples[partitionId] != rowsModified)
+                    if (modifiedTuples[partitionId] != rowsModified) {
                         throw new RuntimeException(
                                 "@LoadMultipartitionTable received different tuple mod counts from two replicas.");
+                    }
                 }
             }
 
@@ -233,7 +233,7 @@ public class LoadMultipartitionTable extends VoltSystemProcedure
         // ensure MP fragment tasks load the plan for the table loading procedure
         m_runner.setProcNameToLoadForFragmentTasks(crudProcName);
 
-        Statement catStmt = proc.getStatements().get(VoltDB.ANON_STMT_NAME + "0");
+        Statement catStmt = proc.getStatements().get(Constants.ANON_STMT_NAME + "0");
         if (catStmt == null) {
             throw new VoltAbortException(
                     String.format("Unable to find SQL statement for found table %s: BAD",

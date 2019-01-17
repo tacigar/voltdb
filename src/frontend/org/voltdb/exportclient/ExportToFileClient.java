@@ -226,10 +226,16 @@ public class ExportToFileClient extends ExportClientBase {
             @Override
             public int compareTo(FileHandle obj) {
                 int first = tableName.compareTo(obj.tableName);
-                if (first != 0) return first;
+                if (first != 0) {
+                    return first;
+                }
                 long second = generation - obj.generation;
-                if (second > 0) return 1;
-                if (second < 0) return -1;
+                if (second > 0) {
+                    return 1;
+                }
+                if (second < 0) {
+                    return -1;
+                }
                 return 0;
             }
 
@@ -293,7 +299,9 @@ public class ExportToFileClient extends ExportClientBase {
          */
         void closeAllWriters() {
             // only need to run this once per batch
-            if (m_hasClosed) return;
+            if (m_hasClosed) {
+                return;
+            }
 
             // flush and close any files that are open
             for (Entry<FileHandle, CSVWriter> entry : m_writers.entrySet()) {
@@ -394,8 +402,9 @@ public class ExportToFileClient extends ExportClientBase {
         CSVWriter getWriter(String tableName, long generation) throws IOException {
             FileHandle handle = new FileHandle(tableName, generation);
             CSVWriter writer = m_writers.get(handle);
-            if (writer != null)
+            if (writer != null) {
                 return writer;
+            }
 
             String path = handle.getPath(ACTIVE_PREFIX);
             File newFile = new VoltFile(path);
@@ -436,7 +445,9 @@ public class ExportToFileClient extends ExportClientBase {
 
         void writeSchema(String tableName, long generation, String schema) throws IOException {
             // if no schema's enabled pretend like this worked
-            if (!m_withSchema) return;
+            if (!m_withSchema) {
+                return;
+            }
 
             FileHandle handle = new FileHandle(tableName, generation);
             String path = handle.getPathForSchema();
@@ -837,7 +848,7 @@ public class ExportToFileClient extends ExportClientBase {
                                       EXPORT_DELIM_NUM_CHARACTERS));
             }
         }
-        TimeZone tz = TimeZone.getTimeZone(conf.getProperty("timezone", VoltDB.GMT_TIMEZONE.getID()));
+        TimeZone tz = TimeZone.getTimeZone(conf.getProperty("timezone", Constants.GMT_TIMEZONE.getID()));
 
         BinaryEncoding encoding = BinaryEncoding.valueOf(
                 conf.getProperty("binaryencoding", "HEX").trim().toUpperCase());

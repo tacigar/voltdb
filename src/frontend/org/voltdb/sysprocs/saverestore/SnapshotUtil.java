@@ -85,7 +85,6 @@ import org.voltdb.settings.NodeSettings;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.VoltFile;
 
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 import com.google_voltpatches.common.util.concurrent.SettableFuture;
 
@@ -505,7 +504,7 @@ public class SnapshotUtil {
      * Write the shutdown save snapshot terminus marker
      */
     public static Runnable writeTerminusMarker(final String nonce, final NodeSettings paths, final VoltLogger logger) {
-        final File f = new File(paths.getVoltDBRoot(), VoltDB.TERMINUS_MARKER);
+        final File f = new File(paths.getVoltDBRoot(), Constants.TERMINUS_MARKER);
         return new Runnable() {
             @Override
             public void run() {
@@ -624,8 +623,9 @@ public class SnapshotUtil {
             return null;
         } finally {
             try {
-                if (fis != null)
+                if (fis != null) {
                     fis.close();
+                }
             } catch (IOException e) {}
         }
     }
@@ -857,7 +857,9 @@ public class SnapshotUtil {
             try {
                 if (f.getName().endsWith(".digest")) {
                     JSONObject digest = CRCCheck(f, logger);
-                    if (digest == null) continue;
+                    if (digest == null) {
+                        continue;
+                    }
                     Long snapshotTxnId = digest.getLong("txnId");
                     String nonce = parseNonceFromSnapshotFilename(f.getName());
                     Snapshot named_s = namedSnapshots.get(nonce);
@@ -1298,7 +1300,9 @@ public class SnapshotUtil {
     }
 
     public static String didSnapshotRequestFailWithErr(VoltTable results[]) {
-        if (results.length < 1) return "HAD NO RESULT TABLES";
+        if (results.length < 1) {
+            return "HAD NO RESULT TABLES";
+        }
         final VoltTable result = results[0];
         result.resetRowPosition();
         //Crazy old code would return one column with an error message.
@@ -1464,7 +1468,9 @@ public class SnapshotUtil {
                             response = responses.poll(
                                     TimeUnit.HOURS.toMillis(2) - (System.currentTimeMillis() - startTime),
                                     TimeUnit.MILLISECONDS);
-                            if (response == null) break;
+                            if (response == null) {
+                                break;
+                            }
                         } catch (InterruptedException e) {
                             VoltDB.crashLocalVoltDB("Should never happen", true, e);
                         }
@@ -1510,7 +1516,7 @@ public class SnapshotUtil {
 
     public static String formatHumanReadableDate(long timestamp) {
         SimpleDateFormat sdf = new SimpleDateFormat(Constants.ODBC_DATE_FORMAT_STRING + "z");
-        sdf.setTimeZone(VoltDB.VOLT_TIMEZONE);
+        sdf.setTimeZone(Constants.VOLT_TIMEZONE);
         return sdf.format(new Date(timestamp));
     }
 
@@ -1599,7 +1605,7 @@ public class SnapshotUtil {
                 }
                 task.setParams( jsObj.toString() );
             } catch (JSONException e){
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             return null;
         } else if (params.length == 2) {
@@ -1638,7 +1644,7 @@ public class SnapshotUtil {
                 jsObj.put(SnapshotUtil.JSON_NONCE, params[1]);
                 jsObj.put(SnapshotUtil.JSON_DUPLICATES_PATH, params[0]);
             } catch (JSONException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             task.setParams( jsObj.toString() );
             return null;

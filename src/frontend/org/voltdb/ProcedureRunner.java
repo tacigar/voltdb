@@ -46,6 +46,7 @@ import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.StmtParameter;
 import org.voltdb.client.BatchTimeoutOverrideType;
 import org.voltdb.client.ClientResponse;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.AdHocPlannedStatement;
 import org.voltdb.compiler.AdHocPlannedStmtBatch;
 import org.voltdb.compiler.ProcedureCompiler;
@@ -1074,14 +1075,14 @@ public class ProcedureRunner {
         if (m_catProc.getHasjava() == false) {
             try {
                 for (int i = 0; i < m_catProc.getStatements().size(); i++) {
-                    Statement statement = m_catProc.getStatements().get(VoltDB.ANON_STMT_NAME + String.valueOf(i));
+                    Statement statement = m_catProc.getStatements().get(Constants.ANON_STMT_NAME + String.valueOf(i));
                     String s = statement.getSqltext();
                     SQLStmt stmt = new SQLStmt(s);
 
                     QueuedSQL singleStmt = new QueuedSQL();
                     singleStmt.stmt = stmt;
                     m_sqlStmts.add(singleStmt);
-                    stmtMap.put(VoltDB.ANON_STMT_NAME + String.valueOf(i), stmt);
+                    stmtMap.put(Constants.ANON_STMT_NAME + String.valueOf(i), stmt);
 
                     int numParams = m_catProc.getParameters().size();
                     m_paramTypes = new Class<?>[numParams];

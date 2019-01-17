@@ -24,7 +24,6 @@ import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SQLStmt;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
 import org.voltdb.catalog.Column;
@@ -32,6 +31,7 @@ import org.voltdb.catalog.Constraint;
 import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.types.ConstraintType;
 
 /**
@@ -155,7 +155,7 @@ public class LoadSinglepartitionTable extends VoltSystemProcedure
         }
 
         // statements of all single-statement procs are named "sql0"
-        Statement catStmt = p.getStatements().get(VoltDB.ANON_STMT_NAME + "0");
+        Statement catStmt = p.getStatements().get(Constants.ANON_STMT_NAME + "0");
         if (catStmt == null) {
             throw new VoltAbortException(
                     String.format("Unable to find SQL statement for found table %s: BAD",

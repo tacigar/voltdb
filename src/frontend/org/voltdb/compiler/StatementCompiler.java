@@ -40,6 +40,7 @@ import org.voltdb.catalog.Procedure;
 import org.voltdb.catalog.Statement;
 import org.voltdb.catalog.StmtParameter;
 import org.voltdb.catalog.Table;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltCompiler.VoltCompilerException;
 import org.voltdb.expressions.ParameterValueExpression;
 import org.voltdb.planner.CompiledPlan;
@@ -478,24 +479,30 @@ public abstract class StatementCompiler {
      * Check through a plan graph and return true if it ever touches a persistent table.
      */
     static boolean fragmentReferencesPersistentTable(AbstractPlanNode node) {
-        if (node == null)
+        if (node == null) {
             return false;
+        }
 
         // these nodes can read/modify persistent tables
-        if (node instanceof AbstractScanPlanNode)
+        if (node instanceof AbstractScanPlanNode) {
             return true;
-        if (node instanceof InsertPlanNode)
+        }
+        if (node instanceof InsertPlanNode) {
             return true;
-        if (node instanceof DeletePlanNode)
+        }
+        if (node instanceof DeletePlanNode) {
             return true;
-        if (node instanceof UpdatePlanNode)
+        }
+        if (node instanceof UpdatePlanNode) {
             return true;
+        }
 
         // recursively check out children
         for (int i = 0; i < node.getChildCount(); i++) {
             AbstractPlanNode child = node.getChild(i);
-            if (fragmentReferencesPersistentTable(child))
+            if (fragmentReferencesPersistentTable(child)) {
                 return true;
+            }
         }
 
         // if nothing found, return false
@@ -556,7 +563,7 @@ public abstract class StatementCompiler {
          * since we reuse the same code for single and multi-statement procedures
          *     statements of all single statement procedures are named 'sql0'
         */
-        Statement stmt = statements.add(VoltDB.ANON_STMT_NAME + "0");
+        Statement stmt = statements.add(Constants.ANON_STMT_NAME + "0");
         stmt.setSqltext(sqlText);
         stmt.setReadonly(catProc.getReadonly());
         stmt.setQuerytype(qtype.getValue());
@@ -724,7 +731,7 @@ public abstract class StatementCompiler {
          * since we reuse the same code for single and multi-statement procedures
          *     statements of all single statement procedures are named 'sql0'
         */
-        Statement stmt = statements.add(VoltDB.ANON_STMT_NAME + index);
+        Statement stmt = statements.add(Constants.ANON_STMT_NAME + index);
         stmt.setSqltext(sqlText);
         stmt.setReadonly(newCatProc.getReadonly());
         stmt.setQuerytype(qtype.getValue());

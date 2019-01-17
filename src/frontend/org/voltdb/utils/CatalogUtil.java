@@ -2057,7 +2057,7 @@ public abstract class CatalogUtil {
     public static File getVoltDbRoot(PathsType paths) {
         File voltDbRoot;
         if (paths == null || paths.getVoltdbroot() == null || VoltDB.instance().getVoltDBRootPath(paths.getVoltdbroot()) == null) {
-            voltDbRoot = new VoltFile(VoltDB.DBROOT);
+            voltDbRoot = new VoltFile(Constants.VOLTDB_ROOT);
             if (!voltDbRoot.exists()) {
                 hostLog.info("Creating voltdbroot directory: " + voltDbRoot.getAbsolutePath());
                 if (!voltDbRoot.mkdirs()) {

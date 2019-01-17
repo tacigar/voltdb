@@ -19,6 +19,7 @@ package org.voltdb.common;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.TimeZone;
 
 import org.voltdb.iv2.UniqueIdGenerator;
 
@@ -114,4 +115,22 @@ public class Constants {
 
     public static final String VOLTDB_ROOT = "voltdbroot";
     public static final String CONFIG_DIR = "config";
+
+    // Staged filenames for advanced deployments
+    public static final String INITIALIZED_MARKER = ".initialized";
+    public static final String TERMINUS_MARKER = ".shutdown_snapshot";
+    public static final String INITIALIZED_PATHS = ".paths";
+    public static final String STAGED_MESH = "_MESH";
+    public static final String DEFAULT_CLUSTER_NAME = "database";
+    public static final String DBROOT = Constants.VOLTDB_ROOT;
+    public static final String MODULE_CACHE = ".bundles-cache";
+
+    /** The name of the SQLStmt implied by a statement procedure's SQL statement. */
+    public static final String ANON_STMT_NAME = "sql";
+
+    /** The GMT time zone you know and love. */
+    public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT+0");
+
+    /** The time zone VoltDB is actually using, currently always GMT. */
+    public static final TimeZone VOLT_TIMEZONE = GMT_TIMEZONE;
 }

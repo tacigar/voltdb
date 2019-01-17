@@ -95,7 +95,7 @@ public class KafkaExportClient extends ExportClientBase {
         m_producerConfig.remove(OLD_SERIALIZER);
         m_producerConfig.remove(OLD_PARTITIONER);
 
-        m_timeZone = VoltDB.GMT_TIMEZONE;
+        m_timeZone = Constants.GMT_TIMEZONE;
         String timeZoneID = config.getProperty(TIMEZONE_PN, "").trim();
         if (!timeZoneID.isEmpty()) {
             m_timeZone = TimeZone.getTimeZone(timeZoneID);
@@ -243,19 +243,23 @@ public class KafkaExportClient extends ExportClientBase {
         String kSerializer = config.getProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "").trim();
         if (kSerializer.isEmpty()) {
             m_producerConfig.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        } else try {
-            Class.forName(kSerializer);
-        } catch (UnknownError|ExceptionInInitializerError|ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unable to load serializer class " + kSerializer , e);
+        } else {
+            try {
+                Class.forName(kSerializer);
+            } catch (UnknownError|ExceptionInInitializerError|ClassNotFoundException e) {
+                throw new IllegalArgumentException("Unable to load serializer class " + kSerializer , e);
+            }
         }
 
         String vSerializer = config.getProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "").trim();
         if (vSerializer.isEmpty()) {
             m_producerConfig.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        } else try {
-            Class.forName(vSerializer);
-        } catch (UnknownError|ExceptionInInitializerError|ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unable to load serializer class " + vSerializer , e);
+        } else {
+            try {
+                Class.forName(vSerializer);
+            } catch (UnknownError|ExceptionInInitializerError|ClassNotFoundException e) {
+                throw new IllegalArgumentException("Unable to load serializer class " + vSerializer , e);
+            }
         }
 
         String bootstrapVal = config.getProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "").trim();
@@ -310,12 +314,14 @@ public class KafkaExportClient extends ExportClientBase {
         }
 
         final void checkOnFirstRow() throws RestartBlockException {
-            if (!m_primed) try {
-                m_producer = new KafkaProducer<>(m_producerConfig);
-            }
-            catch (ConfigException e) {
-                LOG.error("Unable to instantiate a Kafka producer", e);
-                throw new RestartBlockException("Unable to instantiate a Kafka producer", e, true);
+            if (!m_primed) {
+                try {
+                    m_producer = new KafkaProducer<>(m_producerConfig);
+                }
+                catch (ConfigException e) {
+                    LOG.error("Unable to instantiate a Kafka producer", e);
+                    throw new RestartBlockException("Unable to instantiate a Kafka producer", e, true);
+                }
             }
             m_primed = true;
         }
@@ -358,13 +364,19 @@ public class KafkaExportClient extends ExportClientBase {
 
         @Override
         public void onBlockStart(ExportRow row) throws RestartBlockException {
-            if (!m_primed) checkOnFirstRow();
-            if (m_topic == null) populateTopic(row.tableName);
+            if (!m_primed) {
+                checkOnFirstRow();
+            }
+            if (m_topic == null) {
+                populateTopic(row.tableName);
+            }
         }
 
         @Override
         public boolean processRow(ExportRow rd) throws RestartBlockException {
-            if (!m_primed) checkOnFirstRow();
+            if (!m_primed) {
+                checkOnFirstRow();
+            }
 
             String decoded = m_decoder.decode(rd.generation, rd.tableName, rd.types, rd.names, null, rd.values);
             //Use partition value by default if its null use partition id.
@@ -387,7 +399,9 @@ public class KafkaExportClient extends ExportClientBase {
                 throw new RestartBlockException("Unable to send message", e, true);
             } catch (IllegalStateException e) {
                 LOG.warn("Unable to send %s", e, krec);
-                if (m_producer != null) try { m_producer.close(); } catch (Exception ignoreIt) {}
+                if (m_producer != null) {
+                    try { m_producer.close(); } catch (Exception ignoreIt) {}
+                }
                 m_primed = false;
                 throw new RestartBlockException("Unable to send message", e, true);
             }
@@ -396,7 +410,9 @@ public class KafkaExportClient extends ExportClientBase {
 
         @Override
         public void sourceNoLongerAdvertised(AdvertisedDataSource source) {
-            if (m_producer != null) try { m_producer.close(); } catch (Exception ignoreIt) {}
+            if (m_producer != null) {
+                try { m_producer.close(); } catch (Exception ignoreIt) {}
+            }
             m_es.shutdown();
             try {
                 m_es.awaitTermination(365, TimeUnit.DAYS);

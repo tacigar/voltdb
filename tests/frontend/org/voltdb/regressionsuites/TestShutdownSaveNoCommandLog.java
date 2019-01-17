@@ -34,12 +34,12 @@ import java.util.Map;
 
 import org.voltdb.BackendTarget;
 import org.voltdb.InvocationDispatcher;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.client.ArbitraryDurationProc;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcCallException;
+import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 
 public class TestShutdownSaveNoCommandLog extends RegressionSuite
@@ -49,7 +49,10 @@ public class TestShutdownSaveNoCommandLog extends RegressionSuite
     }
 
     public void testShutdownSave() throws Exception {
-        if (isValgrind()) return; // snapshot doesn't run in valgrind ENG-4034
+        if (isValgrind())
+         {
+            return; // snapshot doesn't run in valgrind ENG-4034
+        }
 
         Client client2 = this.getClient();
         for (int i = 0; i < 256; ++i) {
@@ -116,7 +119,7 @@ public class TestShutdownSaveNoCommandLog extends RegressionSuite
         for (int i = 0; i < HOST_COUNT; ++i) {
             File snapDH = getSnapshotPathForHost(cluster, i);
 
-            File terminusFH = new File(snapDH.getParentFile(), VoltDB.TERMINUS_MARKER);
+            File terminusFH = new File(snapDH.getParentFile(), Constants.TERMINUS_MARKER);
             assertTrue("("+ i +") terminus file " + terminusFH + " is not accessible",
                     terminusFH.exists() && terminusFH.isFile() && terminusFH.canRead());
             String nonce;
@@ -159,7 +162,7 @@ public class TestShutdownSaveNoCommandLog extends RegressionSuite
         for (int i = 0; i < HOST_COUNT; ++i) {
             File snapDH = getSnapshotPathForHost(cluster, i);
 
-            File terminusFH = new File(snapDH.getParentFile(), VoltDB.TERMINUS_MARKER);
+            File terminusFH = new File(snapDH.getParentFile(), Constants.TERMINUS_MARKER);
             assertFalse("("+ i +") terminus file " + terminusFH + " is accessible",
                     terminusFH.exists() && terminusFH.isFile() && terminusFH.canRead());
         }

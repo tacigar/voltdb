@@ -76,30 +76,12 @@ import io.netty.handler.ssl.SslContext;
  */
 public class VoltDB {
 
-    // Staged filenames for advanced deployments
-    public static final String INITIALIZED_MARKER = ".initialized";
-    public static final String TERMINUS_MARKER = ".shutdown_snapshot";
-    public static final String INITIALIZED_PATHS = ".paths";
-    public static final String STAGED_MESH = "_MESH";
-    public static final String DEFAULT_CLUSTER_NAME = "database";
-    public static final String DBROOT = Constants.VOLTDB_ROOT;
-    public static final String MODULE_CACHE = ".bundles-cache";
-
-    // The name of the SQLStmt implied by a statement procedure's sql statement.
-    public static final String ANON_STMT_NAME = "sql";
-
-    //The GMT time zone you know and love
-    public static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT+0");
-
-    //The time zone Volt is actually using, currently always GMT
-    public static final TimeZone VOLT_TIMEZONE = GMT_TIMEZONE;
-
-    //Whatever the default timezone was for this locale before we replaced it
+    /** Whatever the default time zone was for this locale before we replaced it. */
     public static final TimeZone REAL_DEFAULT_TIMEZONE;
 
     // if VoltDB is running in your process, prepare to use UTC (GMT) timezone
     public synchronized static void setDefaultTimezone() {
-        TimeZone.setDefault(GMT_TIMEZONE);
+        TimeZone.setDefault(Constants.GMT_TIMEZONE);
     }
 
     static {
@@ -283,10 +265,10 @@ public class VoltDB {
         public boolean m_forceVoltdbCreate = false;
 
         /** cluster name designation */
-        public String m_clusterName = DEFAULT_CLUSTER_NAME;
+        public String m_clusterName = Constants.DEFAULT_CLUSTER_NAME;
 
         /** command line provided voltdbroot */
-        public File m_voltdbRoot = new VoltFile(DBROOT);
+        public File m_voltdbRoot = new VoltFile(Constants.VOLTDB_ROOT);
 
         /** configuration UUID */
         public final UUID m_configUUID = UUID.randomUUID();
@@ -625,15 +607,15 @@ public class VoltDB {
                     m_isPaused = true;
                 } else if (arg.equalsIgnoreCase("voltdbroot")) {
                     m_voltdbRoot = new VoltFile(args[++i]);
-                    if (!DBROOT.equals(m_voltdbRoot.getName())) {
-                        m_voltdbRoot = new VoltFile(m_voltdbRoot, DBROOT);
+                    if ( ! Constants.VOLTDB_ROOT.equals(m_voltdbRoot.getName())) {
+                        m_voltdbRoot = new VoltFile(m_voltdbRoot, Constants.VOLTDB_ROOT);
                     }
                     if (!m_voltdbRoot.exists() && !m_voltdbRoot.mkdirs()) {
                         System.err.println("FATAL: Could not create directory \"" + m_voltdbRoot.getPath() + "\"");
                         referToDocAndExit();
                     }
                     try {
-                        CatalogUtil.validateDirectory(DBROOT, m_voltdbRoot);
+                        CatalogUtil.validateDirectory(Constants.VOLTDB_ROOT, m_voltdbRoot);
                     } catch (RuntimeException e) {
                         System.err.println("FATAL: " + e.getMessage());
                         referToDocAndExit();
@@ -649,8 +631,8 @@ public class VoltDB {
                 } else if (arg.equalsIgnoreCase("getvoltdbroot")) {
                     //Can not use voltdbroot which creates directory we dont intend to create for get deployment etc.
                     m_voltdbRoot = new VoltFile(args[++i]);
-                    if (!DBROOT.equals(m_voltdbRoot.getName())) {
-                        m_voltdbRoot = new VoltFile(m_voltdbRoot, DBROOT);
+                    if ( ! Constants.VOLTDB_ROOT.equals(m_voltdbRoot.getName())) {
+                        m_voltdbRoot = new VoltFile(m_voltdbRoot, Constants.VOLTDB_ROOT);
                     }
                     if (!m_voltdbRoot.exists()) {
                         System.err.println("FATAL: " + m_voltdbRoot.getParentFile().getAbsolutePath() + " does not contain a "
@@ -777,7 +759,7 @@ public class VoltDB {
         }
 
         private boolean isInitialized() {
-            File inzFH = new VoltFile(m_voltdbRoot, VoltDB.INITIALIZED_MARKER);
+            File inzFH = new VoltFile(m_voltdbRoot, Constants.INITIALIZED_MARKER);
             return inzFH.exists() && inzFH.isFile() && inzFH.canRead();
         }
 
@@ -869,11 +851,11 @@ public class VoltDB {
 
         List<File> getInitMarkers() {
             return ImmutableList.<File>builder()
-                    .add(new VoltFile(m_voltdbRoot, VoltDB.INITIALIZED_MARKER))
-                    .add(new VoltFile(m_voltdbRoot, VoltDB.INITIALIZED_PATHS))
+                    .add(new VoltFile(m_voltdbRoot, Constants.INITIALIZED_MARKER))
+                    .add(new VoltFile(m_voltdbRoot, Constants.INITIALIZED_PATHS))
                     .add(new VoltFile(m_voltdbRoot, Constants.CONFIG_DIR))
-                    .add(new VoltFile(m_voltdbRoot, VoltDB.STAGED_MESH))
-                    .add(new VoltFile(m_voltdbRoot, VoltDB.TERMINUS_MARKER))
+                    .add(new VoltFile(m_voltdbRoot, Constants.STAGED_MESH))
+                    .add(new VoltFile(m_voltdbRoot, Constants.TERMINUS_MARKER))
                     .build();
         }
 
@@ -882,7 +864,7 @@ public class VoltDB {
          */
         private void checkInitializationMarker() {
 
-            File inzFH = new VoltFile(m_voltdbRoot, VoltDB.INITIALIZED_MARKER);
+            File inzFH = new VoltFile(m_voltdbRoot, Constants.INITIALIZED_MARKER);
             File deploymentFH = new VoltFile(new VoltFile(m_voltdbRoot, Constants.CONFIG_DIR), "deployment.xml");
             File configCFH = null;
             File optCFH = null;
@@ -929,7 +911,7 @@ public class VoltDB {
             }
             try {
                 if (m_meshBrokers == null || m_meshBrokers.trim().isEmpty()) {
-                    File meshFH = new VoltFile(m_voltdbRoot, VoltDB.STAGED_MESH);
+                    File meshFH = new VoltFile(m_voltdbRoot, Constants.STAGED_MESH);
                     if (meshFH.exists() && meshFH.isFile() && meshFH.canRead()) {
                         try (BufferedReader br = new BufferedReader(new FileReader(meshFH))) {
                             m_meshBrokers = br.readLine();

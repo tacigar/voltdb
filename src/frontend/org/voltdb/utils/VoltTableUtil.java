@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.voltcore.utils.Pair;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTableRow;
 import org.voltdb.VoltType;
@@ -54,7 +53,7 @@ public class VoltTableUtil {
      * Volt using the CSV loader because that relies on the server to coerce the date string
      * and the server only supports GMT.
      */
-    public static TimeZone tz = VoltDB.VOLT_TIMEZONE;
+    public static TimeZone tz = Constants.VOLT_TIMEZONE;
 
     // VoltTable status code to indicate null dependency table. Joining SPI replies to fragment
     // task messages with this.
@@ -175,10 +174,10 @@ public class VoltTableUtil {
             writer = new CSVWriter(sw,
                     fullDelimiters[0], fullDelimiters[1], fullDelimiters[2], String.valueOf(fullDelimiters[3]));
         }
-        else if (delimiter == ',')
+        else if (delimiter == ',') {
             // CSV
             writer = new CSVWriter(sw, delimiter);
-        else {
+        } else {
             // TSV
             writer = CSVWriter.getStrictTSVWriter(sw);
         }
@@ -243,7 +242,9 @@ public class VoltTableUtil {
      * Return true if any string field in the table contains param s.
      */
     public static boolean tableContainsString(VoltTable t, String s, boolean caseSenstive) {
-        if (t.getRowCount() == 0) return false;
+        if (t.getRowCount() == 0) {
+            return false;
+        }
         if (!caseSenstive) {
             s = s.toLowerCase();
         }
@@ -253,7 +254,9 @@ public class VoltTableUtil {
             for (int i = 0; i < t.getColumnCount(); i++) {
                 if (t.getColumnType(i) == VoltType.STRING) {
                     String value = row.getString(i);
-                    if (value == null) continue;
+                    if (value == null) {
+                        continue;
+                    }
                     if (!caseSenstive) {
                         value = value.toLowerCase();
                     }
@@ -319,8 +322,11 @@ public class VoltTableUtil {
 
         @Override
         public long estimateSize() {
-            if (m_row == null) return 0;
-            else return m_fence - m_row.getActiveRowIndex();
+            if (m_row == null) {
+                return 0;
+            } else {
+                return m_fence - m_row.getActiveRowIndex();
+            }
         }
 
         @Override

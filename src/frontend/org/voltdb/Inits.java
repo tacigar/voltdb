@@ -664,7 +664,7 @@ public class Inits {
 
         @Override
         public void run() {
-            ModuleManager.initializeCacheRoot(new File(m_config.m_voltdbRoot, VoltDB.MODULE_CACHE));
+            ModuleManager.initializeCacheRoot(new File(m_config.m_voltdbRoot, Constants.MODULE_CACHE));
             // TODO: start foundation bundles
         }
     }
