@@ -30,7 +30,6 @@ import java.io.FilenameFilter;
 
 import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -90,7 +89,7 @@ public class TestRejoinWithCatalogUpdates extends RejoinTestBase {
         try {
             boolean success = cluster.compileWithAdminMode(builder, -1, false); // note, this admin port is ignored
             assertTrue(success);
-            MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+            MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
             cluster.setHasLocalServer(false);
 
             cluster.startUp();
@@ -110,10 +109,10 @@ public class TestRejoinWithCatalogUpdates extends RejoinTestBase {
             cluster.killSingleHost(0);
             Thread.sleep(1000);
 
-            VoltDB.Configuration config = new VoltDB.Configuration(cluster.portGenerator);
+            VoltConfiguration config = new VoltConfiguration(cluster.portGenerator);
             config.m_startAction = StartAction.REJOIN;
-            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
             config.m_leader = ":" + cluster.internalPort(1);
             config.m_coordinators = cluster.coordinators(1);
 
@@ -134,8 +133,8 @@ public class TestRejoinWithCatalogUpdates extends RejoinTestBase {
             client.createConnection("localhost", cluster.port(0));
 
             // Also make sure a catalog update doesn't reset m_haveDoneRestore
-            File newCatalog = new File(Configuration.getPathToCatalogForTest("rejoin.jar"));
-            File deployment = new File(Configuration.getPathToCatalogForTest("rejoin.xml"));
+            File newCatalog = new File(VoltConfiguration.getPathToCatalogForTest("rejoin.jar"));
+            File deployment = new File(VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
 
             VoltTable[] results =
                 client.updateApplicationCatalog(newCatalog, deployment).getResults();
@@ -166,7 +165,7 @@ public class TestRejoinWithCatalogUpdates extends RejoinTestBase {
         cluster.setHasLocalServer(false);
         boolean success = cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
 
         try {
             cluster.startUp();
@@ -176,8 +175,8 @@ public class TestRejoinWithCatalogUpdates extends RejoinTestBase {
                 Thread.sleep(1000);
                 cluster.recoverOne( 1, 0, "");
 
-                File newCatalog = new File(Configuration.getPathToCatalogForTest("rejoin.jar"));
-                File deployment = new File(Configuration.getPathToCatalogForTest("rejoin.xml"));
+                File newCatalog = new File(VoltConfiguration.getPathToCatalogForTest("rejoin.jar"));
+                File deployment = new File(VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
 
                 Client client = ClientFactory.createClient();
                 client.createConnection("localhost", cluster.port(0));

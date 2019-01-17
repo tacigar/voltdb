@@ -30,7 +30,7 @@ import java.io.File;
 import org.junit.After;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -66,7 +66,7 @@ public class TestConcurrentUpdateCatalog {
         project.addLiteralSchema("CREATE TABLE NEWTABLE (A1 INTEGER, PRIMARY KEY (A1));");
         project.setDeadHostTimeout(6);
         assertTrue(config.compile(project));
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addtable.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addtable.xml"));
 
         config = new LocalCluster("concurrentCatalogUpdate-cluster-addmoretable.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
         project = new VoltProjectBuilder();
@@ -78,11 +78,11 @@ public class TestConcurrentUpdateCatalog {
         }
         project.setDeadHostTimeout(6);
         assertTrue(config.compile(project));
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addmoretable.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addmoretable.xml"));
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-base.xml");
-        String newCatalogURL1 = Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addtable.jar");
-        String newCatalogURL2 = Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addmoretable.jar");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-base.xml");
+        String newCatalogURL1 = VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addtable.jar");
+        String newCatalogURL2 = VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-addmoretable.jar");
 
         SyncCallback cb1 = new SyncCallback();
         SyncCallback cb2 = new SyncCallback();
@@ -202,7 +202,7 @@ public class TestConcurrentUpdateCatalog {
         cluster.setHasLocalServer(false);
         assertTrue(cluster.compile(builder));
 
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-base.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("concurrentCatalogUpdate-cluster-base.xml"));
 
         cluster.startUp();
     }

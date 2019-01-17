@@ -26,7 +26,7 @@ package org.voltdb.compiler;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.compiler.procedures.FloatParamToGetNiceComplaint;
 import org.voltdb.compiler.procedures.InsertAggregatesOfFloat;
 import org.voltdb.compiler.procedures.InsertAggregatesOfFloatInHaving;
@@ -98,7 +98,7 @@ public class TestVoltCompilerAnnotationsAndWarnings extends TestCase {
             assertTrue("Bad type of object for parameter \"procObject\"", false);
         }
 
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("annotations.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("annotations.jar"));
         assertEquals(String.format("Expected compilation %s",
                                    (expectSuccess ? "success" : "failure")),
                      expectSuccess, success);
@@ -403,7 +403,7 @@ public class TestVoltCompilerAnnotationsAndWarnings extends TestCase {
         builder.addStmtProcedure("StmtSPNoncandidate2", "select count(*) from blah where sval = '12345678'");
         builder.addStmtProcedure("StmtSPNoncandidate3", "select count(*) from indexed_replicated_blah where ival = ?");
         builder.addStmtProcedure("FullIndexScan", "select ival, sval from indexed_replicated_blah");
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("annotations.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("annotations.jar"));
         assert(success);
         String captured = capturer.toString("UTF-8");
         System.out.print("\n"

@@ -75,7 +75,6 @@ import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.DeferredSerialization;
 import org.voltcore.utils.Pair;
 import org.voltdb.ClientInterface.ClientInputHandler;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable.ColumnInfo;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.client.ClientResponse;
@@ -177,7 +176,7 @@ public class TestClientInterface {
         doReturn(m_messenger).when(m_volt).getHostMessenger();
         doReturn(mock(VoltNetworkPool.class)).when(m_messenger).getNetwork();
         doReturn(m_zk).when(m_messenger).getZK();
-        doReturn(mock(Configuration.class)).when(m_volt).getConfig();
+        doReturn(mock(VoltConfiguration.class)).when(m_volt).getConfig();
         doReturn(32L).when(m_messenger).getHSIdForLocalSite(HostMessenger.ASYNC_COMPILER_SITE_ID);
         doReturn(ReplicationRole.NONE).when(m_volt).getReplicationRole();
         doReturn(m_context).when(m_volt).getCatalogContext();

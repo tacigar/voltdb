@@ -38,9 +38,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ArbitraryDurationProc;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.TestClientFeatures;
@@ -80,10 +80,10 @@ public class TestJDBCAutoReconnectOnLoss {
                 new ProcedurePartitionData("TT", "A1"));
         m_builder.addStmtProcedure("SelectB", "SELECT * FROM TT;");
 
-        assertTrue("failed to compile catalog", m_builder.compile(Configuration.getPathToCatalogForTest("jdbcreconnecttest.jar"), 3, 1, 0));
+        assertTrue("failed to compile catalog", m_builder.compile(VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.jar"), 3, 1, 0));
 
-        MiscUtils.copyFile(m_builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("jdbcreconnecttest.xml"));
-        m_testjar = Configuration.getPathToCatalogForTest("jdbcreconnecttest.jar");
+        MiscUtils.copyFile(m_builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.xml"));
+        m_testjar = VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.jar");
         if (ClientConfig.ENABLE_SSL_FOR_TEST) {
             driverUrl = driverUrl + JDBCTestCommons.SSL_URL_SUFFIX;
         }

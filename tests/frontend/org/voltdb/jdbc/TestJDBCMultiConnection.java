@@ -38,9 +38,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ArbitraryDurationProc;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.TestClientFeatures;
@@ -75,10 +75,10 @@ public class TestJDBCMultiConnection {
         m_projectBuilder.addStmtProcedure("InsertA", "INSERT INTO TT VALUES(?,?);",
                 new ProcedurePartitionData("TT", "A1"));
         m_projectBuilder.addStmtProcedure("SelectB", "SELECT * FROM TT;");
-        boolean success = m_projectBuilder.compile(Configuration.getPathToCatalogForTest("jdbcreconnecttest.jar"), 3, 1, 0);
+        boolean success = m_projectBuilder.compile(VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.jar"), 3, 1, 0);
         assert(success);
-        MiscUtils.copyFile(m_projectBuilder.getPathToDeployment(), Configuration.getPathToCatalogForTest("jdbcreconnecttest.xml"));
-        m_testJar = Configuration.getPathToCatalogForTest("jdbcreconnecttest.jar");
+        MiscUtils.copyFile(m_projectBuilder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.xml"));
+        m_testJar = VoltConfiguration.getPathToCatalogForTest("jdbcreconnecttest.jar");
 
         // Set up server and connections.
         startServer();

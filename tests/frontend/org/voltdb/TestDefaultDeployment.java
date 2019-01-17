@@ -30,7 +30,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltcore.logging.VoltLogger;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.deploymentfile.DeploymentType;
 import org.voltdb.utils.CatalogUtil;
@@ -67,7 +66,7 @@ public class TestDefaultDeployment {
         builder.addStmtProcedure("hello", "select * from warehouse");
 
         // compileWithDefaultDeployment() generates no deployment.xml so that the default is used.
-        String jarPath = Configuration.getPathToCatalogForTest("test.jar");
+        String jarPath = VoltConfiguration.getPathToCatalogForTest("test.jar");
         assertTrue(builder.compileWithDefaultDeployment(jarPath));
         final File jar = new File(jarPath);
         jar.deleteOnExit();

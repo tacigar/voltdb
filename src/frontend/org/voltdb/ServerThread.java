@@ -29,9 +29,9 @@ import org.voltdb.utils.MiscUtils;
  * Wraps VoltDB in a Thread
  */
 public class ServerThread extends Thread {
-    VoltDB.Configuration m_config;
+    VoltConfiguration m_config;
 
-    public ServerThread(VoltDB.Configuration config) {
+    public ServerThread(VoltConfiguration config) {
         m_config = config;
         if (m_config.m_pathToLicense == null) {
             m_config.m_pathToLicense = getTestLicensePath();
@@ -60,7 +60,7 @@ public class ServerThread extends Thread {
     }
 
     public ServerThread(String pathToCatalog, BackendTarget target) {
-        m_config = new VoltDB.Configuration();
+        m_config = new VoltConfiguration();
         m_config.m_pathToCatalog = pathToCatalog;
         m_config.m_backend = target;
         if (m_config.m_pathToLicense == null) {
@@ -79,7 +79,7 @@ public class ServerThread extends Thread {
     }
 
     public ServerThread(String pathToCatalog, String pathToDeployment, BackendTarget target) {
-        m_config = new VoltDB.Configuration();
+        m_config = new VoltConfiguration();
         m_config.m_pathToCatalog = pathToCatalog;
         m_config.m_pathToDeployment = pathToDeployment;
         m_config.m_backend = target;
@@ -117,7 +117,7 @@ public class ServerThread extends Thread {
                         int zkPort,
                         BackendTarget target)
     {
-        m_config = new VoltDB.Configuration();
+        m_config = new VoltConfiguration();
         m_config.m_pathToCatalog = pathToCatalog;
         m_config.m_pathToDeployment = pathToDeployment;
         m_config.m_backend = target;

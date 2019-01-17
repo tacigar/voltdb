@@ -26,7 +26,6 @@ package org.voltdb;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
@@ -36,8 +35,8 @@ public class TestAdhocWithOnlyComment extends AdhocDDLTestBase {
     @Test
     public void testAdhocWithOnlyComment() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("--dont care");
@@ -46,7 +45,7 @@ public class TestAdhocWithOnlyComment extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

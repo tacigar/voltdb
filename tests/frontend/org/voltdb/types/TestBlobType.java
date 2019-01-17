@@ -27,9 +27,8 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltType;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
@@ -63,17 +62,17 @@ public class TestBlobType extends TestCase {
         builder.addStmtProcedure("LiteralUpdate", "update blah set b = '0a1A' where ival = 5");
         builder.addStmtProcedure("LiteralInsert", "insert into blah values (13, 'aabbcc', 'hi', 'aabb');");
         builder.addProcedure(VarbinaryStringLookup.class);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("binarytest.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("binarytest.jar"), 1, 1, 0);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("binarytest.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("binarytest.xml"));
 
         ServerThread localServer = null;
         Client client = null;
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
-            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("binarytest.jar");
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("binarytest.xml");
+            VoltConfiguration config = new VoltConfiguration();
+            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("binarytest.jar");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("binarytest.xml");
             config.m_backend = BackendTarget.NATIVE_EE_JNI;
             localServer = new ServerThread(config);
             localServer.start();
@@ -196,7 +195,7 @@ public class TestBlobType extends TestCase {
         builder.addLiteralSchema(simpleSchema);
         builder.addPartitionInfo("blah", "ival");
         builder.addStmtProcedure("Insert", "insert into blah values (?, ?);");
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("binarytest.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("binarytest.jar"), 1, 1, 0);
         assertTrue(success);
     }
 
@@ -216,17 +215,17 @@ public class TestBlobType extends TestCase {
         builder.addStmtProcedure("Fake1", "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_STREET_1, C_STREET_2, C_CITY, C_STATE, C_ZIP, C_PHONE, C_SINCE, C_CREDIT, C_CREDIT_LIM, C_DISCOUNT, C_BALANCE, C_YTD_PAYMENT, C_PAYMENT_CNT, C_DATA FROM CUSTOMER WHERE C_LAST = ? AND C_D_ID = ? AND C_W_ID = ? ORDER BY C_FIRST;");
 
         builder.addProcedure(FakeCustomerLookup.class);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("binarytest2.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("binarytest2.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("binarytest2.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("binarytest2.xml"));
 
         ServerThread localServer = null;
         Client client = null;
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
-            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("binarytest2.jar");
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("binarytest2.xml");
+            VoltConfiguration config = new VoltConfiguration();
+            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("binarytest2.jar");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("binarytest2.xml");
             config.m_backend = BackendTarget.NATIVE_EE_JNI;
             localServer = new ServerThread(config);
             localServer.start();
@@ -311,13 +310,13 @@ public class TestBlobType extends TestCase {
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(simpleSchema);
         builder.addProcedure(BigFatBlobAndStringMD5.class);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("bigfatblobs.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("bigfatblobs.jar"), 1, 1, 0);
         assertTrue("Failed to compile catalog", success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("bigfatblobs.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("bigfatblobs.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("bigfatblobs.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("bigfatblobs.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("bigfatblobs.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("bigfatblobs.xml");
         config.m_backend = BackendTarget.NATIVE_EE_JNI;
 
         ServerThread localServer = null;

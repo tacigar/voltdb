@@ -41,8 +41,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
 
@@ -100,11 +100,11 @@ public class TestJDBCResultSet {
             pb = new VoltProjectBuilder();
             pb.addLiteralSchema(ddl);
             boolean success = pb.compile(
-                    Configuration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
+                    VoltConfiguration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
             assert (success);
             MiscUtils.copyFile(pb.getPathToDeployment(),
-                    Configuration.getPathToCatalogForTest(TEST_XML));
-            testjar = Configuration.getPathToCatalogForTest(TEST_JAR);
+                    VoltConfiguration.getPathToCatalogForTest(TEST_XML));
+            testjar = VoltConfiguration.getPathToCatalogForTest(TEST_JAR);
 
             // Set up ServerThread and Connection
             startServer();

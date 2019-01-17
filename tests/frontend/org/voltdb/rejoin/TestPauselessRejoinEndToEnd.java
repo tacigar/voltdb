@@ -39,12 +39,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
 import org.voltdb.ClientResponseImpl;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.RejoinTestBase;
 import org.voltdb.ServerThread;
 import org.voltdb.StartAction;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
@@ -97,7 +96,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
         cluster.setMaxHeap(1300);
         boolean success = cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
         cluster.setHasLocalServer(false);
 
         cluster.startUp();
@@ -130,9 +129,9 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
 
         client.close();
 
-        VoltDB.Configuration config = new VoltDB.Configuration(cluster.portGenerator);
+        VoltConfiguration config = new VoltConfiguration(cluster.portGenerator);
         config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
         config.m_leader = ":" + cluster.internalPort(1);
         config.m_coordinators = cluster.coordinators(1);
         if (cluster.isNewCli()) {
@@ -140,7 +139,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
             config.m_forceVoltdbCreate = false;
             config.m_hostCount = 2;
         } else {
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
         }
         cluster.setPortsFromConfig(0, config);
         localServer = new ServerThread(config);
@@ -182,7 +181,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
         cluster.setMaxHeap(1300);
         boolean success = cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
         cluster.setHasLocalServer(false);
 
         cluster.startUp();
@@ -199,9 +198,9 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
         cluster.killSingleHost(0);
         Thread.sleep(1000);
 
-        VoltDB.Configuration config = new VoltDB.Configuration(cluster.portGenerator);
+        VoltConfiguration config = new VoltConfiguration(cluster.portGenerator);
         config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
         config.m_leader = ":" + cluster.internalPort(1);
         config.m_coordinators = cluster.coordinators(1);
         if (cluster.isNewCli()) {
@@ -209,7 +208,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
             config.m_forceVoltdbCreate = false;
             config.m_hostCount = 2;
         } else {
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
         }
 
         cluster.setPortsFromConfig(0, config);
@@ -284,7 +283,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
         cluster.overrideAnyRequestForValgrind();
         boolean success = cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
         cluster.setHasLocalServer(false);
 
         cluster.startUp();
@@ -353,8 +352,8 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
 
         localServer = null;
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration(cluster.portGenerator);
-            config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
+            VoltConfiguration config = new VoltConfiguration(cluster.portGenerator);
+            config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
             config.m_leader = ":" + cluster.internalPort(1);
             config.m_coordinators = cluster.coordinators(1);
             if (cluster.isNewCli()) {
@@ -362,7 +361,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
                 config.m_forceVoltdbCreate = false;
                 config.m_hostCount = 2;
             } else {
-                config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+                config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
             }
             cluster.setPortsFromConfig(0, config);
             localServer = new ServerThread(config);
@@ -483,7 +482,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
             cluster.overrideAnyRequestForValgrind();
             boolean success = cluster.compile(builder);
             assertTrue(success);
-            MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+            MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
             cluster.setHasLocalServer(false);
 
             cluster.startUp();
@@ -617,8 +616,8 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
             assertFalse(loadThreadHasFailed.get());
             assertFalse(adhocThreadHasFailed.get());
 
-            VoltDB.Configuration config = new VoltDB.Configuration(cluster.portGenerator);
-            config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
+            VoltConfiguration config = new VoltConfiguration(cluster.portGenerator);
+            config.m_startAction = cluster.isNewCli() ? StartAction.PROBE : StartAction.LIVE_REJOIN;            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
             config.m_leader = ":" + cluster.internalPort(1);
             config.m_coordinators = cluster.coordinators(1);
             if (cluster.isNewCli()) {
@@ -626,7 +625,7 @@ public class TestPauselessRejoinEndToEnd extends RejoinTestBase {
                 config.m_forceVoltdbCreate = false;
                 config.m_hostCount = 2;
             } else {
-                config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+                config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
             }
             cluster.setPortsFromConfig(0, config);
             localServer = new ServerThread(config);

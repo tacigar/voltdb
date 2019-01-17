@@ -76,7 +76,7 @@ public class Inits {
 
     final RealVoltDB m_rvdb;
     final NodeStateTracker m_statusTracker;
-    final VoltDB.Configuration m_config;
+    final VoltConfiguration m_config;
     final boolean m_isRejoin;
     DeploymentType m_deployment = null;
     final boolean m_durable;

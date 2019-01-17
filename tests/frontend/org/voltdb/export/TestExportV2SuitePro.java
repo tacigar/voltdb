@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.voltdb.BackendTarget;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientImpl;
 import org.voltdb.client.ClientResponse;
@@ -74,8 +74,8 @@ public class TestExportV2SuitePro extends TestExportBaseSocketExport {
         }
 
         // add a new table
-        final String newCatalogURL = Configuration.getPathToCatalogForTest("export-ddl-addedtable.jar");
-        final String deploymentURL = Configuration.getPathToCatalogForTest("export-ddl-addedtable.xml");
+        final String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-addedtable.jar");
+        final String deploymentURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-addedtable.xml");
         final ClientResponse callProcedure = client.updateApplicationCatalog(new File(newCatalogURL),
                                                                              new File(deploymentURL));
         assertTrue(callProcedure.getStatus() == ClientResponse.SUCCESS);
@@ -114,8 +114,8 @@ public class TestExportV2SuitePro extends TestExportBaseSocketExport {
         }
 
         // now drop the no-nulls table
-        final String newCatalogURL = Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.jar");
-        final String deploymentURL = Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml");
+        final String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.jar");
+        final String deploymentURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml");
         quiesce(client);
         final ClientResponse callProcedure = client.updateApplicationCatalog(new File(newCatalogURL),
                                                                              new File(deploymentURL));
@@ -194,7 +194,7 @@ public class TestExportV2SuitePro extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES2);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
         assertTrue(compile);
 
         /*
@@ -222,7 +222,7 @@ public class TestExportV2SuitePro extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES3);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
         assertTrue(compile);
 
 

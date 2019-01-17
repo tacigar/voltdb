@@ -43,8 +43,7 @@ import java.net.URLDecoder;
 import org.junit.Test;
 import org.voltcore.utils.PortGenerator;
 import org.voltdb.AdhocDDLTestBase;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.fullddlfeatures.TestDDLFeatures;
@@ -56,7 +55,7 @@ public class TestCanonicalDDLThroughSQLcmd extends AdhocDDLTestBase {
     private boolean triedSqlcmdDryRun = false;
 
     private String getFirstCanonicalDDL() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("fullDDL.jar");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("fullDDL.jar");
 
         VoltCompiler compiler = new VoltCompiler(false);
         final URL url = TestDDLFeatures.class.getResource("fullDDL.sql");
@@ -67,8 +66,8 @@ public class TestCanonicalDDLThroughSQLcmd extends AdhocDDLTestBase {
     }
 
     private void secondCanonicalDDLFromAdhoc() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("emptyDDL.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("emptyDDL.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("emptyDDL.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("emptyDDL.xml");
 
         VoltCompiler compiler = new VoltCompiler(false);
         VoltProjectBuilder builder = new VoltProjectBuilder();
@@ -78,7 +77,7 @@ public class TestCanonicalDDLThroughSQLcmd extends AdhocDDLTestBase {
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -98,8 +97,8 @@ public class TestCanonicalDDLThroughSQLcmd extends AdhocDDLTestBase {
     }
 
     private void secondCanonicalDDLFromSQLcmd(boolean fastModeDDL) throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("emptyDDL.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("emptyDDL.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("emptyDDL.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("emptyDDL.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
 
@@ -111,7 +110,7 @@ public class TestCanonicalDDLThroughSQLcmd extends AdhocDDLTestBase {
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

@@ -31,8 +31,8 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.benchmark.tpcc.procedures.InsertNewOrder;
@@ -132,7 +132,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Test that we can enable snapshots
             //
-            String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml");
+            String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml");
             // Mix in various ways to specify no catalog.  Use java null here.
             String depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
                     Constants.UTF8_ENCODING);
@@ -151,7 +151,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Test that we can change settings like the path
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot.xml");
             // Mix in various ways to specify no catalog.  Use empty string here.
             depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
                     Constants.UTF8_ENCODING);
@@ -169,7 +169,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Change the snapshot path to something that doesn't exist, no crashes
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot_dir_not_exist.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot_dir_not_exist.xml");
             // Mix in various ways to specify no catalog.  Use empty array here.
             depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)),
                     Constants.UTF8_ENCODING);
@@ -182,7 +182,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Change it back
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
             // Mix in various ways to specify no catalog.  Make sure the client convenience method
             // works with a null file.
             results = client.updateApplicationCatalog(null, new File(deploymentURL)).getResults();
@@ -199,7 +199,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Make sure you can disable snapshots
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
             results = client.updateApplicationCatalog(null, new File(deploymentURL)).getResults();
             assertTrue(results.length == 1);
             for (File f : m_config.listFiles(new File("/tmp/snapshotdir2"))) {
@@ -216,7 +216,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Test that we can enable snapshots
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml");
             results = client.updateApplicationCatalog(null, new File(deploymentURL)).getResults();
             assertTrue(results.length == 1);
             Thread.sleep(5000);
@@ -231,7 +231,7 @@ public class TestUpdateDeployment extends RegressionSuite {
             //
             // Turn snapshots off so that we can clean up
             //
-            deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
+            deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
             results = client.updateApplicationCatalog(null, new File(deploymentURL)).getResults();
             assertTrue(results.length == 1);
             Thread.sleep(1000);
@@ -265,9 +265,9 @@ public class TestUpdateDeployment extends RegressionSuite {
         client.drain();
         assertTrue(callbackSuccess);
 
-        String newCatalogURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-addtable.jar");
+        String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-addtable.jar");
         // 6 seconds heart beat timeout deployment change
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-addtable.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-addtable.xml");
         // Asynchronously attempt consecutive catalog update and deployment update
         SyncCallback cb1 = new SyncCallback();
         client.updateApplicationCatalog(cb1,
@@ -322,7 +322,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         client.drain();
         assertTrue(callbackSuccess);
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_schema_update.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_schema_update.xml");
         // Try to change the schem setting
         SyncCallback cb = new SyncCallback();
         client.updateApplicationCatalog(cb, null, new File(deploymentURL));
@@ -340,7 +340,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         client.drain();
         assertTrue(callbackSuccess);
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-security-no-users.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-security-no-users.xml");
         // Try to change the schem setting
         SyncCallback cb = new SyncCallback();
         client.updateApplicationCatalog(cb, null, new File(deploymentURL));
@@ -395,7 +395,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         client.drain();
         assertTrue(callbackSuccess);
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-bad-username.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-bad-username.xml");
         // Try to change the schem setting
         SyncCallback cb = new SyncCallback();
         client.updateApplicationCatalog(cb, null, new File(deploymentURL));
@@ -412,7 +412,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         client.drain();
         assertTrue(callbackSuccess);
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-bad-masked-password.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-bad-masked-password.xml");
         // Try to change schema setting
         SyncCallback cb = new SyncCallback();
         client.updateApplicationCatalog(cb, null, new File(deploymentURL));
@@ -426,7 +426,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         Client client = getClient();
         assertTrue(callbackSuccess);
 
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-change-sitesperhost.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-change-sitesperhost.xml");
         // Try to change schema setting
         SyncCallback cb = new SyncCallback();
         client.updateApplicationCatalog(cb, null, new File(deploymentURL));
@@ -488,7 +488,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         boolean basecompile = config.compile(project);
         assertTrue(basecompile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml"));
 
         // add this config to the set of tests to run
         builder.addServerConfig(config, false);
@@ -506,7 +506,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         project.setDeadHostTimeout(DEAD_HOST_TIMEOUT);
         boolean compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-addtable.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-addtable.xml"));
 
         // A catalog change that enables snapshots
         config = new LocalCluster("catalogupdate-cluster-enable_snapshot.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -518,7 +518,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-enable_snapshot.xml"));
 
         //Another catalog change to modify the schedule
         config = new LocalCluster("catalogupdate-cluster-change_snapshot.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -530,7 +530,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot.xml"));
 
         //Another catalog change to modify the schedule
         config = new LocalCluster("catalogupdate-cluster-change_snapshot_dir_not_exist.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -542,7 +542,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot_dir_not_exist.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_snapshot_dir_not_exist.xml"));
 
         // A deployment change that changes the schema change mechanism
         config = new LocalCluster("catalogupdate-cluster-change_schema_update.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -554,7 +554,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-change_schema_update.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-change_schema_update.xml"));
 
         // A deployment change that changes the schema change mechanism
         config = new LocalCluster("catalogupdate-security-no-users.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -566,7 +566,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-security-no-users.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-security-no-users.xml"));
 
         // A deployment change that changes the schema change mechanism
         config = new LocalCluster("catalogupdate-bad-username.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -580,7 +580,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-bad-username.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-bad-username.xml"));
 
         // A deployment change that has bad masked password
         config = new LocalCluster("catalogupdate-bad-masked-password.jar", SITES_PER_HOST, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -594,7 +594,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-bad-masked-password.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-bad-masked-password.xml"));
 
         // A deployment change that alter the sites per host setting (it's disallowed!)
         config = new LocalCluster("catalogupdate-change-sitesperhost.jar", SITES_PER_HOST + 2, HOSTS, K, BackendTarget.NATIVE_EE_JNI);
@@ -605,7 +605,7 @@ public class TestUpdateDeployment extends RegressionSuite {
         // build the jarfile
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-change-sitesperhost.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-change-sitesperhost.xml"));
 
         return builder;
     }

@@ -36,7 +36,7 @@ public class AdhocDDLTestBase extends JUnit4LocalClusterTest {
     protected ServerThread m_localServer;
     protected Client m_client;
 
-    protected void startSystem(VoltDB.Configuration config) throws Exception
+    protected void startSystem(VoltConfiguration config) throws Exception
     {
         startServer(config);
         startClient(null);
@@ -48,7 +48,7 @@ public class AdhocDDLTestBase extends JUnit4LocalClusterTest {
         stopServer();
     }
 
-    protected void startServer(VoltDB.Configuration config) throws Exception
+    protected void startServer(VoltConfiguration config) throws Exception
     {
         m_localServer = new ServerThread(config);
         m_localServer.start();

@@ -27,10 +27,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.voltdb.ClientResponseImpl;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.TableHelper;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
@@ -54,7 +53,7 @@ public class TestLiveTableSchemaMigration extends TestCase {
         CatalogBuilder builder = new CatalogBuilder();
         String ddl = TableHelper.ddlForTable(t, false);
         builder.addLiteralSchema(ddl);
-        String retval = Configuration.getPathToCatalogForTest(jarname);
+        String retval = VoltConfiguration.getPathToCatalogForTest(jarname);
         boolean success = builder.compile(retval);
         // good spot below for a breakpoint if compiling fails
         if (!success) {
@@ -92,7 +91,7 @@ public class TestLiveTableSchemaMigration extends TestCase {
             String deployment = depBuilder.getXML();
             File deploymentFile = VoltProjectBuilder.writeStringToTempFile(deployment);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToDeployment = deploymentFile.getAbsolutePath();
             config.m_pathToCatalog = catPath1;
             config.m_ipcPort = 10000;
@@ -169,7 +168,7 @@ public class TestLiveTableSchemaMigration extends TestCase {
             String deployment = depBuilder.getXML();
             File deploymentFile = VoltProjectBuilder.writeStringToTempFile(deployment);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToDeployment = deploymentFile.getAbsolutePath();
             config.m_pathToCatalog = catPath1;
             config.m_ipcPort = 10000;

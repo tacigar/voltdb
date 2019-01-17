@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.voltdb.VoltConfiguration;
 import org.voltdb.VoltDB;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.utils.BuildDirectoryUtils;
@@ -65,7 +66,7 @@ public class TestCatalogVersionUpgrade extends TestCase {
 
         // Make sure the jar file is present.
         String jarName2 = String.format("catalog-%s.jar", serverVersion);
-        File jar2 = new File(VoltDB.Configuration.getPathToCatalogForTest(jarName2));
+        File jar2 = new File(VoltConfiguration.getPathToCatalogForTest(jarName2));
         assertTrue(jar2.exists());
     }
 

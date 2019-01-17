@@ -30,9 +30,8 @@ import java.net.URL;
 
 import org.junit.Test;
 import org.voltdb.AdhocDDLTestBase;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.StartAction;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
@@ -42,8 +41,8 @@ public class TestUpgradeWithCatalogJar extends AdhocDDLTestBase  {
     @Test
     public void testUpgradeWithCatalogJar() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("--dont care");
@@ -52,7 +51,7 @@ public class TestUpgradeWithCatalogJar extends AdhocDDLTestBase  {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
 
         // jar was compiled with version v7.4 and will be upgraded to current version
         URL catalogJarPath = TestUpgradeWithCatalogJar.class.getResource("upgradeCatalogV7_4.jar");

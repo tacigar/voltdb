@@ -34,10 +34,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.TableHelper;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.common.Constants;
 import org.voltdb.compiler.CatalogBuilder;
@@ -58,15 +57,15 @@ public class TestClientFeatures extends TestCase {
             catBuilder.addSchema(getClass().getResource("clientfeatures.sql"));
             catBuilder.addProcedures(ArbitraryDurationProc.class);
 
-            boolean success = catBuilder.compile(Configuration.getPathToCatalogForTest("timeouts.jar"));
+            boolean success = catBuilder.compile(VoltConfiguration.getPathToCatalogForTest("timeouts.jar"));
             assert(success);
 
             depBuilder = new DeploymentBuilder(1, 1, 0);
-            depBuilder.writeXML(Configuration.getPathToCatalogForTest("timeouts.xml"));
+            depBuilder.writeXML(VoltConfiguration.getPathToCatalogForTest("timeouts.xml"));
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
-            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("timeouts.jar");
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("timeouts.xml");
+            VoltConfiguration config = new VoltConfiguration();
+            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("timeouts.jar");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("timeouts.xml");
             localServer = new ServerThread(config);
             localServer.start();
             localServer.waitForInitialization();
@@ -171,7 +170,7 @@ public class TestClientFeatures extends TestCase {
 
         // run a blocking snapshot that *might* normally timeout
         start = System.nanoTime();
-        response = client.callProcedure("@SnapshotSave", Configuration.getPathToCatalogForTest(""), "slow", 1);
+        response = client.callProcedure("@SnapshotSave", VoltConfiguration.getPathToCatalogForTest(""), "slow", 1);
         duration = (System.nanoTime() - start) / 1000000000.0;
         System.out.printf("Snapshot save duration in seconds: %.2f\n", duration);
         assertEquals(ClientResponse.SUCCESS, response.getStatus());

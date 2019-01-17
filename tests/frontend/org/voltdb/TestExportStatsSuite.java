@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientImpl;
 import org.voltdb.client.ClientResponse;
@@ -225,7 +224,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
         }
 
         // update deployment, no TUPLE_COUNT_EXPORT connector
-        String deploymentURL = Configuration.getPathToCatalogForTest("stats_no_connector.xml");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("stats_no_connector.xml");
         String depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8_ENCODING);
         client.callProcedure("@UpdateApplicationCatalog", null, depBytes);
         stats = client.callProcedure("@Statistics", "export", 0).getResults()[0];
@@ -236,7 +235,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
         }
 
         // add connector back
-        deploymentURL = Configuration.getPathToCatalogForTest("stats_full.xml");
+        deploymentURL = VoltConfiguration.getPathToCatalogForTest("stats_full.xml");
         depBytes = new String(ClientUtils.fileToBytes(new File(deploymentURL)), Constants.UTF8_ENCODING);
         client.callProcedure("@UpdateApplicationCatalog", null, depBytes);
         stats = client.callProcedure("@Statistics", "export", 0).getResults()[0];
@@ -366,7 +365,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
         boolean compile = config.compile(project);
         assertTrue(compile);
         builder.addServerConfig(config, false);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("stats_full.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("stats_full.xml"));
 
 
         // A catalog change that enables snapshots
@@ -382,7 +381,7 @@ public class TestExportStatsSuite extends TestExportBaseSocketExport {
         project.setUseDDLSchema(true);
         compile = config.compile(project);
         assertTrue(compile);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("stats_no_connector.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("stats_no_connector.xml"));
         return builder;
     }
 }

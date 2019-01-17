@@ -207,10 +207,10 @@ public class TestJSONInterfaceSession extends TestCase {
 
             builder.setSecurityEnabled(true, true);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(VoltDB.Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);

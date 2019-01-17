@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.regressionsuites.RegressionSuite;
@@ -39,8 +38,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
 
     @Test
     public void testAlterAddColumn() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -56,7 +55,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -140,8 +139,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterDropColumn() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -173,7 +172,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -331,8 +330,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     public void testAlterColumnOther() throws Exception
     {
         System.out.println("----------------\n\n TestAlterColumnOther \n\n--------------");
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -348,7 +347,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -507,8 +506,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterRename() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -530,7 +529,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -583,8 +582,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterLimitPartitionRows() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -600,7 +599,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -654,8 +653,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterPartitionColumn() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -677,7 +676,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -818,8 +817,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterConstraintAssumeUnique() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- dont care");
@@ -828,7 +827,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         try {
@@ -868,8 +867,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAddNotNullColumnToEmptyTable() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -885,7 +884,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -918,8 +917,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAddNotNullColumnToNonEmptyTable() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -935,7 +934,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -978,8 +977,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     public void testAlterTableENG7242NoExpressions() throws Exception
     {
         System.out.println("----------------\n\n TestAlterTableENG7242 \n\n--------------");
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- dont care");
@@ -988,7 +987,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -1068,8 +1067,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     public void testAlterTableENG7304ENG7305() throws Exception
     {
         System.out.println("----------------\n\n TestAlterTableENG7304ENG7305 \n\n--------------");
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- dont care");
@@ -1078,7 +1077,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         try {
@@ -1150,8 +1149,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterTableWithSimpleMatViews() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -1181,7 +1180,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -1305,8 +1304,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
     @Test
     public void testAlterTableWithMinMatViews() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -1351,7 +1350,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -1488,8 +1487,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
 
     @Test
     public void testENG12384IndexNames() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -1511,7 +1510,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 
@@ -1538,8 +1537,8 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
 
     @Test
     public void testENG13094AlterTableChangeColumnTypeSize() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -1549,7 +1548,7 @@ public class TestAdhocAlterTable extends AdhocDDLTestBase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

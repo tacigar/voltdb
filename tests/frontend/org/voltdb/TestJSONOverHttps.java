@@ -82,7 +82,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 
@@ -192,10 +191,10 @@ public class TestJSONOverHttps extends TestCase {
                 String certstore = getResourcePath(certStorePath);
                 builder.setCertStoreInfo(certstore, certStorePasswd);
             }
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             m_server = new ServerThread(config);

@@ -82,7 +82,7 @@ public class InProcessVoltDBServer {
         depBuilder.setHTTPDPort(8080);
         depBuilder.setJSONAPIEnabled(true);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         if (pathToLicense != null) {
             config.m_pathToLicense = pathToLicense;
         }

@@ -76,12 +76,12 @@ public interface VoltDBInterface
      * Initialize all the global components, then initialize all the m_sites.
      * @param config Configuration from command line.
      */
-    public void initialize(VoltDB.Configuration config);
+    public void initialize(VoltConfiguration config);
     /**
      * CLI entry point for getting config from VoltDB
      * @param config Configuration from command line.
      */
-    public void cli(VoltDB.Configuration config);
+    public void cli(VoltConfiguration config);
 
     /**
      * Start all the site's event loops. That's it.
@@ -112,7 +112,7 @@ public interface VoltDBInterface
 
     public void startSampler();
 
-    public VoltDB.Configuration getConfig();
+    public VoltConfiguration getConfig();
     public CatalogContext getCatalogContext();
     public String getBuildString();
     public String getVersionString();

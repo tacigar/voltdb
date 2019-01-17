@@ -38,9 +38,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
@@ -149,7 +148,7 @@ public class TestInitStartLocalClusterAllOutOfProcess extends JUnit4LocalCluster
             deployment.delete();
         }
 
-        Configuration config = new VoltDB.Configuration(new String[]{"get", "deployment",
+        VoltConfiguration config = new VoltConfiguration(new String[]{"get", "deployment",
             "getvoltdbroot", voltDBRootParentPath,
             "file", deployment.getAbsolutePath() + "l", "forceget"});
         ServerThread server = new ServerThread(config);
@@ -168,7 +167,7 @@ public class TestInitStartLocalClusterAllOutOfProcess extends JUnit4LocalCluster
     // Test get schema
     public void testGetSchema() throws Exception {
         File schema = File.createTempFile("schema", ".sql");
-        Configuration config = new VoltDB.Configuration(new String[]{"get", "schema",
+        VoltConfiguration config = new VoltConfiguration(new String[]{"get", "schema",
             "getvoltdbroot", voltDBRootParentPath,
             "file", schema.getAbsolutePath(), "forceget"});
         ServerThread server = new ServerThread(config);
@@ -224,7 +223,7 @@ public class TestInitStartLocalClusterAllOutOfProcess extends JUnit4LocalCluster
 
     InMemoryJarfile getProcJarFromCatalog() throws IOException {
         File jar = File.createTempFile("procedure", ".jar");
-        Configuration config = new VoltDB.Configuration(new String[]{"get", "classes",
+        VoltConfiguration config = new VoltConfiguration(new String[]{"get", "classes",
             "getvoltdbroot", voltDBRootParentPath,
             "file", jar.getAbsolutePath(), "forceget"});
         ServerThread server = new ServerThread(config);

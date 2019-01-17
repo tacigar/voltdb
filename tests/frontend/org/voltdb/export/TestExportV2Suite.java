@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientImpl;
@@ -188,7 +188,7 @@ public class TestExportV2Suite extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES2);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
         assertTrue(compile);
         /*
          * compile a catalog with an added table for add/drop tests
@@ -215,7 +215,7 @@ public class TestExportV2Suite extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES3);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
         assertTrue(compile);
 
         return builder;

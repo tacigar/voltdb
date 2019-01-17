@@ -33,7 +33,7 @@ import java.net.URL;
 import org.junit.Test;
 import org.voltcore.utils.Pair;
 import org.voltdb.BackendTarget;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTableRow;
 import org.voltdb.VoltType;
@@ -73,7 +73,7 @@ public class TestResourcesInUpdateClasses extends JUnit4LocalClusterTest {
     private Pair<File, String> buildJarFile(byte[] rawCatalog, String resourceFileVersion, boolean useVersionInName) throws Exception {
         Pair<InMemoryJarfile, String> rslt = buildInMemoryJar(rawCatalog, resourceFileVersion, useVersionInName);
         // write the new jar to disk
-        File jarPath = new File(Configuration.getPathToCatalogForTest("jarWithResource" + resourceFileVersion + ".jar"));
+        File jarPath = new File(VoltConfiguration.getPathToCatalogForTest("jarWithResource" + resourceFileVersion + ".jar"));
         rslt.getFirst().writeToFile(jarPath);
         return Pair.of(jarPath, rslt.getSecond());
     }

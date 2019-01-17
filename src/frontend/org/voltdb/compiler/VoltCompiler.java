@@ -51,6 +51,7 @@ import org.hsqldb_voltpatches.VoltXMLElement;
 import org.voltcore.TransactionIdManager;
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.CatalogContext;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.RealVoltDB;
 import org.voltdb.SQLStmt;
@@ -2080,7 +2081,7 @@ public class VoltCompiler {
 
         // Check if it's compatible (or the upgrade is being forced).
         // getConfig() may return null if it's being mocked for a test.
-        if (   VoltDB.Configuration.m_forceCatalogUpgrade
+        if (   VoltConfiguration.m_forceCatalogUpgrade
             || !versionFromCatalog.equals(VoltDB.instance().getVersionString())) {
 
             // Patch the buildinfo.
@@ -2120,11 +2121,11 @@ public class VoltCompiler {
             CatalogContext catalogContext = VoltDB.instance().getCatalogContext();
             final String outputJarPath = (catalogContext != null
                     ? new File(VoltDB.instance().getVoltDBRootPath(), jarName).getPath()
-                    : VoltDB.Configuration.getPathToCatalogForTest(jarName));
+                    : VoltConfiguration.getPathToCatalogForTest(jarName));
             // Place the compiler output in a text file in the same folder.
             final String outputTextPath = (catalogContext != null
                     ? new File(VoltDB.instance().getVoltDBRootPath(), textName).getPath()
-                    : VoltDB.Configuration.getPathToCatalogForTest(textName));
+                    : VoltConfiguration.getPathToCatalogForTest(textName));
             try {
                 m_classLoader = outputJar.getLoader();
 

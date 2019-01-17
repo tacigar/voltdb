@@ -30,10 +30,9 @@ import java.util.Collections;
 import java.util.Random;
 
 import org.voltcore.logging.VoltLogger;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
@@ -75,7 +74,7 @@ public class TestVoltBulkLoader extends TestCase {
     protected String pathToCatalog;
     protected String pathToDeployment;
     protected ServerThread localServer;
-    protected VoltDB.Configuration config;
+    protected VoltConfiguration config;
     protected VoltProjectBuilder builder;
     protected Client client1;
     protected Client client2;
@@ -1055,8 +1054,8 @@ public class TestVoltBulkLoader extends TestCase {
     public void test_Interface(String my_schema, Object[][] my_data,
             int my_batchSize, ArrayList<Integer> expectedFailList, int flushInterval, boolean upsert) throws Exception {
         try{
-            pathToCatalog = Configuration.getPathToCatalogForTest("vbl.jar");
-            pathToDeployment = Configuration.getPathToCatalogForTest("vbl.xml");
+            pathToCatalog = VoltConfiguration.getPathToCatalogForTest("vbl.jar");
+            pathToDeployment = VoltConfiguration.getPathToCatalogForTest("vbl.xml");
             builder = new VoltProjectBuilder();
 
             builder.addLiteralSchema(my_schema);
@@ -1064,7 +1063,7 @@ public class TestVoltBulkLoader extends TestCase {
             boolean success = builder.compile(pathToCatalog, 2, 1, 0);
             assertTrue(success);
             MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
-            config = new VoltDB.Configuration();
+            config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             localServer = new ServerThread(config);
@@ -1295,8 +1294,8 @@ public class TestVoltBulkLoader extends TestCase {
 
     private boolean startServer(String my_schema, boolean multiPartTable, String my_tableName1, String my_tableName2) throws Exception
     {
-        pathToCatalog = Configuration.getPathToCatalogForTest("vbl.jar");
-        pathToDeployment = Configuration.getPathToCatalogForTest("vbl.xml");
+        pathToCatalog = VoltConfiguration.getPathToCatalogForTest("vbl.jar");
+        pathToDeployment = VoltConfiguration.getPathToCatalogForTest("vbl.xml");
         builder = new VoltProjectBuilder();
 
         builder.addLiteralSchema(my_schema);
@@ -1310,7 +1309,7 @@ public class TestVoltBulkLoader extends TestCase {
         boolean success = builder.compile(pathToCatalog, 2, 1, 0);
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
-        config = new Configuration();
+        config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         localServer = new ServerThread(config);

@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.voltcore.utils.Pair;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
@@ -44,7 +43,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
     @Test
     public void testBasicCreateIndex() throws Exception
     {
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         String ddl = "create table FOO (" +
                      "ID integer not null," +
                      "VAL bigint, " +
@@ -148,7 +147,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
     @Test
     public void testCreatePartialIndex() throws Exception
     {
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         String ddl = "create table FOO (" +
                      "ID integer not null," +
                      "TS timestamp, " +
@@ -212,7 +211,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
     @Test
     public void testCreateDropIndexonView() throws Exception
     {
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         String ddl = "create table FOO (" +
                      "ID integer not null," +
                      "VAL bigint, " +
@@ -364,7 +363,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
     @Test
     public void testCreateUnsafeIndexOnNonemptyTable() throws Exception
     {
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         String ddl = "CREATE TABLE T_ENG_12024 (a INT, b INT, c VARCHAR(10));";
         createSchema(config, ddl, 2, 1, 0);
 
@@ -405,7 +404,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
 
     @Test
     public void testENG15047() {
-        final VoltDB.Configuration config = new VoltDB.Configuration();
+        final VoltConfiguration config = new VoltConfiguration();
         final String ddl = "CREATE TABLE P4 (\n" +
                         "INT     INTEGER  DEFAULT 0 PRIMARY KEY, -- also crashes on UNIQUE\n" +
                         "VCHAR_JSON        VARCHAR(100) DEFAULT 'foo' NOT NULL," +
@@ -438,7 +437,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
 
     @Test
     public void testENG15213() throws Exception {
-        final VoltDB.Configuration config = new VoltDB.Configuration();
+        final VoltConfiguration config = new VoltConfiguration();
         final String ddl = "CREATE TABLE P5 (i INTEGER, j FLOAT);";
         try {
             createSchema(config, ddl, 2, 1, 0);
@@ -474,7 +473,7 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
 
     }
 
-    private void createSchema(VoltDB.Configuration config,
+    private void createSchema(VoltConfiguration config,
                               String ddl,
                               final int sitesPerHost,
                               final int hostCount,
@@ -483,10 +482,10 @@ public class TestAdhocCreateDropIndex extends AdhocDDLTestBase {
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(ddl);
         builder.setUseDDLSchema(true);
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
         boolean success = builder.compile(config.m_pathToCatalog, sitesPerHost, hostCount, replication);
         assertTrue("Schema compilation failed", success);
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
         MiscUtils.copyFile(builder.getPathToDeployment(), config.m_pathToDeployment);
     }
 }

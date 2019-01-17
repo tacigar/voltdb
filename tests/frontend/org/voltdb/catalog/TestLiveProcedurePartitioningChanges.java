@@ -30,9 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltProcedure;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
@@ -120,10 +119,10 @@ public class TestLiveProcedurePartitioningChanges extends TestCase {
         DeploymentBuilder deploymentBuilder = new DeploymentBuilder(3, 1, 0);
         deploymentBuilder.setUseDDLSchema(true);
         deploymentBuilder.setEnableCommandLogging(false);
-        deploymentBuilder.writeXML(Configuration.getPathToCatalogForTest("slamcatalog.xml"));
+        deploymentBuilder.writeXML(VoltConfiguration.getPathToCatalogForTest("slamcatalog.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("slamcatalog.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("slamcatalog.xml");
         server = new ServerThread(config);
         server.start();
         server.waitForInitialization();

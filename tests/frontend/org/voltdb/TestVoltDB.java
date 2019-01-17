@@ -63,7 +63,7 @@ final public class TestVoltDB {
 
     @Test
     public void testConfigurationConstructor() {
-        VoltDB.Configuration blankConfig = new VoltDB.Configuration();
+        VoltConfiguration blankConfig = new VoltConfiguration();
         assertFalse(blankConfig.m_noLoadLibVOLTDB);
         assertEquals(BackendTarget.NATIVE_EE_JNI, blankConfig.m_backend);
         assertEquals(null, blankConfig.m_pathToCatalog);
@@ -71,70 +71,70 @@ final public class TestVoltDB {
         assertEquals(Constants.DEFAULT_PORT, blankConfig.m_port);
 
         String args1[] = { "create", "noloadlib" };
-        assertTrue(new VoltDB.Configuration(args1).m_noLoadLibVOLTDB);
+        assertTrue(new VoltConfiguration(args1).m_noLoadLibVOLTDB);
 
         String args2[] = { "create", "hsqldb" };
-        VoltDB.Configuration cfg2 = new VoltDB.Configuration(args2);
+        VoltConfiguration cfg2 = new VoltConfiguration(args2);
         assertEquals(BackendTarget.HSQLDB_BACKEND, cfg2.m_backend);
         String args3[] = { "create", "jni" };
-        VoltDB.Configuration cfg3 = new VoltDB.Configuration(args3);
+        VoltConfiguration cfg3 = new VoltConfiguration(args3);
         assertEquals(BackendTarget.NATIVE_EE_JNI, cfg3.m_backend);
         String args4[] = { "create", "ipc" };
-        VoltDB.Configuration cfg4 = new VoltDB.Configuration(args4);
+        VoltConfiguration cfg4 = new VoltConfiguration(args4);
         assertEquals(BackendTarget.NATIVE_EE_IPC, cfg4.m_backend);
         // what happens if arguments conflict?
         String args5[] = { "create", "ipc", "hsqldb" };
-        VoltDB.Configuration cfg5 = new VoltDB.Configuration(args5);
+        VoltConfiguration cfg5 = new VoltConfiguration(args5);
         assertEquals(BackendTarget.HSQLDB_BACKEND, cfg5.m_backend);
 
         String args9[] = { "create", "catalog xtestxstringx" };
-        VoltDB.Configuration cfg9 = new VoltDB.Configuration(args9);
+        VoltConfiguration cfg9 = new VoltConfiguration(args9);
         assertEquals("xtestxstringx", cfg9.m_pathToCatalog);
         String args10[] = { "create", "catalog", "ytestystringy" };
-        VoltDB.Configuration cfg10 = new VoltDB.Configuration(args10);
+        VoltConfiguration cfg10 = new VoltConfiguration(args10);
         assertEquals("ytestystringy", cfg10.m_pathToCatalog);
 
         String args12[] = { "create", "port", "1234" };
-        VoltDB.Configuration cfg12 = new VoltDB.Configuration(args12);
+        VoltConfiguration cfg12 = new VoltConfiguration(args12);
         assertEquals(1234, cfg12.m_port);
         String args13[] = { "create", "port", "5678" };
-        VoltDB.Configuration cfg13 = new VoltDB.Configuration(args13);
+        VoltConfiguration cfg13 = new VoltConfiguration(args13);
         assertEquals(5678, cfg13.m_port);
 
         String args14[] = { "create" };
-        VoltDB.Configuration cfg14 = new VoltDB.Configuration(args14);
+        VoltConfiguration cfg14 = new VoltConfiguration(args14);
         assertEquals(StartAction.CREATE, cfg14.m_startAction);
         String args15[] = { "recover" };
-        VoltDB.Configuration cfg15 = new VoltDB.Configuration(args15);
+        VoltConfiguration cfg15 = new VoltConfiguration(args15);
         assertEquals(StartAction.RECOVER, cfg15.m_startAction);
         String args16[] = { "recover", "safemode" };
-        VoltDB.Configuration cfg16 = new VoltDB.Configuration(args16);
+        VoltConfiguration cfg16 = new VoltConfiguration(args16);
         assertEquals(StartAction.SAFE_RECOVER, cfg16.m_startAction);
 
         // test host:port formats
         String args18[] = {"create", "port", "localhost:5678"};
-        VoltDB.Configuration cfg18 = new VoltDB.Configuration(args18);
+        VoltConfiguration cfg18 = new VoltConfiguration(args18);
         assertEquals(5678, cfg18.m_port);
         assertEquals("localhost", cfg18.m_clientInterface);
 
         String args19[] = {"create", "adminport", "localhost:5678"};
-        VoltDB.Configuration cfg19 = new VoltDB.Configuration(args19);
+        VoltConfiguration cfg19 = new VoltConfiguration(args19);
         assertEquals(5678, cfg19.m_adminPort);
         assertEquals("localhost", cfg19.m_adminInterface);
 
         String args20[] = {"create", "httpport", "localhost:7777"};
-        VoltDB.Configuration cfg20 = new VoltDB.Configuration(args20);
+        VoltConfiguration cfg20 = new VoltConfiguration(args20);
         assertEquals(7777, cfg20.m_httpPort);
         assertEquals("localhost", cfg20.m_httpPortInterface);
 
         String args21[] = {"create", "internalport", "localhost:7777"};
-        VoltDB.Configuration cfg21 = new VoltDB.Configuration(args21);
+        VoltConfiguration cfg21 = new VoltConfiguration(args21);
         assertEquals(7777, cfg21.m_internalPort);
         assertEquals("localhost", cfg21.m_internalInterface);
 
         //with override
         String args22[] = {"create", "internalinterface", "xxxxxx", "internalport", "localhost:7777"};
-        VoltDB.Configuration cfg22 = new VoltDB.Configuration(args22);
+        VoltConfiguration cfg22 = new VoltConfiguration(args22);
         assertEquals(7777, cfg22.m_internalPort);
         assertEquals("localhost", cfg22.m_internalInterface);
 
@@ -144,65 +144,65 @@ final public class TestVoltDB {
 
     @Test
     public void testConfigurationValidate() throws Exception {
-        VoltDB.Configuration config;
+        VoltConfiguration config;
 
         // missing leader provided deployment - not okay.
         String[] argsya = {"create", "catalog", "qwerty", "deployment", "qwerty"};
-        config = new VoltDB.Configuration(argsya);
+        config = new VoltConfiguration(argsya);
         assertFalse(config.validate());
 
         // missing deployment (it's okay now that a default deployment is supported)
         String[] args3 = {"create", "host", "hola", "catalog", "teststring2"};
-        config = new VoltDB.Configuration(args3);
+        config = new VoltConfiguration(args3);
         assertTrue(config.validate());
 
         // default deployment with default leader -- okay.
-        config = new VoltDB.Configuration(new String[]{"create", "catalog", "catalog.jar"});
+        config = new VoltConfiguration(new String[]{"create", "catalog", "catalog.jar"});
         assertTrue(config.validate());
 
         // empty leader -- tests could pass in empty leader to indicate bind to all interfaces on mac
         String[] argsyo = {"create", "host", "", "catalog", "sdfs", "deployment", "sdfsd"};
-        config = new VoltDB.Configuration(argsyo);
+        config = new VoltConfiguration(argsyo);
         assertTrue(config.validate());
 
         // empty deployment
         String[] args6 = {"create", "host", "hola", "catalog", "teststring6", "deployment", ""};
-        config = new VoltDB.Configuration(args6);
+        config = new VoltConfiguration(args6);
         assertFalse(config.validate());
 
         // replica with explicit create
         String[] args8 = {"host", "hola", "deployment", "teststring4", "catalog", "catalog.jar", "create"};
-        config = new VoltDB.Configuration(args8);
+        config = new VoltConfiguration(args8);
         assertTrue(config.validate());
 
         // valid config
         String[] args10 = {"create", "leader", "localhost", "deployment", "te", "catalog", "catalog.jar"};
-        config = new VoltDB.Configuration(args10);
+        config = new VoltConfiguration(args10);
         assertTrue(config.validate());
 
         // valid config
         String[] args100 = {"create", "host", "hola", "deployment", "teststring4", "catalog", "catalog.jar"};
-        config = new VoltDB.Configuration(args100);
+        config = new VoltConfiguration(args100);
         assertTrue(config.validate());
 
         // valid rejoin config
         String[] args200 = {"rejoin", "host", "localhost"};
-        config = new VoltDB.Configuration(args200);
+        config = new VoltConfiguration(args200);
         assertTrue(config.validate());
 
         // invalid rejoin config, missing rejoin host
         String[] args250 = {"rejoin"};
-        config = new VoltDB.Configuration(args250);
+        config = new VoltConfiguration(args250);
         assertFalse(config.validate()); // false in both pro and community
 
         // rejoinhost should still work
         String[] args201 = {"rejoinhost", "localhost"};
-        config = new VoltDB.Configuration(args201);
+        config = new VoltConfiguration(args201);
         assertTrue(config.validate());
 
         // valid rejoin config
         String[] args300 = {"live", "rejoin", "host", "localhost"};
-        config = new VoltDB.Configuration(args300);
+        config = new VoltConfiguration(args300);
         assertTrue(config.validate());
         assertEquals(StartAction.LIVE_REJOIN, config.m_startAction);
     }
@@ -221,7 +221,7 @@ final public class TestVoltDB {
         final File path = tmp.newFolder();
 
         String [] init = {"initialize", "voltdbroot", path.getPath()};
-        VoltDB.Configuration config = new VoltDB.Configuration(init);
+        VoltConfiguration config = new VoltConfiguration(init);
         assertTrue(config.validate()); // false in both pro and community]
 
         ServerThread server = new ServerThread(config);
@@ -231,23 +231,23 @@ final public class TestVoltDB {
 
         // invalid host count
         String [] args400 = {"probe", "voltdbroot", path.getPath(), "hostcount", "2", "mesh", "uno,", "due", ",","tre", ",quattro" };
-        config = new VoltDB.Configuration(args400);
+        config = new VoltConfiguration(args400);
         assertFalse(config.validate()); // false in both pro and community
 
         String [] args401 = {"probe", "voltdbroot", path.getPath(), "hostcount", "-3" , "mesh", "uno,", "due", ",","tre", ",quattro"};
-        config = new VoltDB.Configuration(args401);
+        config = new VoltConfiguration(args401);
         assertFalse(config.validate()); // false in both pro and community
 
         String [] args402 = {"probe", "voltdbroot", path.getPath(), "hostcount", "4" , "mesh", "uno,", "due", ",","tre", ",quattro"};
-        config = new VoltDB.Configuration(args402);
+        config = new VoltConfiguration(args402);
         assertTrue(config.validate()); // false in both pro and community
 
         String [] args403 = {"probe", "voltdbroot", path.getPath(), "hostcount", "6" , "mesh", "uno,", "due", ",","tre", ",quattro"};
-        config = new VoltDB.Configuration(args403);
+        config = new VoltConfiguration(args403);
         assertTrue(config.validate()); // false in both pro and community
 
         String [] args404 = {"probe", "voltdbroot", path.getPath(), "mesh", "uno,", "due", ",","tre", ",quattro"};
-        config = new VoltDB.Configuration(args404);
+        config = new VoltConfiguration(args404);
         assertTrue(config.validate()); // false in both pro and community
         assertEquals(4, config.m_hostCount);
     }

@@ -26,9 +26,9 @@ package org.voltdb.compiler;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import junit.framework.TestCase;
+import org.voltdb.VoltConfiguration;
 
-import org.voltdb.VoltDB.Configuration;
+import junit.framework.TestCase;
 
 
 public class TestVoltCompilerErrorMsgs extends TestCase {
@@ -75,7 +75,7 @@ public class TestVoltCompilerErrorMsgs extends TestCase {
             }
         }
 
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("errors.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("errors.jar"));
         String captured = capturer.toString("UTF-8");
         String[] lines = captured.split("\n");
 

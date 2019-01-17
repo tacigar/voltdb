@@ -23,7 +23,6 @@
 
 package org.voltdb;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
@@ -144,13 +143,13 @@ public class TestHSQLBackend extends TestCase {
         builder.addLiteralSchema(simpleSchema);
         builder.addPartitionInfo("blah", "ival");
         builder.addStmtProcedure("Insert", "insert into blah values (?, ?);");
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("hsqldbbin.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("hsqldbbin.jar"), 1, 1, 0);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("hsqldbbin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("hsqldbbin.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("hsqldbbin.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("hsqldbbin.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("hsqldbbin.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("hsqldbbin.xml");
         config.m_backend = BackendTarget.HSQLDB_BACKEND;
         config.m_noLoadLibVOLTDB = true;
         ServerThread localServer = new ServerThread(config);

@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -50,8 +49,8 @@ public class TestAdhocCreateDropRole extends AdhocDDLTestBase {
     {
         System.out.println("\n\n-----\n testBasic \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         // Need to parallel dbuilder as we modify builder
         DeploymentBuilder dbuilder = new DeploymentBuilder(2, 1, 0);
@@ -79,7 +78,7 @@ public class TestAdhocCreateDropRole extends AdhocDDLTestBase {
         dbuilder.writeXML(pathToDeployment);
         //MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

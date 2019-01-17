@@ -31,7 +31,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.common.Constants;
@@ -72,12 +71,12 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
 
     void generateCatalogsAndDeployments(boolean useLiveDDL) throws Exception
     {
-        m_pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        m_pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
-        m_pathToReplicaDeployment = Configuration.getPathToCatalogForTest("replicaadhocddl.xml");
-        m_pathToOtherCatalog = Configuration.getPathToCatalogForTest("newadhocddl.jar");
-        m_pathToOtherDeployment = Configuration.getPathToCatalogForTest("newadhocddl.xml");
-        m_pathToOtherReplicaDeployment = Configuration.getPathToCatalogForTest("newreplicaadhocddl.xml");
+        m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
+        m_pathToReplicaDeployment = VoltConfiguration.getPathToCatalogForTest("replicaadhocddl.xml");
+        m_pathToOtherCatalog = VoltConfiguration.getPathToCatalogForTest("newadhocddl.jar");
+        m_pathToOtherDeployment = VoltConfiguration.getPathToCatalogForTest("newadhocddl.xml");
+        m_pathToOtherReplicaDeployment = VoltConfiguration.getPathToCatalogForTest("newreplicaadhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -211,7 +210,7 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
         generateCatalogsAndDeployments(false);
 
         // Fire up a cluster with no catalog
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToDeployment = m_pathToDeployment;
 
         try {
@@ -273,7 +272,7 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
         generateCatalogsAndDeployments(true);
 
         // Fire up a cluster with no catalog
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToDeployment = m_pathToDeployment;
 
         try {
@@ -293,7 +292,7 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
         generateCatalogsAndDeployments(false);
 
         // Fire up a cluster with no catalog
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = m_pathToOtherCatalog;
         config.m_pathToDeployment = m_pathToReplicaDeployment;
 
@@ -367,7 +366,7 @@ public class TestLiveDDLSchemaSwitch extends AdhocDDLTestBase {
         generateCatalogsAndDeployments(true);
 
         // Fire up a cluster with no catalog
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = m_pathToOtherCatalog;
         config.m_pathToDeployment = m_pathToReplicaDeployment;
 

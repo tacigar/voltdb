@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientImpl;
 import org.voltdb.client.ClientResponse;
@@ -103,8 +102,8 @@ public class TestExportGroups extends TestExportBase {
         waitForStreamedAllocatedMemoryZero(client);
         exportVerify(client);
 
-        String newCatalogURL = Configuration.getPathToCatalogForTest("export-ddl-diff-grp.jar");
-        String deploymentURL = Configuration.getPathToCatalogForTest("export-ddl-diff-grp.xml");
+        String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-diff-grp.jar");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-diff-grp.xml");
         ClientResponse callProcedure = client.updateApplicationCatalog(new File(newCatalogURL),
                                                                        new File(deploymentURL));
         assertTrue(callProcedure.getStatus() == ClientResponse.SUCCESS);
@@ -129,15 +128,15 @@ public class TestExportGroups extends TestExportBase {
             System.out.println("Waiting for hashinator to be initialized...");
         }
 
-        String newCatalogURL = Configuration.getPathToCatalogForTest("export-ddl-nonexist-grp.jar");
-        String deploymentURL = Configuration.getPathToCatalogForTest("export-ddl-nonexist-grp.xml");
+        String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-nonexist-grp.jar");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-nonexist-grp.xml");
         ClientResponse callProcedure = client.updateApplicationCatalog(new File(newCatalogURL),
                                                                        new File(deploymentURL));
         assertTrue(callProcedure.getStatus() == ClientResponse.SUCCESS);
         exportVerify(client);
 
-        newCatalogURL = Configuration.getPathToCatalogForTest("export-ddl-diff-grp.jar");
-        deploymentURL = Configuration.getPathToCatalogForTest("export-ddl-diff-grp.xml");
+        newCatalogURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-diff-grp.jar");
+        deploymentURL = VoltConfiguration.getPathToCatalogForTest("export-ddl-diff-grp.xml");
         callProcedure = client.updateApplicationCatalog(new File(newCatalogURL),
                                                         new File(deploymentURL));
         assertTrue(callProcedure.getStatus() == ClientResponse.SUCCESS);
@@ -239,7 +238,7 @@ public class TestExportGroups extends TestExportBase {
         ((LocalCluster )config).setNewCli(false);
         boolean compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl.xml"));
         assertTrue(compile);
         builder.addServerConfig(config, false);
 
@@ -262,7 +261,7 @@ public class TestExportGroups extends TestExportBase {
         project.addProcedures(PROCEDURES);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-diff-grp.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-diff-grp.xml"));
         assertTrue(compile);
 
         /*
@@ -283,7 +282,7 @@ public class TestExportGroups extends TestExportBase {
         project.addProcedures(PROCEDURES);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-nonexist-grp.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-nonexist-grp.xml"));
         assertTrue(compile);
 
         return builder;

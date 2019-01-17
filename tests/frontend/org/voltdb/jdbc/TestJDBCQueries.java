@@ -43,8 +43,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.Encoder;
@@ -331,10 +331,10 @@ public class TestJDBCQueries {
         pb = new VoltProjectBuilder();
         pb.setUseDDLSchema(true);
         pb.addLiteralSchema(ddl);
-        boolean success = pb.compile(Configuration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
+        boolean success = pb.compile(VoltConfiguration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
         assert(success);
-        MiscUtils.copyFile(pb.getPathToDeployment(), Configuration.getPathToCatalogForTest(TEST_XML));
-        testjar = Configuration.getPathToCatalogForTest(TEST_JAR);
+        MiscUtils.copyFile(pb.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest(TEST_XML));
+        testjar = VoltConfiguration.getPathToCatalogForTest(TEST_JAR);
 
         // Set up ServerThread and Connection
         startServer();

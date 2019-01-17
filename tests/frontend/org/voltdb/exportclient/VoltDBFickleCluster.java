@@ -27,8 +27,8 @@ import java.io.File;
 import java.net.URLEncoder;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.regressionsuites.LocalCluster;
 
@@ -40,8 +40,8 @@ import org.voltdb.regressionsuites.LocalCluster;
  */
 public class VoltDBFickleCluster extends LocalCluster {
 
-    static final String jar1Path = Configuration.getPathToCatalogForTest("fickle1.jar");
-    static final String jar2Path = Configuration.getPathToCatalogForTest("fickle2.jar");
+    static final String jar1Path = VoltConfiguration.getPathToCatalogForTest("fickle1.jar");
+    static final String jar2Path = VoltConfiguration.getPathToCatalogForTest("fickle2.jar");
     static String depPath = null;
     static VoltDBFickleCluster m_cluster = new VoltDBFickleCluster();
 

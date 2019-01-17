@@ -27,9 +27,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.voltdb.ClientResponseImpl;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
@@ -108,12 +107,12 @@ public class TestTwoPartitionProcs extends TestCase {
         pb.addLiteralSchema(ddl);
         pb.setHTTPDPort(8080);
         pb.setJSONAPIEnabled(true);
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("compileNT.jar")));
-        MiscUtils.copyFile(pb.getPathToDeployment(), Configuration.getPathToCatalogForTest("compileNT.xml"));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("compileNT.jar")));
+        MiscUtils.copyFile(pb.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("compileNT.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("compileNT.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("compileNT.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("compileNT.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("compileNT.xml");
         config.m_sitesperhost = 12;
         ServerThread localServer = new ServerThread(config);
         localServer.start();

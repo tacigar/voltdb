@@ -23,7 +23,6 @@
 
 package org.voltdb;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 
 import junit.framework.TestCase;
@@ -59,7 +58,7 @@ public class IndexOrderPlayground extends TestCase {
                 new ProcedurePartitionData("table2", "column1", "0"));
         builder.addStmtProcedure("SelectT3", "select * from table3 where column1 = ? and column2 = ?;",
                 new ProcedurePartitionData("table3", "column1", "0"));
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("indexordertest.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("indexordertest.jar"), 1, 1, 0);
         assertTrue(success);
     }
 }

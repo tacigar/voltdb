@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.NullCallback;
@@ -224,7 +223,7 @@ public class TestExportRollback extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES2);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
         assertTrue(compile);
 
         /*
@@ -252,7 +251,7 @@ public class TestExportRollback extends TestExportBaseSocketExport {
         project.addProcedures(PROCEDURES3);
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-addedtable.xml"));
         assertTrue(compile);
 
 

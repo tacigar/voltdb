@@ -52,9 +52,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltType;
 import org.voltdb.client.ArbitraryDurationProc;
 import org.voltdb.client.ClientConfig;
@@ -131,10 +131,10 @@ public class TestJDBCDriver {
                 new ProcedurePartitionData("TT", "A1"));
         pb.addStmtProcedure("SelectB", "SELECT * FROM TT;");
         pb.addStmtProcedure("SelectC", "SELECT * FROM ALL_TYPES;");
-        boolean success = pb.compile(Configuration.getPathToCatalogForTest("jdbcdrivertest.jar"), 3, 1, 0);
+        boolean success = pb.compile(VoltConfiguration.getPathToCatalogForTest("jdbcdrivertest.jar"), 3, 1, 0);
         assert(success);
-        MiscUtils.copyFile(pb.getPathToDeployment(), Configuration.getPathToCatalogForTest("jdbcdrivertest.xml"));
-        testjar = Configuration.getPathToCatalogForTest("jdbcdrivertest.jar");
+        MiscUtils.copyFile(pb.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("jdbcdrivertest.xml"));
+        testjar = VoltConfiguration.getPathToCatalogForTest("jdbcdrivertest.jar");
 
         // Set up ServerThread and Connection
         startServer();

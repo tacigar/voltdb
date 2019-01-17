@@ -46,7 +46,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltDB.SimulatedExitException;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.compiler.VoltCompiler;
@@ -152,7 +151,7 @@ final public class TestInitStartAction {
     public void testInitStartAction() throws Exception {
 
         File deplFH = new VoltFile(new VoltFile(new VoltFile(rootDH, "voltdbroot"), "config"), "deployment.xml");
-        Configuration c1 = new Configuration(
+        VoltConfiguration c1 = new VoltConfiguration(
                 new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "deployment", legacyDeploymentFH.getPath()});
         ServerThread server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
@@ -178,7 +177,7 @@ final public class TestInitStartAction {
 
         serverException.set(null);
         // server thread sets m_forceVoltdbCreate to true by default
-        c1 = new Configuration(
+        c1 = new VoltConfiguration(
                 new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "deployment", legacyDeploymentFH.getPath()});
         assertTrue(c1.m_forceVoltdbCreate);
         server = new ServerThread(c1);
@@ -200,7 +199,7 @@ final public class TestInitStartAction {
         }
 
         try {
-            c1 = new Configuration(new String[]{"initialize", "voltdbroot", rootDH.getPath()});
+            c1 = new VoltConfiguration(new String[]{"initialize", "voltdbroot", rootDH.getPath()});
             fail("did not detect prexisting initialization");
         } catch (VoltDB.SimulatedExitException e) {
             assertEquals(-1, e.getStatus());
@@ -210,7 +209,7 @@ final public class TestInitStartAction {
         VoltDB.crashMessage = null;
         serverException.set(null);
 
-        c1 = new Configuration(new String[]{"create", "deployment", legacyDeploymentFH.getPath(), "host", "localhost"});
+        c1 = new VoltConfiguration(new String[]{"create", "deployment", legacyDeploymentFH.getPath(), "host", "localhost"});
         server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
 
@@ -226,7 +225,7 @@ final public class TestInitStartAction {
 
         clearCrash();
 
-        c1 = new Configuration(new String[]{"recover", "deployment", legacyDeploymentFH.getPath(), "host", "localhost"});
+        c1 = new VoltConfiguration(new String[]{"recover", "deployment", legacyDeploymentFH.getPath(), "host", "localhost"});
         server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
 
@@ -333,7 +332,7 @@ final public class TestInitStartAction {
                 "-- the end.\n";
         File schemaFile = VoltProjectBuilder.writeStringToTempFile(schema);
 
-        Configuration c1 = new Configuration(
+        VoltConfiguration c1 = new VoltConfiguration(
                 new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "schema", schemaFile.getPath()});
         ServerThread server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
@@ -361,7 +360,7 @@ final public class TestInitStartAction {
         File schemaFile = VoltProjectBuilder.writeStringToTempFile(schema);
         {
             // valid use case
-            Configuration c1 = new Configuration(
+            VoltConfiguration c1 = new VoltConfiguration(
                     new String[]{"initialize", "force", "voltdbroot", rootDH.getPath(), "schema", schemaFile.getPath()});
             ServerThread server = new ServerThread(c1);
             server.setUncaughtExceptionHandler(handleUncaught);
@@ -373,7 +372,7 @@ final public class TestInitStartAction {
         }
         try {
             // second attempt is not valid due to existing artifacts
-            new Configuration(
+            new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "schema", schemaFile.getPath()});
         } catch (SimulatedExitException e){
             assertEquals(e.getStatus(), -1);
@@ -389,7 +388,7 @@ final public class TestInitStartAction {
 
         File schemaFile = Files.createTempDirectory("junk").toFile();
         try {
-            new Configuration(
+            new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "schema", schemaFile.getPath()});
             fail("did not detect unusable schema file");
         } catch (VoltDB.SimulatedExitException e) {
@@ -405,7 +404,7 @@ final public class TestInitStartAction {
     @Test
     public void testInitWithNoSchema() throws Exception {
         try {
-            new Configuration(
+            new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force"});
         } catch (VoltDB.SimulatedExitException e) {
             fail("Should init without schema.");
@@ -427,7 +426,7 @@ final public class TestInitStartAction {
                 "CREATE PROCEDURE FROM CLASS org.voltdb.unicorns.ComputeSocialStanding;";
         File schemaFile = VoltProjectBuilder.writeStringToTempFile(schema);
 
-        Configuration c1 = new Configuration(
+        VoltConfiguration c1 = new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "schema", schemaFile.getPath()});
         ServerThread server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
@@ -472,7 +471,7 @@ final public class TestInitStartAction {
         classesJarfile.deleteOnExit();
         originalInMemoryJar.writeToFile(classesJarfile);
 
-        Configuration c1 = new Configuration(
+        VoltConfiguration c1 = new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "schema", resource.getPath(), "classes", classesJarfile.getPath()});
         ServerThread server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);
@@ -507,7 +506,7 @@ final public class TestInitStartAction {
         classesJarfile.deleteOnExit();
         originalInMemoryJar.writeToFile(classesJarfile);
 
-        Configuration c1 = new Configuration(
+        VoltConfiguration c1 = new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "classes", classesJarfile.getPath()});
         ServerThread server = new ServerThread(c1);
         server.setUncaughtExceptionHandler(handleUncaught);

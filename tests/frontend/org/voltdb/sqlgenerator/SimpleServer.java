@@ -26,9 +26,8 @@ package org.voltdb.sqlgenerator;
 import java.util.ArrayList;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.MiscUtils;
@@ -71,7 +70,7 @@ public class SimpleServer {
 
         String[] hostargs = new String[host_manager_args.size()];
 
-        VoltDB.Configuration config = new VoltDB.Configuration(host_manager_args.toArray(hostargs));
+        VoltConfiguration config = new VoltConfiguration(host_manager_args.toArray(hostargs));
 
         if (config.m_backend != BackendTarget.NATIVE_EE_JNI)
         {
@@ -84,14 +83,14 @@ public class SimpleServer {
         builder.addSchema(SimpleServer.class.getResource(schemaFileName));
         builder.setCompilerDebugPrintStream(System.out);
 
-        if (!builder.compile(Configuration.getPathToCatalogForTest("simple.jar"), sites, hosts, k_factor)) {
+        if (!builder.compile(VoltConfiguration.getPathToCatalogForTest("simple.jar"), sites, hosts, k_factor)) {
             System.err.println("Compilation failed");
             System.exit(-1);
         }
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("simple.xml"));
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("simple.jar");
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("simple.xml"));
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("simple.jar");
         System.out.println("catalog path: " + config.m_pathToCatalog);
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("simple.xml");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("simple.xml");
         System.out.println("deployment path: " + config.m_pathToDeployment);
         config.m_port = Constants.DEFAULT_PORT;
         ServerThread server = new ServerThread(config);

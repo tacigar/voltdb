@@ -24,9 +24,9 @@
 package org.voltdb.eng1016;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -53,7 +53,7 @@ public class Runner extends TestCase {
                                  new ProcedurePartitionData("items", "id", "1"));
 
         project.addPartitionInfo("items", "id");
-        boolean success = project.compile(Configuration.getPathToCatalogForTest("poc.jar"));
+        boolean success = project.compile(VoltConfiguration.getPathToCatalogForTest("poc.jar"));
         if (!success) {
             System.err.println("Failure to compile catalog.");
             System.exit(-1);
@@ -61,7 +61,7 @@ public class Runner extends TestCase {
         String pathToDeployment = project.getPathToDeployment();
 
         // start up voltdb
-        ServerThread server = new ServerThread(Configuration.getPathToCatalogForTest("poc.jar"), pathToDeployment, BackendTarget.NATIVE_EE_JNI);
+        ServerThread server = new ServerThread(VoltConfiguration.getPathToCatalogForTest("poc.jar"), pathToDeployment, BackendTarget.NATIVE_EE_JNI);
         server.start();
         server.waitForInitialization();
 

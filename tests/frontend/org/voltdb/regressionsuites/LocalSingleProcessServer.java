@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.StartAction;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 
 /**
@@ -61,7 +61,7 @@ public abstract class LocalSingleProcessServer extends VoltServerConfig {
     {
         assert(jarFileName != null);
         assert(siteCount > 0);
-        m_jarFileName = Configuration.getPathToCatalogForTest(jarFileName);
+        m_jarFileName = VoltConfiguration.getPathToCatalogForTest(jarFileName);
         m_siteCount = siteCount;
         if (LocalCluster.isMemcheckDefined() && target.isValgrindable) {
             m_target = BackendTarget.NATIVE_EE_VALGRIND_IPC;
@@ -198,7 +198,7 @@ public abstract class LocalSingleProcessServer extends VoltServerConfig {
             }
         }
 
-        Configuration config = new Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_backend = m_target;
         config.m_noLoadLibVOLTDB = (m_target == BackendTarget.HSQLDB_BACKEND);
         // m_jarFileName is already prefixed with test output path.

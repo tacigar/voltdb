@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.benchmark.tpcc.procedures.InsertNewOrder;
@@ -236,7 +236,7 @@ public class TestCatalogUpdateAutoUpgradeSuite extends RegressionSuite {
         project.addProcedure(org.voltdb.benchmark.tpcc.procedures.delivery.class,
                 new ProcedurePartitionData("WAREHOUSE", "W_ID"));
 
-        upgradeCatalogBasePath = Configuration.getPathToCatalogForTest("catalogupdate-for-upgrade");
+        upgradeCatalogBasePath = VoltConfiguration.getPathToCatalogForTest("catalogupdate-for-upgrade");
         upgradeCatalogXMLPath = upgradeCatalogBasePath + ".xml";
         upgradeCatalogJarPath = upgradeCatalogBasePath + ".jar";
 

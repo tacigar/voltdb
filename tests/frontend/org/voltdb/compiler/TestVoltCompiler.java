@@ -43,8 +43,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.hsqldb_voltpatches.HsqlException;
 import org.mockito.Mockito;
 import org.voltcore.logging.VoltLogger;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltType;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.catalog.Catalog;
@@ -101,7 +101,7 @@ public class TestVoltCompiler extends TestCase {
                      "alter table ttl ADD USING TTL 20 ON COLUMN a BATCH_SIZE 10;\n";
         VoltProjectBuilder pb = new VoltProjectBuilder();
         pb.addLiteralSchema(ddl);
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("testout.jar")));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("testout.jar")));
     }
 
     public void testDDLFiltering() throws Exception {
@@ -168,7 +168,7 @@ public class TestVoltCompiler extends TestCase {
 
         VoltProjectBuilder pb = new VoltProjectBuilder();
         pb.addLiteralSchema(schema);
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("testout.jar")));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("testout.jar")));
     }
 
     public void testUTF8XMLFromHSQL() throws IOException {
@@ -178,7 +178,7 @@ public class TestVoltCompiler extends TestCase {
         pb.addLiteralSchema(schema);
         pb.addStmtProcedure("utf8insert", "insert into blah values(1, 'něco za nic')");
         pb.addPartitionInfo("blah", "pkey");
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("utf8xml.jar")));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("utf8xml.jar")));
     }
 
     private String feedbackToString(List<Feedback> fbs) {
@@ -2528,7 +2528,7 @@ public class TestVoltCompiler extends TestCase {
                 new ProcedurePartitionData("blah", "pkey", "0"));
         // Currently no way to do this?
         // pb.addStmtProcedure("declaredspquery2", "select strval SODECLARED2 from blah where pkey = 12", "blah.pkey=12");
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("test3324.jar")));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("test3324.jar")));
         List<String> diagnostics = pb.harvestDiagnostics();
         // This asserts that the undeclared SP plans don't mistakenly get SP treatment
         // -- they must each include a RECEIVE plan node.

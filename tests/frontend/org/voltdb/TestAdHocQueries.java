@@ -39,7 +39,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.NoConnectionsException;
@@ -68,7 +67,7 @@ public class TestAdHocQueries extends AdHocQueryTester {
 
     @Test
     public void testProcedureAdhoc() throws Exception {
-        VoltDB.Configuration config = setUpSPDB();
+        VoltConfiguration config = setUpSPDB();
         ServerThread localServer = new ServerThread(config);
 
         try {
@@ -211,7 +210,7 @@ public class TestAdHocQueries extends AdHocQueryTester {
     @Test
     public void testSP() throws Exception {
         System.out.println("Starting testSP");
-        VoltDB.Configuration config = setUpSPDB();
+        VoltConfiguration config = setUpSPDB();
         ServerThread localServer = new ServerThread(config);
 
         try {
@@ -335,8 +334,8 @@ public class TestAdHocQueries extends AdHocQueryTester {
     }
 
     public static String m_catalogJar = "adhoc.jar";
-    public static String m_pathToCatalog = Configuration.getPathToCatalogForTest(m_catalogJar);
-    public static String m_pathToDeployment = Configuration.getPathToCatalogForTest("adhoc.xml");
+    public static String m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest(m_catalogJar);
+    public static String m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhoc.xml");
 
     @Test
     public void testSimple() throws Exception {
@@ -598,7 +597,7 @@ public class TestAdHocQueries extends AdHocQueryTester {
     public void testAdHocQueryForStackOverFlowCondition() throws IOException, Exception {
         System.out.println("Starting testLongAdHocQuery");
 
-        VoltDB.Configuration config = setUpSPDB();
+        VoltConfiguration config = setUpSPDB();
         ServerThread localServer = new ServerThread(config);
         localServer.start();
         localServer.waitForInitialization();

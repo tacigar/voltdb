@@ -37,7 +37,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientResponse;
@@ -50,8 +49,8 @@ import org.voltdb.utils.MiscUtils;
 public class TestAdhocProcedureRoles extends AdhocDDLTestBase {
 
     final static boolean VERBOSE = false;
-    final static String CATALOG_PATH = Configuration.getPathToCatalogForTest("adhocddl.jar");
-    final static String DEPLOYMENT_PATH = Configuration.getPathToCatalogForTest("adhocddl.xml");
+    final static String CATALOG_PATH = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+    final static String DEPLOYMENT_PATH = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
     final static RoleInfo ADMIN_TEMPLATE = new RoleInfo(null, false, false, true, false, false, false);
     final static RoleInfo USER_TEMPLATE = new RoleInfo(null, false, false, false, false, false, false);
 
@@ -127,7 +126,7 @@ public class TestAdhocProcedureRoles extends AdhocDDLTestBase {
 
         void start() throws Exception
         {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = CATALOG_PATH;
             config.m_pathToDeployment = DEPLOYMENT_PATH;
             startServer(config);

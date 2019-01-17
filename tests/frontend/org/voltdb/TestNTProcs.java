@@ -44,7 +44,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -493,16 +492,16 @@ public class TestNTProcs extends TestCase {
     private void compile() throws Exception {
         VoltProjectBuilder pb = new VoltProjectBuilder();
         pb.addLiteralSchema(SCHEMA);
-        assertTrue(pb.compile(Configuration.getPathToCatalogForTest("compileNT.jar"), 5, 0));
-        MiscUtils.copyFile(pb.getPathToDeployment(), Configuration.getPathToCatalogForTest("compileNT.xml"));
+        assertTrue(pb.compile(VoltConfiguration.getPathToCatalogForTest("compileNT.jar"), 5, 0));
+        MiscUtils.copyFile(pb.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("compileNT.xml"));
     }
 
     private ServerThread start() throws Exception {
         compile();
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("compileNT.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("compileNT.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("compileNT.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("compileNT.xml");
         ServerThread localServer = new ServerThread(config);
         localServer.start();
         localServer.waitForInitialization();
@@ -786,8 +785,8 @@ public class TestNTProcs extends TestCase {
     }
 
     public void testUAC() throws Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("--dont care");
@@ -796,7 +795,7 @@ public class TestNTProcs extends TestCase {
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

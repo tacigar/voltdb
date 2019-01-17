@@ -34,8 +34,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.RejoinTestBase;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
@@ -74,7 +74,7 @@ public class TestPauselessRejoinFuzz extends RejoinTestBase {
         final int numTuples = cluster.isValgrind() ? 1000 : 60000;
         boolean success = cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
         cluster.setHasLocalServer(false);
 
         final ArrayList<Integer> serverValues = new ArrayList<Integer>();

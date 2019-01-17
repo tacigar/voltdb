@@ -34,8 +34,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.voltdb.AdhocDDLTestBase;
 import org.voltdb.ClientResponseImpl;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTableTestHelpers;
 import org.voltdb.client.Client;
@@ -72,8 +71,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testBasic() throws Exception {
         System.out.println("\n\n-----\n testBasic \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -95,7 +94,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         jarfile.put("deployment.xml", new File(pathToDeployment));
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -181,8 +180,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testRoleControl() throws Exception {
         System.out.println("\n\n-----\n testRoleControl \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -214,7 +213,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
 
         Client auth_client = null;
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             // Default client auth is going to fail, catch and keep chugging
@@ -287,8 +286,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testCollidingClasses() throws Exception {
         System.out.println("\n\n-----\n testCollidingProc \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -308,7 +307,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         }
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -379,8 +378,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testNonJarInput() throws Exception {
         System.out.println("\n\n-----\n testNonJarInput \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -389,7 +388,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -418,8 +417,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testInnerClasses() throws Exception {
         System.out.println("\n\n-----\n testInnerClasses \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -428,7 +427,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -471,8 +470,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testBadInitializerClasses() throws Exception {
         System.out.println("\n\n-----\n testBadInitializerClasses \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -481,7 +480,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -531,8 +530,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testDeleteClasses() throws Exception {
         System.out.println("\n\n-----\n testCollidingProc \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -556,7 +555,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         }
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -702,8 +701,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testStatsAfterUpdateClasses() throws Exception {
         System.out.println("\n\n-----\n testStatsAfterUpdateClasses \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("create table tb1 (a int);");
         builder.setUseDDLSchema(true);
@@ -725,7 +724,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         jarfile.put("deployment.xml", new File(pathToDeployment));
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -796,8 +795,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testUpdateClassesAdvanced() throws Exception {
         System.out.println("\n\n-----\n testCreateProceduresBeforeUpdateClasses \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
                 "create table t1 (a int, b int); \n" +
@@ -808,7 +807,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -869,8 +868,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testUpdateClassesWithSQLStmtChanges() throws Exception {
         System.out.println("\n\n-----\n testUpdateClassesWithSQLStmtChanges \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
                 "create table tt (PID varchar(20 BYTES) NOT NULL, CITY varchar(6 BYTES), " +
@@ -883,7 +882,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);
@@ -943,8 +942,8 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
     public void testUpdateClassesInvalidSQLStmt() throws Exception {
         System.out.println("\n\n-----\n testUpdateClassesInvalidSQLStmt \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
                 "create table t1 (a int, b int); \n" +
@@ -955,7 +954,7 @@ public class TestUpdateClasses extends AdhocDDLTestBase {
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = pathToCatalog;
             config.m_pathToDeployment = pathToDeployment;
             startSystem(config);

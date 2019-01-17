@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.BatchTimeoutOverrideType;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientImpl;
@@ -48,8 +47,8 @@ public class TestAdhocCompilerException extends AdhocDDLTestBase
         // Enables special DDL string triggering artificial exception in AsyncCompilerAgent.
         System.setProperty("asynccompilerdebug", "true");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.setUseDDLSchema(true);
@@ -57,7 +56,7 @@ public class TestAdhocCompilerException extends AdhocDDLTestBase
         assertTrue("Schema compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

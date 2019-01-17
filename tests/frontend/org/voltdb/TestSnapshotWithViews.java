@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -335,7 +334,7 @@ public class TestSnapshotWithViews extends TestExportBase {
 
         compile = config.compile(project);
         MiscUtils.copyFile(project.getPathToDeployment(),
-                Configuration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
+                VoltConfiguration.getPathToCatalogForTest("export-ddl-sans-nonulls.xml"));
         assertTrue(compile);
 
         return builder;

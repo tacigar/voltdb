@@ -41,11 +41,10 @@ import junit.framework.TestCase;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ParameterSet;
 import org.voltdb.ServerThread;
 import org.voltdb.TestJSONInterface;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
@@ -248,11 +247,11 @@ public class HTTPDBenchmark extends TestCase {
         builder.addStmtProcedure("Insert", "insert into dummy values (?,?,?);");
         builder.addStmtProcedure("Select", "select * from dummy;");
         builder.setHTTPDPort(8095);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("jsonperf.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("jsonperf.jar"), 1, 1, 0);
         assert(success);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("jsonperf.jar");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("jsonperf.jar");
         config.m_pathToDeployment = builder.getPathToDeployment();
         ServerThread server = new ServerThread(config);
         server.start();

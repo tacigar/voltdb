@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.voltcore.messaging.HostMessenger;
 import org.voltdb.AdHocQueryTester;
 import org.voltdb.CatalogContext;
-import org.voltdb.VoltDB;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.compiler.PlannerTool;
 import org.voltdb.settings.DbSettings;
@@ -51,7 +51,7 @@ public class TestLargeModeRatio extends AdHocQueryTester {
     @Before
     public void setUp() throws Exception {
         // For planner-only testing, we shouldn't care about IV2
-        VoltDB.Configuration config = setUpSPDB();
+        VoltConfiguration config = setUpSPDB();
         byte[] bytes = MiscUtils.fileToBytes(new File(config.m_pathToCatalog));
         String serializedCatalog = CatalogUtil.getSerializedCatalogStringFromJar(CatalogUtil.loadAndUpgradeCatalogFromJar(bytes, false).getFirst());
         Catalog catalog = new Catalog();

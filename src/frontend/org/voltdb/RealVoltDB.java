@@ -115,7 +115,6 @@ import org.voltcore.zk.ZKCountdownLatch;
 import org.voltcore.zk.ZKUtil;
 import org.voltdb.CatalogContext.CatalogJarWriteMode;
 import org.voltdb.ProducerDRGateway.MeshMemberInfo;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.catalog.CatalogMap;
 import org.voltdb.catalog.Cluster;
@@ -244,7 +243,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
 
     private static final VoltLogger hostLog = new VoltLogger("HOST");
     private static final VoltLogger consoleLog = new VoltLogger("CONSOLE");
-    private VoltDB.Configuration m_config = new VoltDB.Configuration();
+    private VoltConfiguration m_config = new VoltConfiguration();
     int m_configuredNumberOfPartitions;
     int m_configuredReplicationFactor;
     // CatalogContext is immutable, just make sure that accessors see a consistent version
@@ -469,7 +468,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return getConfigDirectory(m_config);
     }
 
-    private File getConfigDirectory(Configuration config) {
+    private File getConfigDirectory(VoltConfiguration config) {
         return getConfigDirectory(config.m_voltdbRoot);
     }
 
@@ -481,7 +480,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return getConfigLogDeployment(m_config);
     }
 
-    private File getConfigLogDeployment(Configuration config) {
+    private File getConfigLogDeployment(VoltConfiguration config) {
         return new VoltFile(getConfigDirectory(config), "deployment.xml");
     }
 
@@ -612,7 +611,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return null;
     }
 
-    private void managedPathsEmptyCheck(Configuration config) {
+    private void managedPathsEmptyCheck(VoltConfiguration config) {
         List<String> nonEmptyPaths = managedPathsWithFiles(config, m_catalogContext.getDeployment());
         if (!nonEmptyPaths.isEmpty()) {
             StringBuilder crashMessage =
@@ -631,7 +630,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         }
     }
 
-    private List<String> managedPathsWithFiles(Configuration config, DeploymentType deployment) {
+    private List<String> managedPathsWithFiles(VoltConfiguration config, DeploymentType deployment) {
         ImmutableList.Builder<String> nonEmptyPaths = ImmutableList.builder();
         PathsType paths = deployment.getPaths();
         String voltDbRoot = getVoltDBRootPath(paths.getVoltdbroot());
@@ -675,7 +674,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return nonEmptyPaths.build();
     }
 
-    private int outputDeployment(Configuration config) {
+    private int outputDeployment(VoltConfiguration config) {
         try {
             File configInfoDir = new VoltFile(config.m_voltdbRoot, Constants.CONFIG_DIR);
             File depFH = new VoltFile(configInfoDir, "deployment.xml");
@@ -720,7 +719,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return 0;
     }
 
-    private int outputSchema(Configuration config) {
+    private int outputSchema(VoltConfiguration config) {
         if ((new File(config.m_getOutput)).exists() && !config.m_forceGetCreate) {
             consoleLog.fatal("Failed to save schema file, file already exists: " + config.m_getOutput);
             return -1;
@@ -744,7 +743,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return 0;
     }
 
-    private int outputProcedures(Configuration config) {
+    private int outputProcedures(VoltConfiguration config) {
         File outputFile = new File(config.m_getOutput);
         if (outputFile.exists() && !config.m_forceGetCreate) {
             consoleLog.fatal("Failed to save classes, file already exists: " + config.m_getOutput);
@@ -764,7 +763,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
     }
 
     @Override
-    public void cli(Configuration config) {
+    public void cli(VoltConfiguration config) {
         if (config.m_startAction != StartAction.GET) {
             System.err.println("This can only be called for GET action.");
             VoltDB.exit(-1);
@@ -803,7 +802,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
      * @param config configuration that gets passed in from command line.
      */
     @Override
-    public void initialize(Configuration config) {
+    public void initialize(VoltConfiguration config) {
         hostLog.info("PID of this Volt process is " + CLibrary.getpid());
         ShutdownHooks.enableServerStopLogging();
         synchronized(m_startAndStopLock) {
@@ -2357,7 +2356,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
      * @param config
      * @param dt a {@link DeploymentType}
      */
-    private void stageDeploymentFileForInitialize(Configuration config, DeploymentType dt) {
+    private void stageDeploymentFileForInitialize(VoltConfiguration config, DeploymentType dt) {
 
         String deprootFN = dt.getPaths().getVoltdbroot().getPath();
         File   deprootFH = new VoltFile(deprootFN);
@@ -2449,7 +2448,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         ClusterSettings.create(CatalogUtil.asClusterSettingsMap(dt)).store();
     }
 
-    private void stageSchemaFiles(Configuration config, boolean isXCDR) {
+    private void stageSchemaFiles(VoltConfiguration config, boolean isXCDR) {
         if (config.m_userSchema == null && config.m_stagedClassesPath == null) {
             return; // nothing to do
         }
@@ -2467,7 +2466,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         }
     }
 
-    private void stageInitializedMarker(Configuration config) {
+    private void stageInitializedMarker(VoltConfiguration config) {
         File depFH = new VoltFile(config.m_voltdbRoot, Constants.INITIALIZED_MARKER);
         try (PrintWriter pw = new PrintWriter(new FileWriter(depFH), true)) {
             pw.println(config.m_clusterName);
@@ -2476,7 +2475,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         }
     }
 
-    private void deleteInitializationMarkers(Configuration configuration) {
+    private void deleteInitializationMarkers(VoltConfiguration configuration) {
         for (File c: configuration.getInitMarkers()) {
             MiscUtils.deleteRecursively(c);
         }
@@ -2485,7 +2484,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
     public static final String SECURITY_OFF_WARNING = "User authentication is not enabled."
             + " The database is accessible and could be modified or shut down by anyone on the network.";
 
-    boolean readDeploymentAndCreateStarterCatalogContext(VoltDB.Configuration config) {
+    boolean readDeploymentAndCreateStarterCatalogContext(VoltConfiguration config) {
         /*
          * Debate with the cluster what the deployment file should be
          */
@@ -2706,7 +2705,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         }
     }
 
-    ReadDeploymentResults readPrimedDeployment(Configuration config) {
+    ReadDeploymentResults readPrimedDeployment(VoltConfiguration config) {
         /*
          * Debate with the cluster what the deployment file should be
          */
@@ -3239,7 +3238,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
         return determination;
     }
 
-    void logDebuggingInfo(VoltDB.Configuration config, String httpPortExtraLogMessage, boolean jsonEnabled) {
+    void logDebuggingInfo(VoltConfiguration config, String httpPortExtraLogMessage, boolean jsonEnabled) {
         String startAction = m_config.m_startAction.toString();
         String startActionLog = "Database start action is " + (startAction.substring(0, 1).toUpperCase() +
                 startAction.substring(1).toLowerCase()) + ".";
@@ -4015,7 +4014,7 @@ public class RealVoltDB implements VoltDBInterface, RestoreAgent.Callback, HostM
     }
 
     @Override
-    public VoltDB.Configuration getConfig() {
+    public VoltConfiguration getConfig() {
         return m_config;
     }
 

@@ -47,9 +47,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.VoltTable;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -176,10 +176,10 @@ public class TestJDBCSecurityEnabled {
         // create a default admin account
         pb.setSecurityEnabled(true, true);
 
-        boolean success = pb.compile(Configuration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
+        boolean success = pb.compile(VoltConfiguration.getPathToCatalogForTest(TEST_JAR), 3, 1, 0);
         assert(success);
-        MiscUtils.copyFile(pb.getPathToDeployment(), Configuration.getPathToCatalogForTest(TEST_XML));
-        testjar = Configuration.getPathToCatalogForTest(TEST_JAR);
+        MiscUtils.copyFile(pb.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest(TEST_XML));
+        testjar = VoltConfiguration.getPathToCatalogForTest(TEST_JAR);
 
         // Set up ServerThread and Connection
         startServer();

@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.StartAction;
-import org.voltdb.VoltDB;
 import org.voltdb.common.Constants;
 import org.voltdb.probe.MeshProber;
 
@@ -41,7 +41,7 @@ import com.google_voltpatches.common.collect.ImmutableSortedSet;
 // VoltDB.Configuration represents all of the VoltDB command line parameters.
 // Extend that to include test-only parameters, the JVM parameters
 // and a serialization function that produces a legitimate command line.
-public class CommandLine extends VoltDB.Configuration
+public class CommandLine extends VoltConfiguration
 {
     // Values for garbage collection roll-over configuration.  For now statically defined, but
     // in the future we could configure them from the UI or VEM command line.

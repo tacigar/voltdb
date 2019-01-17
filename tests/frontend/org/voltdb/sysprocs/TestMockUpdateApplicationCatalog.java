@@ -39,10 +39,10 @@ import java.util.jar.JarOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.OperationMode;
 import org.voltdb.ServerThread;
 import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
@@ -52,7 +52,7 @@ import org.voltdb.utils.MiscUtils;
 
 public class TestMockUpdateApplicationCatalog {
     private ServerThread m_localServer;
-    private VoltDB.Configuration m_config;
+    private VoltConfiguration m_config;
     private Client m_client;
 
 
@@ -70,13 +70,13 @@ public class TestMockUpdateApplicationCatalog {
         TPCCProjectBuilder builder = new TPCCProjectBuilder();
         builder.addDefaultSchema();
         builder.addDefaultPartitioning();
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml"));
 
-        m_config = new VoltDB.Configuration();
-        m_config.m_pathToCatalog = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.jar");
-        m_config.m_pathToDeployment = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
+        m_config = new VoltConfiguration();
+        m_config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.jar");
+        m_config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
         m_localServer = new ServerThread(m_config);
         m_localServer.start();
         m_localServer.waitForInitialization();
@@ -85,7 +85,7 @@ public class TestMockUpdateApplicationCatalog {
         builder.addDefaultSchema();
         builder.addDefaultPartitioning();
         addBaseProcedures(builder);
-        success = builder.compile(Configuration.getPathToCatalogForTest("catalogupdate-cluster-expanded.jar"), 1, 1, 0);
+        success = builder.compile(VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-expanded.jar"), 1, 1, 0);
         assert(success);
 
         assertEquals(OperationMode.RUNNING, VoltDB.instance().getMode());
@@ -105,8 +105,8 @@ public class TestMockUpdateApplicationCatalog {
 
     @Test
     public void testInvalidCatalogJar() throws IOException, ClassNotFoundException {
-        String newCatalogURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-expanded.jar");
-        String deploymentURL = Configuration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
+        String newCatalogURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-expanded.jar");
+        String deploymentURL = VoltConfiguration.getPathToCatalogForTest("catalogupdate-cluster-base.xml");
 
         String tempjarURL = newCatalogURL + ".tmp";
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(tempjarURL));

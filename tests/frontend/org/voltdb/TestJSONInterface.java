@@ -103,7 +103,6 @@ import org.json_voltpatches.JSONArray;
 import org.json_voltpatches.JSONException;
 import org.json_voltpatches.JSONObject;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientAuthScheme;
 import org.voltdb.client.ClientConfig;
@@ -434,10 +433,10 @@ public class TestJSONInterface extends TestCase {
             builder.addStmtProcedure("fooinsert", "insert into foo values (?, ?);");
             builder.addStmtProcedure("foocount", "select count(*) from foo;");
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -534,10 +533,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -592,10 +591,10 @@ public class TestJSONInterface extends TestCase {
             VoltProjectBuilder builder = new VoltProjectBuilder();
             builder.addLiteralSchema(simpleSchema);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -715,7 +714,7 @@ public class TestJSONInterface extends TestCase {
             String schemaPath = schemaFile.getPath();
             schemaPath = URLEncoder.encode(schemaPath, "UTF-8");
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
 
             VoltProjectBuilder builder = new VoltProjectBuilder();
             builder.addSchema(schemaPath);
@@ -723,7 +722,7 @@ public class TestJSONInterface extends TestCase {
             builder.addStmtProcedure("Insert", "insert into blah values (?,?,?,?,?);");
             builder.addProcedure(CrazyBlahProc.class, blahData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"), 1, 1, 0, 0) != null;
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"), 1, 1, 0, 0) != null;
             assertTrue(success);
 
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
@@ -817,7 +816,7 @@ public class TestJSONInterface extends TestCase {
             String schemaPath = schemaFile.getPath();
             schemaPath = URLEncoder.encode(schemaPath, "UTF-8");
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
 
             VoltProjectBuilder builder = new VoltProjectBuilder();
             builder.addSchema(schemaPath);
@@ -825,7 +824,7 @@ public class TestJSONInterface extends TestCase {
             builder.addStmtProcedure("Insert", "insert into blah values (?,?,?,?,?);");
             builder.addProcedure(CrazyBlahProc.class, blahData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"), 1, 1, 0, 0) != null;
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"), 1, 1, 0, 0) != null;
             assertTrue(success);
 
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
@@ -1073,10 +1072,10 @@ public class TestJSONInterface extends TestCase {
             builder.addStmtProcedure("Select", "select * from HELLOWORLD;");
             builder.addProcedure(SelectStarHelloWorld.class);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1150,10 +1149,10 @@ public class TestJSONInterface extends TestCase {
 
             builder.setHTTPDPort(8095);
 
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1239,7 +1238,7 @@ public class TestJSONInterface extends TestCase {
             builder2.addProcedures(pi);
             builder2.setHTTPDPort(8095);
 
-            success = builder2.compile(Configuration.getPathToCatalogForTest("json-update.jar"));
+            success = builder2.compile(VoltConfiguration.getPathToCatalogForTest("json-update.jar"));
             assertTrue(success);
 
             pset = ParameterSet.fromArrayNoCopy(Encoder.hexEncode(MiscUtils.fileToBytes(new File(config.m_pathToCatalog))),
@@ -1274,7 +1273,7 @@ public class TestJSONInterface extends TestCase {
             builder3.addProcedures(pi);
             builder3.setHTTPDPort(8095);
 
-            success = builder3.compile(Configuration.getPathToCatalogForTest("json-update.jar"));
+            success = builder3.compile(VoltConfiguration.getPathToCatalogForTest("json-update.jar"));
             assertTrue(success);
 
             pset = ParameterSet.fromArrayNoCopy(Encoder.hexEncode(MiscUtils.fileToBytes(new File(config.m_pathToCatalog))),
@@ -1321,10 +1320,10 @@ public class TestJSONInterface extends TestCase {
             builder.setHTTPDPort(8095);
             builder.setJSONAPIEnabled(false);
 
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1361,10 +1360,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1398,10 +1397,10 @@ public class TestJSONInterface extends TestCase {
             builder.addProcedure(InsertProc.class);
             builder.addProcedure(LongReadProc.class);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1471,10 +1470,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1532,10 +1531,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addStmtProcedure("Insert", "insert into foo values (?, ?);");
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1593,10 +1592,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1631,10 +1630,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1674,10 +1673,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1788,10 +1787,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1879,10 +1878,10 @@ public class TestJSONInterface extends TestCase {
 
             // suite defines its own ADMINISTRATOR user
             builder.setSecurityEnabled(true, false);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -1954,10 +1953,10 @@ public class TestJSONInterface extends TestCase {
 
             // suite defines its own ADMINISTRATOR user
             builder.setSecurityEnabled(true, false);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2021,10 +2020,10 @@ public class TestJSONInterface extends TestCase {
 
             // suite defines its own ADMINISTRATOR user
             builder.setSecurityEnabled(true, false);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2071,10 +2070,10 @@ public class TestJSONInterface extends TestCase {
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
             builder.setUseDDLSchema(true);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2136,10 +2135,10 @@ public class TestJSONInterface extends TestCase {
         try {
             VoltProjectBuilder builder = new VoltProjectBuilder();
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2181,10 +2180,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2241,10 +2240,10 @@ public class TestJSONInterface extends TestCase {
                 builder.setSecurityEnabled(true, true);
             }
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2295,10 +2294,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addProcedure(DelayProc.class, fooData);
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);
@@ -2345,10 +2344,10 @@ public class TestJSONInterface extends TestCase {
             builder.addPartitionInfo("foo", "bar");
             builder.addStmtProcedure("Insert", "insert into foo values(?);");
             builder.setHTTPDPort(8095);
-            boolean success = builder.compile(Configuration.getPathToCatalogForTest("json.jar"));
+            boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("json.jar"));
             assertTrue(success);
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             config.m_pathToCatalog = config.setPathToCatalogForTest("json.jar");
             config.m_pathToDeployment = builder.getPathToDeployment();
             server = new ServerThread(config);

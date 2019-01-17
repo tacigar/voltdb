@@ -23,9 +23,8 @@
 
 package org.voltdb.utils;
 
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 
 public class HTTPAdminListenerStarter {
@@ -45,13 +44,13 @@ public class HTTPAdminListenerStarter {
         builder.addStmtProcedure("Insert", "insert into blah values (?);");
         builder.setHTTPDPort(8080);
         builder.setJSONAPIEnabled(true);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("rejoin.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("rejoin.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("rejoin.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("rejoin.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("rejoin.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("rejoin.xml");
         ServerThread localServer = new ServerThread(config);
         localServer.start();
         localServer.waitForInitialization();

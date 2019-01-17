@@ -32,7 +32,6 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ProcCallException;
@@ -46,7 +45,7 @@ import org.voltdb.utils.MiscUtils;
 
 public class TestStreamView
 {
-    private VoltDB.Configuration m_config;
+    private VoltConfiguration m_config;
     private ServerThread m_localServer;
     private Client m_client;
 
@@ -346,13 +345,13 @@ public class TestStreamView
         Properties props = new Properties();
         project.addExport(true, "custom", props, "noop");
 
-        boolean compiled = project.compile(Configuration.getPathToCatalogForTest("test-stream-view.jar"), 1, 1, 0);
+        boolean compiled = project.compile(VoltConfiguration.getPathToCatalogForTest("test-stream-view.jar"), 1, 1, 0);
         assertTrue(compiled);
-        MiscUtils.copyFile(project.getPathToDeployment(), Configuration.getPathToCatalogForTest("test-stream-view.xml"));
+        MiscUtils.copyFile(project.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("test-stream-view.xml"));
 
-        m_config = new VoltDB.Configuration();
-        m_config.m_pathToCatalog = Configuration.getPathToCatalogForTest("test-stream-view.jar");
-        m_config.m_pathToDeployment = Configuration.getPathToCatalogForTest("test-stream-view.xml");
+        m_config = new VoltConfiguration();
+        m_config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("test-stream-view.jar");
+        m_config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("test-stream-view.xml");
         m_localServer = new ServerThread(m_config);
         m_localServer.start();
         m_localServer.waitForInitialization();

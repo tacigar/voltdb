@@ -31,7 +31,6 @@ import java.io.IOException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.regressionsuites.JUnit4LocalClusterTest;
 import org.voltdb.regressionsuites.LocalCluster;
@@ -129,7 +128,7 @@ public class TestMixedVersionClusters extends JUnit4LocalClusterTest {
     public static void compileCatalog() throws IOException {
         m_builder.addLiteralSchema("CREATE TABLE V0 (id BIGINT);");
         m_builder.configureLogging(null, null, false, false, 200, Integer.MAX_VALUE, null);
-        assertTrue(m_builder.compile(Configuration.getPathToCatalogForTest(JAR_NAME), 2, 3, K));
+        assertTrue(m_builder.compile(VoltConfiguration.getPathToCatalogForTest(JAR_NAME), 2, 3, K));
     }
 
     //

@@ -50,9 +50,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.voltcore.logging.VoltLogger;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTableRow;
 import org.voltdb.client.Client;
@@ -97,8 +97,8 @@ public class TestCSVLoader {
     {
         prepare();
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("csv.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("csv.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("csv.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("csv.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
 
         builder.addLiteralSchema(
@@ -119,7 +119,7 @@ public class TestCSVLoader {
         boolean success = builder.compile(pathToCatalog, 2, 1, 0);
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
-        Configuration config = new Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         localServer = new ServerThread(config);

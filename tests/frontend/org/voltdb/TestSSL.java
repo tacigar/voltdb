@@ -31,7 +31,6 @@ import java.util.TreeMap;
 
 import org.junit.After;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -110,7 +109,7 @@ public class TestSSL extends TestCase {
                 LocalCluster.FailureState.ALL_RUNNING, false, env);
         boolean success = m_cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("ssl.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("ssl.xml"));
         m_cluster.setHasLocalServer(false);
 
         m_cluster.startUp();
@@ -129,10 +128,10 @@ public class TestSSL extends TestCase {
             String certstore = getResourcePath(certStorePath);
             builder.setCertStoreInfo(certstore, certStorePasswd);
         }
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("ssl.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("ssl.jar"));
         assertTrue(success);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = config.setPathToCatalogForTest("ssl.jar");
         config.m_pathToDeployment = builder.getPathToDeployment();
         m_server = new ServerThread(config);
@@ -222,7 +221,7 @@ public class TestSSL extends TestCase {
         m_cluster.setHasLocalServer(false);
         boolean success = m_cluster.compile(builder);
         assertTrue(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("sslRejoin.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("sslRejoin.xml"));
 
 
         m_cluster.startUp();
@@ -257,15 +256,15 @@ public class TestSSL extends TestCase {
         m_cluster.killSingleHost(0);
         Thread.sleep(100);
 
-        VoltDB.Configuration config = new VoltDB.Configuration(m_cluster.portGenerator);
+        VoltConfiguration config = new VoltConfiguration(m_cluster.portGenerator);
         config.m_startAction = m_cluster.isNewCli() ? StartAction.PROBE : StartAction.REJOIN;
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("sslRejoin.jar");
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("sslRejoin.jar");
         if (m_cluster.isNewCli()) {
             config.m_voltdbRoot = new File(m_cluster.getServerSpecificRoot("0"));
             config.m_forceVoltdbCreate = false;
             config.m_hostCount = hostCount;
         }
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("sslRejoin.xml");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("sslRejoin.xml");
         config.m_leader = ":" + m_cluster.internalPort(1);
         config.m_coordinators = m_cluster.coordinators(1);
 

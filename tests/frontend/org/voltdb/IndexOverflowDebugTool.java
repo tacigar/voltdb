@@ -25,7 +25,6 @@ package org.voltdb;
 
 import junit.framework.TestCase;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientConfig;
 import org.voltdb.client.ClientFactory;
@@ -62,13 +61,13 @@ public class IndexOverflowDebugTool extends TestCase {
         builder.addStmtProcedure("crash2", "SELECT * FROM P1 WHERE P1.ID>-6611959682909750107");
         builder.addStmtProcedure("crash3", "SELECT * FROM P1 INNER JOIN R1 ON P1.ID = R1.BIG");
         builder.addStmtProcedure("crash4", "SELECT * FROM P1 WHERE P1.ID = 5 AND P1.TINY > -2000;");
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("indexoverflow.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("indexoverflow.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("indexoverflow.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("indexoverflow.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("indexoverflow.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("indexoverflow.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("indexoverflow.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("indexoverflow.xml");
         config.m_backend = BackendTarget.NATIVE_EE_IPC;
         config.m_ipcPort = 10001;
         ServerThread localServer = new ServerThread(config);

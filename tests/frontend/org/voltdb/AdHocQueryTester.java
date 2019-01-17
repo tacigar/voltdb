@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.voltcore.utils.PortGenerator;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.NoConnectionsException;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -102,9 +101,9 @@ public abstract class AdHocQueryTester extends JUnit4LocalClusterTest {
         builder.addProcedure(org.voltdb_testprocs.adhoc.executeSQLSPWRITE.class, parted1Data);
     }
 
-    public static VoltDB.Configuration setUpSPDB() throws IOException, Exception {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocsp.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocsp.xml");
+    public static VoltConfiguration setUpSPDB() throws IOException, Exception {
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocsp.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocsp.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
 
@@ -113,7 +112,7 @@ public abstract class AdHocQueryTester extends JUnit4LocalClusterTest {
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration(new PortGenerator());
+        VoltConfiguration config = new VoltConfiguration(new PortGenerator());
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         return config;

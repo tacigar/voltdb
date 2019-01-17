@@ -35,8 +35,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.voltdb.AdhocDDLTestBase;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltType;
 import org.voltdb.client.ClientResponse;
@@ -48,8 +47,8 @@ import org.voltdb.utils.MiscUtils;
 public class TestDDLFeatures extends AdhocDDLTestBase {
 
     String catalogJar = "DDLFeature.jar";
-    String pathToCatalog = Configuration.getPathToCatalogForTest("DDLFeature.jar");
-    String pathToDeployment = Configuration.getPathToCatalogForTest("DDLFeature.xml");
+    String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("DDLFeature.jar");
+    String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("DDLFeature.xml");
 
     VoltProjectBuilder builder = new VoltProjectBuilder();
 
@@ -65,7 +64,7 @@ public class TestDDLFeatures extends AdhocDDLTestBase {
         assertTrue(success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

@@ -44,7 +44,7 @@ public class TestAdhocCompilerErrorMessages extends AdhocDDLTestBase
     public void testEng7609CleanDDLErrorMessages() throws Exception
     {
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             startSystem(config);
             boolean threw = false;
             try {
@@ -67,7 +67,7 @@ public class TestAdhocCompilerErrorMessages extends AdhocDDLTestBase
     public void testEmptyMultiStmtProcErrors() throws Exception
     {
         try {
-            VoltDB.Configuration config = new VoltDB.Configuration();
+            VoltConfiguration config = new VoltConfiguration();
             startSystem(config);
             boolean threw = false;
             try {

@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -54,7 +53,7 @@ public class TestMidRejoinDeath extends RejoinTestBase {
             cluster.setMaxHeap(1024);
             boolean success = cluster.compile(builder);
             assertTrue(success);
-            MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("rejoin.xml"));
+            MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("rejoin.xml"));
             cluster.setHasLocalServer(false);
 
             cluster.startUp();

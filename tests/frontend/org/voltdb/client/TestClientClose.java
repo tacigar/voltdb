@@ -29,9 +29,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
 import org.voltcore.network.ReverseDNSCache;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.ServerThread;
-import org.voltdb.VoltDB;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltTable;
 import org.voltdb.compiler.CatalogBuilder;
 import org.voltdb.compiler.DeploymentBuilder;
@@ -51,15 +50,15 @@ public class TestClientClose extends TestCase {
             catBuilder.addSchema(getClass().getResource("clientfeatures.sql"));
             catBuilder.addProcedures(ArbitraryDurationProc.class);
 
-            boolean success = catBuilder.compile(Configuration.getPathToCatalogForTest("timeouts.jar"));
+            boolean success = catBuilder.compile(VoltConfiguration.getPathToCatalogForTest("timeouts.jar"));
             assert(success);
 
             depBuilder = new DeploymentBuilder(1, 1, 0);
-            depBuilder.writeXML(Configuration.getPathToCatalogForTest("timeouts.xml"));
+            depBuilder.writeXML(VoltConfiguration.getPathToCatalogForTest("timeouts.xml"));
 
-            VoltDB.Configuration config = new VoltDB.Configuration();
-            config.m_pathToCatalog = Configuration.getPathToCatalogForTest("timeouts.jar");
-            config.m_pathToDeployment = Configuration.getPathToCatalogForTest("timeouts.xml");
+            VoltConfiguration config = new VoltConfiguration();
+            config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("timeouts.jar");
+            config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("timeouts.xml");
             localServer = new ServerThread(config);
             localServer.start();
             localServer.waitForInitialization();

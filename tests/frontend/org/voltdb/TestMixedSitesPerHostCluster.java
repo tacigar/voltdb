@@ -32,7 +32,6 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.regressionsuites.JUnit4LocalClusterTest;
 import org.voltdb.regressionsuites.LocalCluster;
@@ -98,7 +97,7 @@ public class TestMixedSitesPerHostCluster extends JUnit4LocalClusterTest {
         final int hostCount = 3;
         m_builder.addLiteralSchema("CREATE TABLE V0 (id BIGINT);");
         m_builder.configureLogging(null, null, false, false, 200, Integer.MAX_VALUE, null);
-        assertTrue(m_builder.compile(Configuration.getPathToCatalogForTest(JAR_NAME), fakeSph, hostCount, K));
+        assertTrue(m_builder.compile(VoltConfiguration.getPathToCatalogForTest(JAR_NAME), fakeSph, hostCount, K));
     }
 
     @Test

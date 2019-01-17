@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.BackendTarget;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.EELibraryLoader;
 import org.voltdb.ServerThread;
 import org.voltdb.StartAction;
@@ -451,7 +452,7 @@ public class LocalCluster extends VoltServerConfig {
             leader("").
             target(m_target).
             startCommand(isNewCli() ? "probe" : "create").
-            jarFileName(VoltDB.Configuration.getPathToCatalogForTest(m_jarFileName)).
+            jarFileName(VoltConfiguration.getPathToCatalogForTest(m_jarFileName)).
             buildDir(buildDir).
             classPath(classPath).
             pathToLicense(ServerThread.getTestLicensePath()).
@@ -2133,7 +2134,7 @@ public class LocalCluster extends VoltServerConfig {
         return m_cmdLines.get(hostId).adminPort();
     }
 
-    public void setPortsFromConfig(int hostId, VoltDB.Configuration config) {
+    public void setPortsFromConfig(int hostId, VoltConfiguration config) {
         CommandLine cl = m_cmdLines.get(hostId);
         assert(cl != null);
         cl.m_port = config.m_port;

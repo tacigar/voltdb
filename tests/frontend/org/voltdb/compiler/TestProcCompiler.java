@@ -26,7 +26,7 @@ package org.voltdb.compiler;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.voltdb.VoltDB.Configuration;
+import org.voltdb.VoltConfiguration;
 
 import junit.framework.TestCase;
 
@@ -57,7 +57,7 @@ public class TestProcCompiler extends TestCase {
                                  "select * from indexed_replicated_blah where ival <> 0");
 
 
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("index_on_constant.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("index_on_constant.jar"));
         assert(success);
         String captured = capturer.toString("UTF-8");
         System.out.println(captured);
@@ -93,7 +93,7 @@ public class TestProcCompiler extends TestCase {
         String sql = getQueryForFoo(350);
         builder.addStmtProcedure("StmtWithPredicates", sql);
 
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("lots_of_predicates.jar"));
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("lots_of_predicates.jar"));
         assert(success);
     }
 
@@ -116,7 +116,7 @@ public class TestProcCompiler extends TestCase {
             // results in an error and does not crash or hang the system.
             String sql = getQueryForFoo(npreds);
             builder.addStmtProcedure("StmtForStackOverFlow", sql);
-            success = builder.compile(Configuration.getPathToCatalogForTest("max_plus_predicates.jar"));
+            success = builder.compile(VoltConfiguration.getPathToCatalogForTest("max_plus_predicates.jar"));
         }
 
         assert(!success);

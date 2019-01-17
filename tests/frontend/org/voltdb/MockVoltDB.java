@@ -48,7 +48,6 @@ import org.voltcore.logging.VoltLogger;
 import org.voltcore.messaging.HostMessenger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.ZKUtil;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.VoltZK.MailboxType;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.catalog.Cluster;
@@ -90,7 +89,7 @@ public class MockVoltDB implements VoltDBInterface
     OperationMode m_startMode = OperationMode.RUNNING;
     ReplicationRole m_replicationRole = ReplicationRole.NONE;
     long m_clusterCreateTime = 0;
-    VoltDB.Configuration voltconfig = null;
+    VoltConfiguration voltconfig = null;
     private final ListeningExecutorService m_es = MoreExecutors.listeningDecorator(CoreUtils.getSingleThreadExecutor("Mock Computation Service"));
     private ScheduledThreadPoolExecutor m_periodicWorkThread = CoreUtils.getScheduledThreadPoolExecutor("Periodic Work", 1, CoreUtils.SMALL_STACK_SIZE);;
     public int m_hostId = 0;
@@ -316,17 +315,17 @@ public class MockVoltDB implements VoltDBInterface
         return null;
     }
 
-    public void setConfig(VoltDB.Configuration config)
+    public void setConfig(VoltConfiguration config)
     {
         voltconfig = config;
     }
 
     @Override
-    public Configuration getConfig()
+    public VoltConfiguration getConfig()
     {
         if (voltconfig == null)
         {
-            voltconfig = new VoltDB.Configuration();
+            voltconfig = new VoltConfiguration();
         }
         return voltconfig;
     }
@@ -389,14 +388,14 @@ public class MockVoltDB implements VoltDBInterface
     }
 
     @Override
-    public void initialize(Configuration config)
+    public void initialize(VoltConfiguration config)
     {
         m_noLoadLib = config.m_noLoadLibVOLTDB;
         voltconfig = config;
     }
 
     @Override
-    public void cli(Configuration config)
+    public void cli(VoltConfiguration config)
     {
         m_noLoadLib = config.m_noLoadLibVOLTDB;
         voltconfig = config;

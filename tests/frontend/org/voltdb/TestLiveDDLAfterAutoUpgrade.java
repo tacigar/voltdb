@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ProcCallException;
 import org.voltdb.compiler.CatalogUpgradeTools;
 import org.voltdb.compiler.VoltProjectBuilder;
@@ -42,8 +41,8 @@ public class TestLiveDDLAfterAutoUpgrade extends AdhocDDLTestBase {
     @Test
     public void testEng7357() throws Exception
     {
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhocddl.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhocddl.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhocddl.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhocddl.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(
@@ -66,7 +65,7 @@ public class TestLiveDDLAfterAutoUpgrade extends AdhocDDLTestBase {
         InMemoryJarfile jarfile = CatalogUtil.loadInMemoryJarFile(MiscUtils.fileToBytes(catFile));
         jarfile.writeToFile(catFile);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
 

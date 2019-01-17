@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcCallException;
@@ -52,8 +51,8 @@ public class TestAdhocCreateDropJavaProc extends AdhocDDLTestBase {
     {
         System.out.println("\n\n-----\n testBasic \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema("-- Don't care");
         builder.setUseDDLSchema(true);
@@ -169,8 +168,8 @@ public class TestAdhocCreateDropJavaProc extends AdhocDDLTestBase {
     {
         System.out.println("\n\n-----\n testCreateUsingExistingImport \n-----\n\n");
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("updateclasses.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("updateclasses.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("updateclasses.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("updateclasses.xml");
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.setUseDDLSchema(true);
         boolean success = builder.compile(pathToCatalog, 2, 1, 0);

@@ -25,7 +25,6 @@ package org.voltdb;
 
 import java.io.IOException;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.NoConnectionsException;
@@ -270,8 +269,8 @@ public class TestLikeQueries extends TestCase {
 
     public void testLikeClause() throws Exception {
 
-        String pathToCatalog = Configuration.getPathToCatalogForTest("adhoc_like.jar");
-        String pathToDeployment = Configuration.getPathToCatalogForTest("adhoc_like.xml");
+        String pathToCatalog = VoltConfiguration.getPathToCatalogForTest("adhoc_like.jar");
+        String pathToDeployment = VoltConfiguration.getPathToCatalogForTest("adhoc_like.xml");
 
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.addLiteralSchema(schema);
@@ -283,7 +282,7 @@ public class TestLikeQueries extends TestCase {
         assertTrue("Insert compilation failed", success);
         MiscUtils.copyFile(builder.getPathToDeployment(), pathToDeployment);
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
+        VoltConfiguration config = new VoltConfiguration();
         config.m_pathToCatalog = pathToCatalog;
         config.m_pathToDeployment = pathToDeployment;
         ServerThread localServer = new ServerThread(config);

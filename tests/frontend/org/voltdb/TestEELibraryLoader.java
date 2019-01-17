@@ -35,7 +35,7 @@ public class TestEELibraryLoader
 {
     @Test
     public void testLoader() {
-        VoltDB.Configuration configuration = new VoltDB.Configuration();
+        VoltConfiguration configuration = new VoltConfiguration();
         configuration.m_noLoadLibVOLTDB = true;
         MockVoltDB mockvolt = new MockVoltDB();
         VoltDB.ignoreCrash = true;
@@ -58,7 +58,7 @@ public class TestEELibraryLoader
         assertFalse(VoltDB.wasCrashCalled);
 
         // Now test SUCCESS case
-        configuration = new VoltDB.Configuration();
+        configuration = new VoltConfiguration();
         VoltDBInterface mockitovolt = mock(VoltDBInterface.class);
         VoltDBInterface realvolt = new RealVoltDB();
         when(mockitovolt.getEELibraryVersionString())

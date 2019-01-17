@@ -23,7 +23,6 @@
 
 package org.voltdb;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientResponse;
@@ -47,13 +46,13 @@ public class TestExpectations extends TestCase {
         builder.addPartitionInfo("blah", "ival");
         builder.addStmtProcedure("Insert", "insert into blah values (?, ?);");
         builder.addProcedure(CrushExpectations.class, new ProcedurePartitionData("BLAH", "IVAL"));
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("expectations.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("expectations.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("expectations.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("expectations.xml"));
 
-        VoltDB.Configuration config = new VoltDB.Configuration();
-        config.m_pathToCatalog = Configuration.getPathToCatalogForTest("expectations.jar");
-        config.m_pathToDeployment = Configuration.getPathToCatalogForTest("expectations.xml");
+        VoltConfiguration config = new VoltConfiguration();
+        config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("expectations.jar");
+        config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("expectations.xml");
         ServerThread localServer = new ServerThread(config);
         localServer.start();
         localServer.waitForInitialization();

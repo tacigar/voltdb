@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.voltdb.VoltDB.Configuration;
 import org.voltdb.client.Client;
 import org.voltdb.client.ClientFactory;
 import org.voltdb.client.ClientUtils;
@@ -49,7 +48,7 @@ public class TestMemoryResourceMonitor extends TestCase
     private static final int DEFAULT_MONITORING_INTERVAL = 60;
 
     private ServerThread m_localServer;
-    private VoltDB.Configuration m_config;
+    private VoltConfiguration m_config;
     private Client m_client;
     private TestStatsProducer m_mockStatsProducer;
 
@@ -62,13 +61,13 @@ public class TestMemoryResourceMonitor extends TestCase
         if (setMonitoringInterval) {
             builder.setResourceCheckInterval(MONITORING_INTERVAL);
         }
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("resourcemonitor.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("resourcemonitor.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("resourcemonitor.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("resourcemonitor.xml"));
 
-        m_config = new VoltDB.Configuration();
-        m_config.m_pathToCatalog = Configuration.getPathToCatalogForTest("resourcemonitor.jar");
-        m_config.m_pathToDeployment = Configuration.getPathToCatalogForTest("resourcemonitor.xml");
+        m_config = new VoltConfiguration();
+        m_config.m_pathToCatalog = VoltConfiguration.getPathToCatalogForTest("resourcemonitor.jar");
+        m_config.m_pathToDeployment = VoltConfiguration.getPathToCatalogForTest("resourcemonitor.xml");
         m_localServer = new ServerThread(m_config);
         m_localServer.start();
         m_localServer.waitForInitialization();
@@ -264,11 +263,11 @@ public class TestMemoryResourceMonitor extends TestCase
         VoltProjectBuilder builder = new VoltProjectBuilder();
         builder.setRssLimit(rssLimit);
         builder.setResourceCheckInterval(MONITORING_INTERVAL);
-        boolean success = builder.compile(Configuration.getPathToCatalogForTest("updatedresourcemonitor.jar"), 1, 1, 0);
+        boolean success = builder.compile(VoltConfiguration.getPathToCatalogForTest("updatedresourcemonitor.jar"), 1, 1, 0);
         assert(success);
-        MiscUtils.copyFile(builder.getPathToDeployment(), Configuration.getPathToCatalogForTest("updatedresourcemonitor.xml"));
+        MiscUtils.copyFile(builder.getPathToDeployment(), VoltConfiguration.getPathToCatalogForTest("updatedresourcemonitor.xml"));
 
-        return Configuration.getPathToCatalogForTest("updatedresourcemonitor.xml");
+        return VoltConfiguration.getPathToCatalogForTest("updatedresourcemonitor.xml");
     }
 
     // time in seconds
