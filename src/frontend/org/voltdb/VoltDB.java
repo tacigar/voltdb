@@ -25,17 +25,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.voltcore.logging.VoltLogger;
-import org.voltcore.messaging.HostMessenger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.OnDemandBinaryLogger;
 import org.voltcore.utils.ShutdownHooks;
@@ -44,6 +39,7 @@ import org.voltdb.common.Constants;
 import org.voltdb.snmp.SnmpTrapSender;
 import org.voltdb.types.TimestampType;
 import org.voltdb.utils.PlatformProperties;
+import org.voltdb.utils.StackTrace;
 import org.voltdb.utils.VoltTrace;
 
 /**
@@ -72,86 +68,6 @@ public class VoltDB {
 
     public static BackendTarget getEEBackendType() {
         return m_config.m_backend;
-    }
-
-    /*
-     * Create a file that starts with the supplied message that contains
-     * human readable stack traces for all java threads in the current process.
-     */
-    public static void dropStackTrace(String message) {
-        if (CoreUtils.isJunitTest()) {
-            VoltLogger log = new VoltLogger("HOST");
-            log.warn("Declining to drop a stack trace during a junit test.");
-            return;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HH:mm:ss.SSSZ");
-        String dateString = sdf.format(new Date());
-        CatalogContext catalogContext = VoltDB.instance().getCatalogContext();
-        HostMessenger hm = VoltDB.instance().getHostMessenger();
-        int hostId = 0;
-        if (hm != null) {
-            hostId = hm.getHostId();
-        }
-        String root = catalogContext != null ? VoltDB.instance().getVoltDBRootPath() + File.separator : "";
-        try {
-            PrintWriter writer = new PrintWriter(root + "host" + hostId + "-" + dateString + ".txt");
-            writer.println(message);
-            printStackTraces(writer);
-            writer.flush();
-            writer.close();
-        } catch (Exception e) {
-            try
-            {
-                VoltLogger log = new VoltLogger("HOST");
-                log.error("Error while dropping stack trace for \"" + message + "\"", e);
-            }
-            catch (RuntimeException rt_ex)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /*
-     * Print stack traces for all java threads in the current process to the supplied writer
-     */
-    public static void printStackTraces(PrintWriter writer) {
-        printStackTraces(writer, null);
-    }
-
-    /*
-     * Print stack traces for all threads in the process to the supplied writer.
-     * If a List is supplied then the stack frames for the current thread will be placed in it
-     */
-    public static void printStackTraces(PrintWriter writer, List<String> currentStacktrace) {
-        if (currentStacktrace == null) {
-            currentStacktrace = new ArrayList<>();
-        }
-
-        Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
-        StackTraceElement[] myTrace = traces.get(Thread.currentThread());
-        for (StackTraceElement ste : myTrace) {
-            currentStacktrace.add(ste.toString());
-        }
-
-        writer.println();
-        writer.println("****** Current Thread ****** ");
-        for (String currentStackElem : currentStacktrace) {
-            writer.println(currentStackElem);
-        }
-
-        writer.println("****** All Threads ******");
-        Iterator<Thread> it = traces.keySet().iterator();
-        while (it.hasNext())
-        {
-            Thread key = it.next();
-            writer.println();
-            StackTraceElement[] st = traces.get(key);
-            writer.println("****** " + key + " ******");
-            for (StackTraceElement ste : st) {
-                writer.println(ste);
-            }
-        }
     }
 
     public static void crashLocalVoltDB(String errMsg) {
@@ -285,7 +201,7 @@ public class VoltDB {
                         thrown.printStackTrace(writer);
                     }
 
-                    printStackTraces(writer, currentStacktrace);
+                    StackTrace.print(writer, currentStacktrace);
                     writer.close();
                 }
                 catch (Throwable err)

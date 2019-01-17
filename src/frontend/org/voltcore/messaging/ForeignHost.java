@@ -42,8 +42,7 @@ import org.voltcore.utils.EstTime;
 import org.voltcore.utils.RateLimitedLogger;
 import org.voltdb.OperationMode;
 import org.voltdb.VoltDB;
-
-import com.google_voltpatches.common.base.Throwables;
+import org.voltdb.utils.StackTrace;
 
 public class ForeignHost {
     private static final VoltLogger hostLog = new VoltLogger("HOST");
@@ -107,7 +106,7 @@ public class ForeignHost {
                 // Log the remote host's action
                 if (!m_hostMessenger.isShuttingDown()) {
                     String msg = "Received remote hangup from foreign host " + hostnameAndIPAndPort();
-                    VoltDB.dropStackTrace(msg);
+                    StackTrace.dumpToFile(msg);
                     CoreUtils.printAsciiArtLog(hostLog, msg, Level.INFO);
                 }
                 m_hostMessenger.reportForeignHostFailed(m_hostId);
@@ -139,10 +138,11 @@ public class ForeignHost {
 
     private void setLogRate(long deadHostTimeout) {
         int logRate;
-        if (deadHostTimeout < 30 * 1000)
+        if (deadHostTimeout < 30 * 1000) {
             logRate = (int) (deadHostTimeout / 3);
-        else
+        } else {
             logRate = 10 * 1000;
+        }
         rateLimitedLogger = new RateLimitedLogger(logRate, hostLog, Level.WARN);
         m_logRate = logRate;
     }
@@ -172,13 +172,14 @@ public class ForeignHost {
     synchronized void close()
     {
         m_isUp = false;
-        if (m_closing) return;
+        if (m_closing) {
+            return;
+        }
         m_closing = true;
         try {
             m_network.shutdownAsync();
-
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -209,7 +210,9 @@ public class ForeignHost {
     @Override
     protected void finalize() throws Throwable
     {
-        if (m_closing) return;
+        if (m_closing) {
+            return;
+        }
         close();
         super.finalize();
     }
@@ -239,8 +242,8 @@ public class ForeignHost {
                             buf.putInt(buf.capacity() - 4);
                             buf.putLong(message.m_sourceHSId);
                             buf.putInt(destinations.length);
-                            for (int ii = 0; ii < destinations.length; ii++) {
-                                buf.putLong(destinations[ii]);
+                            for (long destination : destinations) {
+                                buf.putLong(destination);
                             }
                             message.flattenToBuffer(buf);
                             buf.flip();
@@ -295,7 +298,7 @@ public class ForeignHost {
                 hostLog.info("\tlast message: " + m_lastMessageMillis);
                 hostLog.info("\tdelta (millis): " + current_delta);
                 hostLog.info("\ttimeout value (millis): " + m_deadHostTimeout);
-                VoltDB.dropStackTrace("Timed out foreign host " + hostnameAndIPAndPort() + " with delta " + current_delta);
+                StackTrace.dumpToFile("Timed out foreign host " + hostnameAndIPAndPort() + " with delta " + current_delta);
             }
             m_hostMessenger.reportForeignHostFailed(m_hostId);
         }
