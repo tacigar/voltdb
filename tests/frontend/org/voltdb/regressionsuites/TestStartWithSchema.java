@@ -79,10 +79,10 @@ final public class TestStartWithSchema {
      * @return number of nodes in cluster that have staged catalogs
      */
     static int countNodesWithStagedCatalog(LocalCluster cluster) throws IOException {
-        final String pathWithinSubroot = File.separator + Constants.DBROOT + File.separator + CatalogUtil.STAGED_CATALOG_PATH;
+        final String pathWithinSubroot = File.separator + Constants.VOLTDB_ROOT + File.separator + CatalogUtil.STAGED_CATALOG_PATH;
         int total = 0;
         for (Map.Entry<String, String> entry : cluster.getHostRoots().entrySet()) {
-            assert( entry.getValue().contains(Constants.DBROOT) == false ) : entry.getValue();
+            assert( entry.getValue().contains(Constants.VOLTDB_ROOT) == false ) : entry.getValue();
             File testFile = new VoltFile(entry.getValue() + pathWithinSubroot);
             if (testFile.canRead() && (testFile.length() > 0)) {
                 InMemoryJarfile jar = new InMemoryJarfile(testFile);

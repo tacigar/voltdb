@@ -82,7 +82,7 @@ public class VoltDB {
     public static final String INITIALIZED_PATHS = ".paths";
     public static final String STAGED_MESH = "_MESH";
     public static final String DEFAULT_CLUSTER_NAME = "database";
-    public static final String DBROOT = Constants.DBROOT;
+    public static final String DBROOT = Constants.VOLTDB_ROOT;
     public static final String MODULE_CACHE = ".bundles-cache";
 
     // The name of the SQLStmt implied by a statement procedure's sql statement.

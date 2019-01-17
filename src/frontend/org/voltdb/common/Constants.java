@@ -22,7 +22,10 @@ import java.nio.charset.Charset;
 
 import org.voltdb.iv2.UniqueIdGenerator;
 
+/** Constants used by VoltDB */
 public class Constants {
+
+    public static final int UNDEFINED = -1;
 
     public static final Charset UTF8_ENCODING = Charset.forName("UTF-8");
     public static final Charset US_ASCII_ENCODING = Charset.forName("US-ASCII");
@@ -34,12 +37,9 @@ public class Constants {
      */
     public static final String ODBC_DATE_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss.SSS";
 
- // The default heart beat timeout value
+    /** Default heart beat timeout value */
     public static final int DEFAULT_HEARTBEAT_TIMEOUT_SECONDS = 90;
     public static final String VOLT_TMP_DIR = "volt.tmpdir";
-    public static final int DEFAULT_INTERNAL_PORT = 3021;
-    public static final int DEFAULT_ZK_PORT = 7181;
-    public static final String DEFAULT_INTERNAL_INTERFACE = "";
 
     // Network constants
     public static final int DEFAULT_PORT = 21212;
@@ -49,6 +49,9 @@ public class Constants {
     public static final int DEFAULT_DR_PORT = 5555;
     public static final int DEFAULT_HTTP_PORT = 8080;
     public static final int DEFAULT_HTTPS_PORT = 8443;
+    public static final int DEFAULT_INTERNAL_PORT = 3021;
+    public static final int DEFAULT_ZK_PORT = 7181;
+    public static final String DEFAULT_INTERNAL_INTERFACE = "";
     public static final String DEFAULT_EXTERNAL_INTERFACE = "";
 
     /**
@@ -57,7 +60,7 @@ public class Constants {
      */
     public static final int BACKWARD_TIME_FORGIVENESS_WINDOW_MS = 3000;
 
-    // authentication handshake codes
+    // Authentication handshake codes.
     public static final byte AUTH_HANDSHAKE_VERSION = 2;
     public static final byte AUTH_SERVICE_NAME = 4;
     public static final byte AUTH_HANDSHAKE = 5;
@@ -66,10 +69,12 @@ public class Constants {
 
     public static final String DEFAULT_KEYSTORE_RESOURCE = "keystore";
     public static final String DEFAULT_KEYSTORE_PASSWD = "password";
-    public static final String DEFAULT_TRUSTSTORE_RESOURCE = System.getProperty("java.home") + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts";
+    public static final String DEFAULT_TRUSTSTORE_RESOURCE =
+            System.getProperty("java.home") + File.separator + "lib"
+                    + File.separator + "security" + File.separator + "cacerts";
     public static final String DEFAULT_TRUSTSTORE_PASSWD = "changeit";
 
-    // reasons a connection can fail
+    // Reasons for a connection failure.
     public static final byte AUTHENTICATION_FAILURE = -1;
     public static final byte MAX_CONNECTIONS_LIMIT_ERROR = 1;
     public static final byte WIRE_PROTOCOL_TIMEOUT_ERROR = 2;
@@ -77,18 +82,18 @@ public class Constants {
     public static final byte AUTHENTICATION_FAILURE_DUE_TO_REJOIN = 4;
     public static final byte EXPORT_DISABLED_REJECTION = 5;
 
-    // from jdbc metadata generation
+    // from JDBC metadata generation
     public static final String JSON_PARTITION_PARAMETER = "partitionParameter";
     public static final String JSON_PARTITION_PARAMETER_TYPE = "partitionParameterType";
     public static final String JSON_SINGLE_PARTITION = "singlePartition";
     public static final String JSON_READ_ONLY = "readOnly";
 
-    // The transaction id layout.
+    // The transaction ID layout.
     static final long UNUSED_SIGN_BITS = 1;
     static final long SEQUENCE_BITS = 49;
     static final long PARTITIONID_BITS = 14;
 
-    // maximum values for the txn id fields
+    // Maximum values for the transaction ID fields
     static final long SEQUENCE_MAX_VALUE = (1L << SEQUENCE_BITS) - 1L;
     static final int PARTITIONID_MAX_VALUE = (1 << PARTITIONID_BITS) - 1;
 
@@ -100,14 +105,13 @@ public class Constants {
     /** String that can be used to indicate NULL value in CSV files */
     public static final String QUOTED_CSV_NULL = "\"\\N\"";
 
-    // default export group to use when no group name is provided
+    /** Default export group to use when no group name is provided. */
     public static final String DEFAULT_EXPORT_CONNECTOR_NAME = "__default__";
 
     // Special HTTP port values to disable or trigger auto-scan.
-    public static final int UNDEFINED = -1;
     public static final int HTTP_PORT_DISABLED = UNDEFINED;
     public static final int HTTP_PORT_AUTO = 0;
 
-    public static final String DBROOT = "voltdbroot";
+    public static final String VOLTDB_ROOT = "voltdbroot";
     public static final String CONFIG_DIR = "config";
 }

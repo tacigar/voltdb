@@ -711,7 +711,7 @@ public class LocalCluster extends VoltServerConfig {
             String root = m_hostRoots.get(hostIdStr);
             //For new CLI dont pass deployment for probe.
             cmdln.pathToDeployment(null);
-            cmdln.voltdbRoot(root + File.separator + Constants.DBROOT);
+            cmdln.voltdbRoot(root + File.separator + Constants.VOLTDB_ROOT);
         }
         m_localServer = new ServerThread(cmdln);
         if (m_usesStagedSchema) {
@@ -734,8 +734,8 @@ public class LocalCluster extends VoltServerConfig {
             if (!m_hostRoots.containsKey(hostId)) {
                 throw new IllegalArgumentException("getServerSpecificRoot possibly called before cluster has started.");
             }
-            assert( new File(m_hostRoots.get(hostId)).getName().equals(Constants.DBROOT) == false ) : m_hostRoots.get(hostId);
-            return m_hostRoots.get(hostId) + File.separator + Constants.DBROOT;
+            assert( new File(m_hostRoots.get(hostId)).getName().equals(Constants.VOLTDB_ROOT) == false ) : m_hostRoots.get(hostId);
+            return m_hostRoots.get(hostId) + File.separator + Constants.VOLTDB_ROOT;
         }
         else {
             for (CommandLine cl : m_cmdLines) {
@@ -766,8 +766,8 @@ public class LocalCluster extends VoltServerConfig {
         //If we are initializing lets wait for it to finish.
         ServerThread th = new ServerThread(cmdln);
         File root = VoltFile.getServerSpecificRoot(String.valueOf(hostId), clearLocalDataDirectories);
-        assert( root.getName().equals(Constants.DBROOT) == false ) : root.getAbsolutePath();
-        cmdln.voltdbRoot(new File(root, Constants.DBROOT));
+        assert( root.getName().equals(Constants.VOLTDB_ROOT) == false ) : root.getAbsolutePath();
+        cmdln.voltdbRoot(new File(root, Constants.VOLTDB_ROOT));
         try {
             th.initialize();
         }
@@ -1032,8 +1032,8 @@ public class LocalCluster extends VoltServerConfig {
         try {
             //If clear clean VoltFile.getServerSpecificRoot(String.valueOf(hostId))
             root = VoltFile.getServerSpecificRoot(String.valueOf(hostId), clearLocalDataDirectories);
-            assert( root.getName().equals(Constants.DBROOT) == false ) : root.getAbsolutePath();
-            cmdln = cmdln.voltdbRoot(new File(root, Constants.DBROOT));
+            assert( root.getName().equals(Constants.VOLTDB_ROOT) == false ) : root.getAbsolutePath();
+            cmdln = cmdln.voltdbRoot(new File(root, Constants.VOLTDB_ROOT));
             cmdln = cmdln.startCommand(StartAction.INITIALIZE);
             if (clearLocalDataDirectories) {
                 cmdln.setForceVoltdbCreate(true);
