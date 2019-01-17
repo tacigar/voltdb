@@ -55,6 +55,7 @@ import org.voltdb.client.ProcCallException;
 import org.voltdb.common.Constants;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.compiler.deploymentfile.DrRoleType;
+import org.voltdb.exceptions.SimulatedExitException;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.CommandLine;
 import org.voltdb.utils.VoltFile;
@@ -772,7 +773,7 @@ public class LocalCluster extends VoltServerConfig {
         try {
             th.initialize();
         }
-        catch (VoltDB.SimulatedExitException expected) {
+        catch (SimulatedExitException expected) {
             //All ok
         }
         catch (Exception ex) {

@@ -73,6 +73,7 @@ import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
 import org.voltdb.utils.MiscUtils;
 import org.voltdb.utils.Poisoner;
+import org.voltdb.utils.StackTrace;
 import org.voltdb.utils.VoltFile;
 import org.voltdb.utils.VoltTrace;
 
@@ -663,14 +664,14 @@ public final class InvocationDispatcher {
             //collect thread dumps
             String dumpDir = new File(VoltDB.instance().getVoltDBRootPath(), "thread_dumps").getAbsolutePath();
             String fileName =  hostMessenger.getHostname() + "_host-" + hostMessenger.getHostId() + "_" + System.currentTimeMillis()+".jstack";
-            success = VoltDB.dumpThreadTraceToFile(dumpDir, fileName );
+            success = StackTrace.dumpThreadTraceToFile(dumpDir, fileName );
             liveHids.remove(hostMessenger.getHostId());
             hostMessenger.sendPoisonPill(liveHids, "@Jstack called", ForeignHost.PRINT_STACKTRACE);
         } else if (ihid == hostMessenger.getHostId()) { // only local
             //collect thread dumps
             String dumpDir = new File(VoltDB.instance().getVoltDBRootPath(), "thread_dumps").getAbsolutePath();
             String fileName =  hostMessenger.getHostname() + "_host-" + hostMessenger.getHostId() + "_" + System.currentTimeMillis()+".jstack";
-            success = VoltDB.dumpThreadTraceToFile(dumpDir, fileName );
+            success = StackTrace.dumpThreadTraceToFile(dumpDir, fileName );
         } else { // only remote
             hostMessenger.sendPoisonPill(ihid, "@Jstack called", ForeignHost.PRINT_STACKTRACE);
         }

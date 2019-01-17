@@ -80,9 +80,11 @@ public abstract class ClientFactory {
         }
     }
 
+    /**
+     * This method is intended to ensure that the resources needed to create clients
+     * are always initialized and won't be released with the active client count goes to zero.
+     */
     public static synchronized void increaseClientCountToOne() {
-        // This method is intended to ensure that the resources needed to create clients
-        // are always initialized and won't be released with the active client count goes to zero.
         m_preserveResources = true;
         VoltLogger.startAsynchronousLogging();
         EstTimeUpdater.start();

@@ -46,10 +46,10 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.voltdb.VoltDB.SimulatedExitException;
 import org.voltdb.catalog.Catalog;
 import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
+import org.voltdb.exceptions.SimulatedExitException;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.InMemoryJarfile;
 import org.voltdb.utils.Poisoner;
@@ -124,7 +124,7 @@ final public class TestInitStartAction {
      */
     private void expectSimulatedExit(int exitCode){
         assertNotNull(serverException.get());
-        if (!(serverException.get() instanceof VoltDB.SimulatedExitException)) {
+        if (!(serverException.get() instanceof SimulatedExitException)) {
             System.err.println("got an unexpected exception");
             serverException.get().printStackTrace(System.err);
             if (Poisoner.wasCrashCalled) {
@@ -132,8 +132,8 @@ final public class TestInitStartAction {
             }
         }
 
-        assertTrue(serverException.get() instanceof VoltDB.SimulatedExitException);
-        VoltDB.SimulatedExitException exitex = (VoltDB.SimulatedExitException)serverException.get();
+        assertTrue(serverException.get() instanceof SimulatedExitException);
+        SimulatedExitException exitex = (SimulatedExitException)serverException.get();
         assertEquals(exitCode, exitex.getStatus());
     }
 
@@ -202,7 +202,7 @@ final public class TestInitStartAction {
         try {
             c1 = new VoltConfiguration(new String[]{"initialize", "voltdbroot", rootDH.getPath()});
             fail("did not detect prexisting initialization");
-        } catch (VoltDB.SimulatedExitException e) {
+        } catch (SimulatedExitException e) {
             assertEquals(-1, e.getStatus());
         }
 
@@ -394,7 +394,7 @@ final public class TestInitStartAction {
             new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force", "schema", schemaFile.getPath()});
             fail("did not detect unusable schema file");
-        } catch (VoltDB.SimulatedExitException e) {
+        } catch (SimulatedExitException e) {
             assertEquals(e.getStatus(), -1);
         }
 
@@ -409,7 +409,7 @@ final public class TestInitStartAction {
         try {
             new VoltConfiguration(
                     new String[]{"initialize", "voltdbroot", rootDH.getPath(), "force"});
-        } catch (VoltDB.SimulatedExitException e) {
+        } catch (SimulatedExitException e) {
             fail("Should init without schema.");
         }
     }

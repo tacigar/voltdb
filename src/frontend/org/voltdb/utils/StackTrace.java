@@ -1,7 +1,12 @@
 package org.voltdb.utils;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,5 +101,38 @@ public class StackTrace {
                 writer.println(ste);
             }
         }
+    }
+
+    public static String generateThreadDump() {
+        StringBuilder threadDumps = new StringBuilder();
+        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        ThreadInfo[] threadInfos = threadMXBean.dumpAllThreads(true, true);
+        for (ThreadInfo t : threadInfos) {
+            threadDumps.append(t);
+        }
+        return threadDumps.toString();
+    }
+
+    public static boolean dumpThreadTraceToFile(String dumpDir, String fileName) {
+        final File dir = new File(dumpDir);
+        if (!dir.getParentFile().canWrite() || !dir.getParentFile().canExecute()) {
+            System.err.println("Parent directory " + dir.getParentFile().getAbsolutePath() +
+                    " is not writable");
+            return false;
+        }
+        if (!dir.exists()) {
+            if (!dir.mkdir()) {
+                System.err.println("Failed to create directory " + dir.getAbsolutePath());
+                return false;
+            }
+        }
+        File file = new File(dumpDir, fileName);
+        try (FileWriter writer = new FileWriter(file); PrintWriter out = new PrintWriter(writer)) {
+            out.println(generateThreadDump());
+        } catch (IOException e) {
+            System.err.println("Failed to write to file " + file.getAbsolutePath());
+            return false;
+        }
+        return true;
     }
 }

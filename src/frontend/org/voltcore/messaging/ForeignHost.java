@@ -386,7 +386,7 @@ public class ForeignHost {
                 //collect thread dumps
                 String dumpDir = new File(VoltDB.instance().getVoltDBRootPath(), "thread_dumps").getAbsolutePath();
                 String fileName =  m_hostMessenger.getHostname() + "_host-" + m_hostId + "_" + System.currentTimeMillis()+".jstack";
-                VoltDB.dumpThreadTraceToFile(dumpDir, fileName );
+                StackTrace.dumpThreadTraceToFile(dumpDir, fileName );
             } else {
                 //Should never come here.
                 hostLog.error("Invalid Cause in poison pill: " + cause);
