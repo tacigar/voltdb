@@ -51,10 +51,10 @@ import org.hsqldb_voltpatches.VoltXMLElement;
 import org.voltcore.TransactionIdManager;
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.CatalogContext;
-import org.voltdb.VoltConfiguration;
 import org.voltdb.ProcedurePartitionData;
 import org.voltdb.RealVoltDB;
 import org.voltdb.SQLStmt;
+import org.voltdb.VoltConfiguration;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltDBInterface;
 import org.voltdb.VoltNonTransactionalProcedure;
@@ -82,6 +82,7 @@ import org.voltdb.utils.Encoder;
 import org.voltdb.utils.InMemoryJarfile;
 import org.voltdb.utils.InMemoryJarfile.JarLoader;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -290,14 +291,18 @@ public class VoltCompiler {
 
         public String getStandardFeedbackLine() {
             String retval = "";
-            if (severityLevel == Severity.INFORMATIONAL)
+            if (severityLevel == Severity.INFORMATIONAL) {
                 retval = "INFO";
-            if (severityLevel == Severity.WARNING)
+            }
+            if (severityLevel == Severity.WARNING) {
                 retval = "WARNING";
-            if (severityLevel == Severity.ERROR)
+            }
+            if (severityLevel == Severity.ERROR) {
                 retval = "ERROR";
-            if (severityLevel == Severity.UNEXPECTED)
+            }
+            if (severityLevel == Severity.UNEXPECTED) {
                 retval = "UNEXPECTED ERROR";
+            }
 
             return retval + " " + getLogString();
         }
@@ -306,8 +311,9 @@ public class VoltCompiler {
             String retval = new String();
             if (! fileName.equals(NO_FILENAME)) {
                 retval += "[" + fileName;
-                if (lineNo != NO_LINE_NUMBER)
+                if (lineNo != NO_LINE_NUMBER) {
                     retval += ":" + lineNo;
+                }
                 retval += "]: ";
             }
             retval += message;
@@ -677,7 +683,7 @@ public class VoltCompiler {
                         " setting VoltCompiler.RETRY_FAILED_CATALOG_REBUILD_UNDER_DEBUG = true and") +
                     " setting a breakpoint in VoltCompiler.replayFailedCatalogRebuildUnderDebug" +
                     " to debug a replay of the faulty catalog rebuild roundtrip. ";
-            VoltDB.crashLocalVoltDB(crashAdvice + "The offending diffcmds were: " + diffCmds);
+            Poisoner.crashLocalVoltDB(crashAdvice + "The offending diffcmds were: " + diffCmds);
         }
         else {
             Log.info("Catalog verification completed successfuly.");
@@ -892,8 +898,8 @@ public class VoltCompiler {
             throws VoltCompilerException
     {
         List<VoltCompilerReader> ddlReaderList = new ArrayList<>(ddlFilePaths.length);
-        for (int i = 0; i < ddlFilePaths.length; ++i) {
-            ddlReaderList.add(createDDLFileReader(ddlFilePaths[i]));
+        for (String ddlFilePath : ddlFilePaths) {
+            ddlReaderList.add(createDDLFileReader(ddlFilePath));
         }
         return ddlReaderList;
     }
@@ -1105,8 +1111,9 @@ public class VoltCompiler {
             for (final VoltCompilerReader schemaReader : schemaReaders) {
                 String origFilename = m_currentFilename;
                 try {
-                    if (m_currentFilename.equals(NO_FILENAME))
+                    if (m_currentFilename.equals(NO_FILENAME)) {
                         m_currentFilename = schemaReader.getName();
+                    }
 
                     // add the file object's path to the list of files for the jar
                     m_ddlFilePaths.put(schemaReader.getName(), schemaReader.getPath());
@@ -1750,7 +1757,9 @@ public class VoltCompiler {
                     throw new VoltCompilerException(msg);
                 }
                 finally {
-                    if ( jar != null) try {jar.close();} catch (Exception ignoreIt) {};
+                    if ( jar != null) {
+                        try {jar.close();} catch (Exception ignoreIt) {}
+                    };
                 }
             }
             // load directly from a classfile
@@ -1848,7 +1857,9 @@ public class VoltCompiler {
                     org.xml.sax.SAXParseException.class.cast(jxbex.getLinkedException());
             for( DeprecatedProjectElement dpe: DeprecatedProjectElement.values()) {
                 Matcher mtc = dpe.messagePattern.matcher(saxex.getMessage());
-                if( mtc.find()) return dpe;
+                if( mtc.find()) {
+                    return dpe;
+                }
             }
 
             return null;

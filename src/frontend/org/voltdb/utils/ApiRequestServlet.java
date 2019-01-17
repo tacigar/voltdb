@@ -17,7 +17,7 @@
 
 package org.voltdb.utils;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import static org.voltdb.utils.HTTPAdminListener.JSON_CONTENT_TYPE;
 
 import java.io.IOException;
@@ -25,10 +25,12 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Request;
 
+import org.eclipse.jetty.server.Request;
 import org.voltdb.VoltDB;
 import org.voltdb.client.ClientResponse;
+
+import com.google.common.base.Throwables;
 
 /**
  *
@@ -44,7 +46,9 @@ public class ApiRequestServlet extends VoltBaseServlet {
             throws IOException, ServletException {
         super.doGet(request, response);
         String target = request.getPathInfo();
-        if (target == null) target = "/";
+        if (target == null) {
+            target = "/";
+        }
         try {
             // http://www.ietf.org/rfc/rfc4627.txt dictates this mime type
             response.setContentType(JSON_CONTENT_TYPE);

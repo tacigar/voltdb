@@ -52,6 +52,7 @@ import org.voltdb.compiler.VoltCompiler;
 import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.InMemoryJarfile;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.base.Joiner;
@@ -106,7 +107,7 @@ final public class TestInitStartAction {
             fw.write(expnd);
         }
         System.setProperty("VOLT_JUSTATEST", "YESYESYES");
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
     }
 
     AtomicReference<Throwable> serverException = new AtomicReference<>(null);
@@ -126,8 +127,8 @@ final public class TestInitStartAction {
         if (!(serverException.get() instanceof VoltDB.SimulatedExitException)) {
             System.err.println("got an unexpected exception");
             serverException.get().printStackTrace(System.err);
-            if (VoltDB.wasCrashCalled) {
-                System.err.println("Crash message is:\n  "+ VoltDB.crashMessage);
+            if (Poisoner.wasCrashCalled) {
+                System.err.println("Crash message is:\n  "+ Poisoner.crashMessage);
             }
         }
 
@@ -139,8 +140,8 @@ final public class TestInitStartAction {
     /** Clears recorded crash (or simulated exit) in preparation for another test.
      */
     private void clearCrash(){
-        VoltDB.wasCrashCalled = false;
-        VoltDB.crashMessage = null;
+        Poisoner.wasCrashCalled = false;
+        Poisoner.crashMessage = null;
         serverException.set(null);
     }
 
@@ -205,8 +206,8 @@ final public class TestInitStartAction {
             assertEquals(-1, e.getStatus());
         }
 
-        VoltDB.wasCrashCalled = false;
-        VoltDB.crashMessage = null;
+        Poisoner.wasCrashCalled = false;
+        Poisoner.crashMessage = null;
         serverException.set(null);
 
         c1 = new VoltConfiguration(new String[]{"create", "deployment", legacyDeploymentFH.getPath(), "host", "localhost"});
@@ -218,10 +219,12 @@ final public class TestInitStartAction {
 
         assertNotNull(serverException.get());
         assertTrue(serverException.get() instanceof AssertionError);
-        assertTrue(VoltDB.wasCrashCalled);
-        assertTrue(VoltDB.crashMessage.contains("Cannot use legacy start action"));
+        assertTrue(Poisoner.wasCrashCalled);
+        assertTrue(Poisoner.crashMessage.contains("Cannot use legacy start action"));
 
-        if (!c1.m_isEnterprise) return;
+        if (!c1.m_isEnterprise) {
+            return;
+        }
 
         clearCrash();
 
@@ -234,8 +237,8 @@ final public class TestInitStartAction {
 
         assertNotNull(serverException.get());
         assertTrue(serverException.get() instanceof AssertionError);
-        assertTrue(VoltDB.wasCrashCalled);
-        assertTrue(VoltDB.crashMessage.contains("Cannot use legacy start action"));
+        assertTrue(Poisoner.wasCrashCalled);
+        assertTrue(Poisoner.crashMessage.contains("Cannot use legacy start action"));
 
         // this test which action should be considered legacy
         EnumSet<StartAction> legacyOnes = EnumSet.complementOf(EnumSet.of(StartAction.INITIALIZE,StartAction.PROBE, StartAction.GET));
@@ -251,7 +254,7 @@ final public class TestInitStartAction {
      * 4.  Negative test with procedures missing
      *
      * Note that SimulatedExitException is thrown by the command line parser with no descriptive details.
-     * VoltDB.crashLocalVoltDB() throws an AssertionError with the message "Faux crash of VoltDB successful."
+     * PoisonPill.crashLocalVoltDB() throws an AssertionError with the message "Faux crash of VoltDB successful."
      */
 
     /** Verifies that the staged catalog matches what VoltCompiler emits given the supplied schema.
@@ -435,8 +438,8 @@ final public class TestInitStartAction {
 
         assertNotNull(serverException.get());
         assertTrue(serverException.get().getMessage().equals("Faux crash of VoltDB successful."));
-        assertTrue(VoltDB.wasCrashCalled);
-        assertTrue(VoltDB.crashMessage.contains("Could not compile specified schema"));
+        assertTrue(Poisoner.wasCrashCalled);
+        assertTrue(Poisoner.crashMessage.contains("Could not compile specified schema"));
         assertEquals(true, schemaFile.delete());
     }
 

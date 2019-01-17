@@ -33,7 +33,6 @@ import org.voltdb.sysprocs.saverestore.HashinatorSnapshotData;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.base.Suppliers;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.MapMaker;
 
 /**
@@ -148,9 +147,8 @@ public abstract class TheHashinator {
                     hashinatorImplementation.getConstructor(byte[].class, boolean.class);
             return constructor.newInstance(configBytes, cooked);
         } catch (Exception e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**
@@ -325,7 +323,9 @@ public abstract class TheHashinator {
         if (existingHashinator == null) {
             existingHashinator = constructHashinator(hashinatorImplementation, configBytes, cooked);
             TheHashinator tempVal = m_cachedHashinators.putIfAbsent( version, existingHashinator);
-            if (tempVal != null) existingHashinator = tempVal;
+            if (tempVal != null) {
+                existingHashinator = tempVal;
+            }
         }
 
         //Do a CAS loop to maintain a global instance
@@ -466,10 +466,16 @@ public abstract class TheHashinator {
                 Set<Integer> partitions = TheHashinator.this.pGetPartitions();
 
                 for (int ii = 0; ii < 500000; ii++) {
-                    if (partitions.isEmpty()) break;
+                    if (partitions.isEmpty()) {
+                        break;
+                    }
                     Object value = null;
-                    if (type == VoltType.INTEGER) value = ii;
-                    if (type == VoltType.STRING) value = String.valueOf(ii);
+                    if (type == VoltType.INTEGER) {
+                        value = ii;
+                    }
+                    if (type == VoltType.STRING) {
+                        value = String.valueOf(ii);
+                    }
                     if (type == VoltType.VARBINARY) {
                         ByteBuffer buf = ByteBuffer.allocate(4);
                         buf.putInt(ii);

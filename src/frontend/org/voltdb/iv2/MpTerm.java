@@ -27,9 +27,9 @@ import java.util.concurrent.ExecutionException;
 import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.collect.ImmutableMap;
@@ -106,9 +106,9 @@ public class MpTerm implements Term
             m_leaderCache.start(true);
         }
         catch (ExecutionException ee) {
-            VoltDB.crashLocalVoltDB("Unable to create babysitter starting term.", true, ee);
+            Poisoner.crashLocalVoltDB("Unable to create babysitter starting term.", true, ee);
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Unable to create babysitter starting term.", true, e);
+            Poisoner.crashLocalVoltDB("Unable to create babysitter starting term.", true, e);
         }
     }
 

@@ -26,7 +26,7 @@ import java.nio.channels.FileChannel;
 import org.voltcore.utils.DBBPool;
 import org.voltcore.utils.DBBPool.BBContainer;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 /*
  * Extend the File class and override its constructors to allow a property to be specified
@@ -130,9 +130,8 @@ public class VoltFile extends File {
             }
             return tempUserDir;
         } catch (Exception ioe) {
-            Throwables.propagate(ioe);
+            throw new RuntimeException(ioe);
         }
-        return null;
     }
     /*
      * Basic kill it with fire. Deletes everything in /tmp/${username} of

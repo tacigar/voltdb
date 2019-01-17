@@ -25,6 +25,7 @@ import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.zk.LeaderElector;
 import org.voltcore.zk.LeaderNoticeHandler;
+import org.voltdb.utils.Poisoner;
 
 /**
  * GlobalServiceElector performs leader election to determine which VoltDB cluster node
@@ -55,7 +56,7 @@ class GlobalServiceElector implements LeaderNoticeHandler
                 service.acceptPromotion();
             }
             catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Unable to promote global service.", true, e);
+                Poisoner.crashLocalVoltDB("Unable to promote global service.", true, e);
             }
         }
     }
@@ -84,7 +85,7 @@ class GlobalServiceElector implements LeaderNoticeHandler
                 service.acceptPromotion();
             }
             catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Unable to promote global service.", true, e);
+                Poisoner.crashLocalVoltDB("Unable to promote global service.", true, e);
             }
         }
     }
@@ -94,7 +95,7 @@ class GlobalServiceElector implements LeaderNoticeHandler
         try {
             m_leaderElector.shutdown();
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Error shutting down GlobalServiceElector's LeaderElector", true, e);
+            Poisoner.crashLocalVoltDB("Error shutting down GlobalServiceElector's LeaderElector", true, e);
         }
     }
 

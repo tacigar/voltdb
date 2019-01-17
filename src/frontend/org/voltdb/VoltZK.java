@@ -43,6 +43,7 @@ import org.voltdb.common.Constants;
 import org.voltdb.iv2.LeaderCache;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
 import org.voltdb.iv2.MigratePartitionLeaderInfo;
+import org.voltdb.utils.Poisoner;
 
 /**
  * VoltZK provides constants for all voltdb-registered
@@ -254,7 +255,7 @@ public class VoltZK {
             } catch (org.apache.zookeeper_voltpatches.KeeperException.NodeExistsException e) {
                 // this is an expected race.
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
             }
         }
     }
@@ -368,7 +369,7 @@ public class VoltZK {
         try {
             startActionBytes = action.toString().getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            VoltDB.crashLocalVoltDB("Utf-8 encoding is not supported in current platform", false, e);
+            Poisoner.crashLocalVoltDB("Utf-8 encoding is not supported in current platform", false, e);
         }
 
         zk.create(VoltZK.start_action_node + hostId, startActionBytes, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL,
@@ -391,7 +392,7 @@ public class VoltZK {
                 return false;
             }
         } catch (KeeperException | InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Unable to check ZK node exists: " + node, true, e);
+            Poisoner.crashLocalVoltDB("Unable to check ZK node exists: " + node, true, e);
         }
         return true;
     }
@@ -439,13 +440,13 @@ public class VoltZK {
                       mode);
         } catch (KeeperException e) {
             if (e.code() != KeeperException.Code.NODEEXISTS) {
-                VoltDB.crashLocalVoltDB("Unable to create action blocker " + node, true, e);
+                Poisoner.crashLocalVoltDB("Unable to create action blocker " + node, true, e);
             }
             // node exists
             return "Invalid " + request + " request: Can't do " + request +
                     " while another one is in progress. Please retry " + request + " later.";
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Unable to create action blocker " + node, true, e);
+            Poisoner.crashLocalVoltDB("Unable to create action blocker " + node, true, e);
         }
 
         /*
@@ -519,11 +520,11 @@ public class VoltZK {
                 break;
             default:
                 // not possible
-                VoltDB.crashLocalVoltDB("Invalid request " + node , true, new RuntimeException("Non-supported " + request));
+                Poisoner.crashLocalVoltDB("Invalid request " + node , true, new RuntimeException("Non-supported " + request));
             }
         } catch (Exception e) {
             // should not be here
-            VoltDB.crashLocalVoltDB("Error reading children of ZK " + VoltZK.actionBlockers + ": " + e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB("Error reading children of ZK " + VoltZK.actionBlockers + ": " + e.getMessage(), true, e);
         }
 
         if (errorMsg != null) {
@@ -582,9 +583,9 @@ public class VoltZK {
                 return false;
             }
 
-            org.voltdb.VoltDB.crashLocalVoltDB("Unable to create MigratePartitionLeader Indicator", true, e);
+            Poisoner.crashLocalVoltDB("Unable to create MigratePartitionLeader Indicator", true, e);
         } catch (InterruptedException | JSONException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Unable to create MigratePartitionLeader Indicator", true, e);
+            Poisoner.crashLocalVoltDB("Unable to create MigratePartitionLeader Indicator", true, e);
         }
 
         return true;

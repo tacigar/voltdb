@@ -37,6 +37,7 @@ import org.voltcore.utils.CoreUtils;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.messaging.LocalMailbox;
 import org.voltdb.utils.CompressionService;
+import org.voltdb.utils.Poisoner;
 
 /**
  * OpsAgent is a base class for providing non-blocking, non-transactional,
@@ -196,7 +197,7 @@ public abstract class OpsAgent
             hostLog.error("Exception processing message in OpsAgent for " + m_name + ": " + message, e);
         } catch (Throwable t) {
             //Handle throwable because otherwise the future swallows up other exceptions
-            VoltDB.crashLocalVoltDB("Exception processing message in OpsAgent for " + m_name + ": " + message, true, t);
+            Poisoner.crashLocalVoltDB("Exception processing message in OpsAgent for " + m_name + ": " + message, true, t);
         }
 
     }
@@ -232,7 +233,7 @@ public abstract class OpsAgent
             request.aggregateTables = tables.toArray(new VoltTable[tables.size()]);
         }
         else if (!dummy) {
-            for (int ii = 0; ii < request.aggregateTables.length; ii++) {
+            for (VoltTable aggregateTable : request.aggregateTables) {
                 if (buf.hasRemaining()) {
                     final int tableLength = buf.getInt();
                     int oldLimit = buf.limit();
@@ -241,14 +242,16 @@ public abstract class OpsAgent
                     buf.position(buf.limit()).limit(oldLimit);
                     VoltTable vt = PrivateVoltTableFactory.createVoltTableFromBuffer( tableBuf, true);
                     while (vt.advanceRow()) {
-                        request.aggregateTables[ii].add(vt);
+                        aggregateTable.add(vt);
                     }
                 }
             }
         }
 
         request.expectedOpsResponses--;
-        if (request.expectedOpsResponses > 0) return;
+        if (request.expectedOpsResponses > 0) {
+            return;
+        }
 
         m_pendingRequests.remove(requestId);
 
@@ -418,9 +421,9 @@ public abstract class OpsAgent
                 4 * results.length + // length prefix for each stats table
                 + statbytes);
         responseBuffer.putLong(requestId);
-        for (int i = 0; i < bufs.length; i++) {
-            responseBuffer.putInt(bufs[i].remaining());
-            responseBuffer.put(bufs[i]);
+        for (ByteBuffer buf : bufs) {
+            responseBuffer.putInt(buf.remaining());
+            responseBuffer.put(buf);
         }
         byte responseBytes[] = CompressionService.compressBytes(responseBuffer.array());
 

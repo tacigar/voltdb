@@ -51,7 +51,7 @@ import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.SerializationHelper;
 
 import com.google_voltpatches.common.base.Charsets;
-import com.google_voltpatches.common.base.Throwables;
+
 
 /* Serializes data over a connection that presumably is being read
  * by a voltdb execution engine. The serialization is currently a
@@ -1242,7 +1242,7 @@ public class ExecutionEngineIPC extends ExecutionEngine {
             }
         }
         catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         //*/
         return null;
@@ -1785,11 +1785,10 @@ public class ExecutionEngineIPC extends ExecutionEngine {
                     throw new EOFException();
                 }
             }
-            return  retval.array();
+            return retval.array();
         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
-        throw new RuntimeException("Failed to executeTask in IPC client");
     }
 
     @Override

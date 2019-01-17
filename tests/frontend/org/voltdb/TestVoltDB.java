@@ -45,6 +45,7 @@ import org.voltdb.compiler.VoltProjectBuilder.UserInfo;
 import org.voltdb.utils.BuildDirectoryUtils;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 final public class TestVoltDB {
 
@@ -55,7 +56,7 @@ final public class TestVoltDB {
 
     @Before
     public void setup() {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
     }
 
     @Rule

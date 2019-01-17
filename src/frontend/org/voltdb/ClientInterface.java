@@ -101,12 +101,13 @@ import org.voltdb.messaging.LocalMailbox;
 import org.voltdb.messaging.MigratePartitionLeaderMessage;
 import org.voltdb.security.AuthenticationRequest;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTrace;
 
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.base.Predicate;
 import com.google_voltpatches.common.base.Supplier;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.collect.Sets;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
@@ -315,7 +316,7 @@ public class ClientInterface implements SnapshotDaemon.DaemonInitiator {
                     String msg = "Client interface failed to bind to"
                             + (m_isAdmin ? " Admin " : " ") + "port: " + m_port;
                     CoreUtils.printPortsInUse(hostLog);
-                    VoltDB.crashLocalVoltDB(msg, false, e);
+                    Poisoner.crashLocalVoltDB(msg, false, e);
                 }
             }
             m_running = true;
@@ -543,7 +544,7 @@ public class ClientInterface implements SnapshotDaemon.DaemonInitiator {
                     } catch (InterruptedException e) {
                         String msg = "Client Listener Interrupted while shutting down "
                                 + (m_isAdmin ? " Admin " : " ") + "port: " + m_port;
-                        VoltDB.crashLocalVoltDB(msg, false, e);
+                        Poisoner.crashLocalVoltDB(msg, false, e);
                     }
                 }
             }
@@ -1437,9 +1438,9 @@ public class ClientInterface implements SnapshotDaemon.DaemonInitiator {
                     try {
                         future.get();
                     } catch (InterruptedException e) {
-                        VoltDB.crashLocalVoltDB("Failed to make SnapshotDaemon active", false, e);
+                        Poisoner.crashLocalVoltDB("Failed to make SnapshotDaemon active", false, e);
                     } catch (ExecutionException e) {
-                        VoltDB.crashLocalVoltDB("Failed to make SnapshotDaemon active", false, e);
+                        Poisoner.crashLocalVoltDB("Failed to make SnapshotDaemon active", false, e);
                     }
                 }
             }, CoreUtils.SAMETHREADEXECUTOR);

@@ -20,10 +20,11 @@ package org.voltdb;
 import java.io.File;
 import java.net.URL;
 
-import org.voltdb.common.Constants;
 import org.voltcore.utils.InstanceId;
+import org.voltdb.common.Constants;
 import org.voltdb.probe.MeshProber;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Wraps VoltDB in a Thread
@@ -54,7 +55,7 @@ public class ServerThread extends Thread {
         m_config.m_noLoadLibVOLTDB = m_config.m_backend == BackendTarget.HSQLDB_BACKEND;
         m_config.m_forceVoltdbCreate = true;
         if (config.m_startAction == StartAction.INITIALIZE || config.m_startAction == StartAction.GET) {
-            VoltDB.ignoreCrash = true;
+            Poisoner.ignoreCrash = true;
         }
         setName("ServerThread");
     }
@@ -204,7 +205,9 @@ public class ServerThread extends Thread {
 
         // in the community edition, any non-empty string
         // should work fine here, as it won't be checked
-        if (resource == null) return "[community]";
+        if (resource == null) {
+            return "[community]";
+        }
 
         // return the filesystem path
         File licxml = new File(resource.getFile());

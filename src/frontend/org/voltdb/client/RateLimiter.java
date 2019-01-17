@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 /**
  * Provide the {@link Client} with a way to throttle throughput in one
@@ -248,7 +248,7 @@ class RateLimiter {
                         throw new TimeoutException();
                     }
                 } catch (InterruptedException e) {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 return System.nanoTime();
             }

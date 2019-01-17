@@ -27,6 +27,8 @@ import org.apache.zookeeper_voltpatches.ZooDefs.Ids;
 import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.apache.zookeeper_voltpatches.data.Stat;
 import org.voltdb.VoltZK;
+import org.voltdb.utils.Poisoner;
+
 import com.google_voltpatches.common.collect.Lists;
 
 /**
@@ -77,7 +79,7 @@ public class CoreZK {
                 cb.get();
             }
         } catch (Exception e) {
-            org.voltdb.VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     e.getMessage(), false, e);
         }
     }
@@ -123,14 +125,14 @@ public class CoreZK {
                     return ByteBuffer.wrap(zk.getData(rejoin_node_blocker, false, null)).getInt();
                 } catch (KeeperException e1) {
                     if (e1.code() != KeeperException.Code.NONODE) {
-                        org.voltdb.VoltDB.crashLocalVoltDB("Unable to get the current rejoining node indicator");
+                        Poisoner.crashLocalVoltDB("Unable to get the current rejoining node indicator");
                     }
                 } catch (InterruptedException e1) {}
             } else {
-                org.voltdb.VoltDB.crashLocalVoltDB("Unable to create rejoin node Indicator", true, e);
+                Poisoner.crashLocalVoltDB("Unable to create rejoin node Indicator", true, e);
             }
         } catch (InterruptedException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Unable to create rejoin node Indicator", true, e);
+            Poisoner.crashLocalVoltDB("Unable to create rejoin node Indicator", true, e);
         }
 
         return -1;

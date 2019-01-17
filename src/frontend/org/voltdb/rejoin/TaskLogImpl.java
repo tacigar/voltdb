@@ -29,10 +29,10 @@ import org.voltcore.logging.VoltLogger;
 import org.voltcore.messaging.TransactionInfoBaseMessage;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.DBBPool.BBContainer;
-import org.voltdb.VoltDB;
 import org.voltdb.utils.BinaryDeque;
 import org.voltdb.utils.BinaryDeque.BinaryDequeReader;
 import org.voltdb.utils.PersistentBinaryDeque;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A task queue that can overflow to disk.
@@ -105,11 +105,11 @@ public class TaskLogImpl implements TaskLog {
                         m_buffers.offer(boundTail.getContainer());
                         if (m_reader.sizeInBytes() > m_overflowLimit * 1024 * 1024) {
                             // we can never catch up, should break rejoin.
-                            VoltDB.crashLocalVoltDB("On-disk task log is full. Please reduce " +
+                            Poisoner.crashLocalVoltDB("On-disk task log is full. Please reduce " +
                                     "workload and try live rejoin again, or use blocking rejoin.");
                         }
                     } catch (Throwable t) {
-                        VoltDB.crashLocalVoltDB("Error in task log buffering transactions", true, t);
+                        Poisoner.crashLocalVoltDB("Error in task log buffering transactions", true, t);
                     }
                 }
             };
@@ -130,8 +130,12 @@ public class TaskLogImpl implements TaskLog {
 
     @Override
     public void logTask(TransactionInfoBaseMessage message) throws IOException {
-        if (message.getSpHandle() <= m_snapshotSpHandle) return;
-        if (m_closed) throw new IOException("Closed");
+        if (message.getSpHandle() <= m_snapshotSpHandle) {
+            return;
+        }
+        if (m_closed) {
+            throw new IOException("Closed");
+        }
 
         assert(message != null);
         bufferCatchup(message.getSerializedSize());
@@ -165,7 +169,9 @@ public class TaskLogImpl implements TaskLog {
      */
     @Override
     public TransactionInfoBaseMessage getNextMessage() throws IOException {
-        if (m_closed) throw new IOException("Closed");
+        if (m_closed) {
+            throw new IOException("Closed");
+        }
         if (m_head == null) {
             // Get another buffer asynchronously
             final Runnable r = new Runnable() {
@@ -177,7 +183,7 @@ public class TaskLogImpl implements TaskLog {
                            m_headBuffers.offer(new RejoinTaskBuffer(cont));
                         }
                     } catch (Throwable t) {
-                        VoltDB.crashLocalVoltDB("Error retrieving buffer data in task log", true, t);
+                        Poisoner.crashLocalVoltDB("Error retrieving buffer data in task log", true, t);
                     } finally {
                         m_pendingPolls.decrementAndGet();
                     }
@@ -240,7 +246,9 @@ public class TaskLogImpl implements TaskLog {
 
     private boolean m_closed = false;
     public void close(boolean synchronous) throws IOException {
-        if (m_closed) return;
+        if (m_closed) {
+            return;
+        }
         m_closed = true;
         m_es.shutdown();
         if (synchronous) {

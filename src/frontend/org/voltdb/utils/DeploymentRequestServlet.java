@@ -17,16 +17,20 @@
 
 package org.voltdb.utils;
 
-import com.google_voltpatches.common.base.Throwables;
+
+import static org.voltdb.utils.HTTPAdminListener.JSON_CONTENT_TYPE;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.annotation.XmlAttribute;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParseException;
@@ -56,7 +60,8 @@ import org.voltdb.compiler.deploymentfile.PathsType;
 import org.voltdb.compiler.deploymentfile.ServerExportEnum;
 import org.voltdb.compiler.deploymentfile.UsersType;
 import org.voltdb.compiler.deploymentfile.UsersType.User;
-import static org.voltdb.utils.HTTPAdminListener.JSON_CONTENT_TYPE;
+
+import com.google.common.base.Throwables;
 
 /**
  *

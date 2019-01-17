@@ -26,6 +26,7 @@ import org.voltdb.NTProcedureService;
 import org.voltdb.VoltDB;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.utils.CompressionService;
+import org.voltdb.utils.Poisoner;
 
 /**
  *
@@ -68,12 +69,12 @@ public class VerifyCatalogAndWriteJar extends UpdateApplicationBase {
         try {
             timeoutSeconds = Long.parseLong(timeoutEnvString);
         } catch (NumberFormatException ex) {
-            VoltDB.crashLocalVoltDB("Invalid system environment setting for "
+            Poisoner.crashLocalVoltDB("Invalid system environment setting for "
                         + NTProcedureService.NTPROCEDURE_RUN_EVERYWHERE_TIMEOUT
                         + " in "+ timeoutEnvString + " seconds.");
         }
         if (timeoutSeconds < 10) {
-            VoltDB.crashLocalVoltDB(" NT run-everywhere timeout value needs to be greater than 10 seconds, now the setting is " +
+            Poisoner.crashLocalVoltDB(" NT run-everywhere timeout value needs to be greater than 10 seconds, now the setting is " +
                     timeoutSeconds + " seconds.");
         }
         return timeoutSeconds;

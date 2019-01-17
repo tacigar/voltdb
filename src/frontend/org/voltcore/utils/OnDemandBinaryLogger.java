@@ -72,6 +72,8 @@ public class OnDemandBinaryLogger {
             s.count = ras.getChannel().map(MapMode.READ_WRITE, 0, 8);
             s.count.order(ByteOrder.nativeOrder());
             m_files.put(name, s);
+            ras.close();
+            dos.close();
         }
         return s;
     }
@@ -130,6 +132,6 @@ public class OnDemandBinaryLogger {
         } else {
             System.err.println("Unsupported operation " + op);
         }
-
+        dis.close();
     }
 }

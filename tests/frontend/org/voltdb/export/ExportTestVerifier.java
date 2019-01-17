@@ -30,7 +30,7 @@ import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltdb.exportclient.ExportDecoderBase;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
 import org.voltdb.exportclient.ExportRow;
 
@@ -135,7 +135,7 @@ public class ExportTestVerifier extends ExportDecoderBase
         try {
             m_es.awaitTermination(356, TimeUnit.DAYS);
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         System.out.println("Source No Longer Present: " + m_partitionId);
     }

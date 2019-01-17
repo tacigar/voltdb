@@ -63,6 +63,7 @@ import org.voltdb.utils.HTTPAdminListener;
 import org.voltdb.utils.InMemoryJarfile;
 import org.voltdb.utils.MiscUtils;
 import org.voltdb.utils.PlatformProperties;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This breaks up VoltDB initialization tasks into discrete units.
@@ -109,7 +110,7 @@ public class Inits {
                     iw = m_readyJobs.take();
                 }
                 catch (InterruptedException e) {
-                    VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                    Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
                 }
                 if (iw instanceof COMPLETION_WORK) {
                     return;
@@ -149,7 +150,7 @@ public class Inits {
                     Constructor<?> constructor = cls.getDeclaredConstructor(Inits.class);
                     instance = (InitWork) constructor.newInstance(this);
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Critical error loading class " + cls.getName(), true, e);
+                    Poisoner.crashLocalVoltDB("Critical error loading class " + cls.getName(), true, e);
                 }
                 m_jobs.put(instance.getClass(), instance);
             }
@@ -286,10 +287,10 @@ public class Inits {
         try {
             emptyJarFile = CatalogUtil.createTemporaryEmptyCatalogJarFile(DrRoleType.XDCR.value().equals(drRole));
         } catch (IOException e) {
-            VoltDB.crashLocalVoltDB("I/O exception while creating empty catalog jar file.", false, e);
+            Poisoner.crashLocalVoltDB("I/O exception while creating empty catalog jar file.", false, e);
         }
         if (emptyJarFile == null) {
-            VoltDB.crashLocalVoltDB("Failed to generate empty catalog.");
+            Poisoner.crashLocalVoltDB("Failed to generate empty catalog.");
         }
         return emptyJarFile;
     }
@@ -335,13 +336,13 @@ public class Inits {
                             deploymentBytes);
                 }
                 catch (IOException e) {
-                    VoltDB.crashGlobalVoltDB("Unable to distribute catalog.", false, e);
+                    Poisoner.crashGlobalVoltDB("Unable to distribute catalog.", false, e);
                 }
                 catch (org.apache.zookeeper_voltpatches.KeeperException e) {
-                    VoltDB.crashGlobalVoltDB("Unable to publish catalog.", false, e);
+                    Poisoner.crashGlobalVoltDB("Unable to publish catalog.", false, e);
                 }
                 catch (InterruptedException e) {
-                    VoltDB.crashGlobalVoltDB("Interrupted while publishing catalog.", false, e);
+                    Poisoner.crashGlobalVoltDB("Interrupted while publishing catalog.", false, e);
                 }
             }
         }
@@ -362,7 +363,7 @@ public class Inits {
                 catch (org.apache.zookeeper_voltpatches.KeeperException.NoNodeException e) {
                 }
                 catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("System was interrupted while waiting for a catalog.", false, null);
+                    Poisoner.crashLocalVoltDB("System was interrupted while waiting for a catalog.", false, null);
                 }
             } while (catalogStuff == null || catalogStuff.catalogBytes.length == 0);
 
@@ -378,10 +379,10 @@ public class Inits {
                 try {
                     thisNodeCatalog = new InMemoryJarfile(m_rvdb.m_pathToStartupCatalog);
                 } catch (IOException e){
-                    VoltDB.crashLocalVoltDB("Failed to load initialized schema: " + e.getMessage(), false, e);
+                    Poisoner.crashLocalVoltDB("Failed to load initialized schema: " + e.getMessage(), false, e);
                 }
                 if (!Arrays.equals(catalogStuff.catalogHash, thisNodeCatalog.getSha1Hash())) {
-                    VoltDB.crashGlobalVoltDB("Nodes have been initialized with different schemas. All nodes must initialize with identical schemas.", false, null);
+                    Poisoner.crashGlobalVoltDB("Nodes have been initialized with different schemas. All nodes must initialize with identical schemas.", false, null);
                 }
             }
 
@@ -397,11 +398,11 @@ public class Inits {
                 catalogJarBytes = loadResults.getFirst().getFullJarBytes();
                 catalogJarHash = loadResults.getFirst().getSha1Hash();
             } catch (IOException e) {
-                VoltDB.crashLocalVoltDB("Unable to load catalog", false, e);
+                Poisoner.crashLocalVoltDB("Unable to load catalog", false, e);
             }
 
             if ((serializedCatalog == null) || (serializedCatalog.length() == 0)) {
-                VoltDB.crashLocalVoltDB("Catalog loading failure", false, null);
+                Poisoner.crashLocalVoltDB("Catalog loading failure", false, null);
             }
 
             /* N.B. node recovery requires discovering the current catalog version. */
@@ -415,7 +416,7 @@ public class Inits {
             // a starter context which uses a placeholder catalog.
             String result = CatalogUtil.compileDeployment(catalog, m_deployment, false);
             if (result != null) {
-                VoltDB.crashLocalVoltDB(result);
+                Poisoner.crashLocalVoltDB(result);
             }
 
             try {
@@ -429,7 +430,7 @@ public class Inits {
                         m_rvdb.m_catalogContext.getDeploymentBytes(),
                         m_rvdb.m_messenger);
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Error agreeing on starting catalog version", true, e);
+                Poisoner.crashLocalVoltDB("Error agreeing on starting catalog version", true, e);
             }
         }
     }
@@ -455,7 +456,7 @@ public class Inits {
                                                DrRoleType.fromValue(m_rvdb.getCatalogContext().getCluster().getDrrole())))
                 {
                     // validateLicense logs. Exit call is here for testability.
-                    VoltDB.crashGlobalVoltDB("VoltDB license constraints are not met.", false, null);
+                    Poisoner.crashGlobalVoltDB("VoltDB license constraints are not met.", false, null);
                 }
             }
         }
@@ -489,7 +490,7 @@ public class Inits {
                                                                                        VoltDB.instance().getCommandLogSnapshotPath());
                         }
                     } catch (Exception e) {
-                        VoltDB.crashLocalVoltDB("Unable to instantiate command log", true, e);
+                        Poisoner.crashLocalVoltDB("Unable to instantiate command log", true, e);
                     }
                 }
             }
@@ -515,7 +516,7 @@ public class Inits {
                                 m_rvdb.getCatalogContext().cluster.getDrclusterid());
                     }
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Unable to instantiate SNMP", true, e);
+                    Poisoner.crashLocalVoltDB("Unable to instantiate SNMP", true, e);
                 }
             }
         }
@@ -642,9 +643,6 @@ public class Inits {
                                 Ids.OPEN_ACL_UNSAFE,
                                 CreateMode.PERSISTENT);
                     } catch (KeeperException.NodeExistsException e) {}
-                    String discoveredReplicationConfig =
-                        new String(zk.getData(VoltZK.replicationconfig, false, null), "UTF-8");
-                    JSONObject discoveredjsObj = new JSONObject(discoveredReplicationConfig);
                 } else {
                     String discoveredReplicationConfig =
                             new String(zk.getData(VoltZK.replicationconfig, false, null), "UTF-8");
@@ -653,7 +651,7 @@ public class Inits {
                     m_rvdb.setReplicationActive(replicationActive);
                 }
             } catch (Exception e) {
-                VoltDB.crashGlobalVoltDB("Error discovering replication role", false, e);
+                Poisoner.crashGlobalVoltDB("Error discovering replication role", false, e);
             }
         }
     }
@@ -689,7 +687,7 @@ public class Inits {
                         m_rvdb.m_partitionsToSitesAtStartupForExportInit
                         );
             } catch (Throwable t) {
-                VoltDB.crashLocalVoltDB("Error setting up export", true, t);
+                Poisoner.crashLocalVoltDB("Error setting up export", true, t);
             }
         }
     }
@@ -707,7 +705,7 @@ public class Inits {
             try {
                 ImportManager.initialize(m_rvdb.m_myHostId, m_rvdb.m_catalogContext, m_rvdb.m_messenger);
             } catch (Throwable t) {
-                VoltDB.crashLocalVoltDB("Error setting up import", true, t);
+                Poisoner.crashLocalVoltDB("Error setting up import", true, t);
             }
         }
     }
@@ -777,7 +775,7 @@ public class Inits {
                                                       paths.getVoltDBRoot().getPath(),
                                                       m_rvdb.m_terminusNonce);
                 } catch (IOException e) {
-                    VoltDB.crashLocalVoltDB("Unable to construct the RestoreAgent", true, e);
+                    Poisoner.crashLocalVoltDB("Unable to construct the RestoreAgent", true, e);
                 }
 
                 m_rvdb.m_globalServiceElector.registerService(m_rvdb.m_restoreAgent);
@@ -814,7 +812,7 @@ public class Inits {
                                 // it will have no viable snapshot to recover again. Bypass version check
                                 // when c/l is disabled resolves this issue.
                                 if (clenabled == true && !m_rvdb.m_restoreAgent.willRestoreShutdownSnaphot()) {
-                                    VoltDB.crashLocalVoltDB(String.format(
+                                    Poisoner.crashLocalVoltDB(String.format(
                                                 "Cannot load command logs from one version (%s) into a different version of VoltDB (%s). " +
                                                 "To upgrade the VoltDB software, first use \"voltadmin shutdown --save\", then " +
                                                 "upgrade and restart.", catalogVersion, serverVersion),
@@ -860,7 +858,7 @@ public class Inits {
             }
             catch (Exception e) {
                 hostLog.fatal(e.getMessage());
-                VoltDB.crashLocalVoltDB(e.getMessage());
+                Poisoner.crashLocalVoltDB(e.getMessage());
             }
 
         }

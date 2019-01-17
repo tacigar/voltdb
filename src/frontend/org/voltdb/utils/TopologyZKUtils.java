@@ -40,7 +40,7 @@ public abstract class TopologyZKUtils {
         } catch (KeeperException.NodeExistsException nee) {
             // It's fine if we didn't win, we'll pick up the topology below
         } catch (KeeperException | InterruptedException | JSONException e) {
-            VoltDB.crashLocalVoltDB("Unable to write topology to ZK, dying", true, e);
+            Poisoner.crashLocalVoltDB("Unable to write topology to ZK, dying", true, e);
         }
 
         // Then, have everyone read the topology data back from ZK
@@ -54,7 +54,7 @@ public abstract class TopologyZKUtils {
             String jsonTopology = new String(data, Charsets.UTF_8);
             topology = AbstractTopology.topologyFromJSON(jsonTopology);
         } catch (KeeperException | InterruptedException | JSONException e) {
-            VoltDB.crashLocalVoltDB("Unable to read topology from ZK, dying", true, e);
+            Poisoner.crashLocalVoltDB("Unable to read topology from ZK, dying", true, e);
         }
         return topology;
     }
@@ -66,7 +66,7 @@ public abstract class TopologyZKUtils {
             byte[] payload = topology.topologyToJSON().toString().getBytes(Charsets.UTF_8);
             zk.setData(VoltZK.topology, payload, stat.getVersion());
         } catch (KeeperException | InterruptedException | JSONException e) {
-            VoltDB.crashLocalVoltDB("Unable to update topology to ZK, dying", true, e);
+            Poisoner.crashLocalVoltDB("Unable to update topology to ZK, dying", true, e);
         }
     }
 }

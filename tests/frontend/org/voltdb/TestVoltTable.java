@@ -985,7 +985,7 @@ public class TestVoltTable extends TestCase {
 
     public void testFormattedString() throws JSONException, IOException {
         // Set the default timezone since we're using a timestamp type.  Eliminate test flakeyness.
-        VoltDB.setDefaultTimezone();
+        VoltDB.setDefaultTimeZone();
 
         VoltTable table = new VoltTable(new ColumnInfo("tinyint",   VoltType.TINYINT),
                                         new ColumnInfo("smallint",  VoltType.SMALLINT),

@@ -102,7 +102,7 @@ public class UpdateKey extends VoltProcedure {
             // TODO: this needs to iterate for all rowid keys
             byte[] oldpayload = db.get(makeKey(rowid_group, rowid));
             if (oldpayload == null) {
-                VoltDB.crashLocalVoltDB("Could not find payload from expected key: " +
+                PoisonPill.crashLocalVoltDB("Could not find payload from expected key: " +
                                         rowid_group + "_" + rowid, false, null);
             }
             // System.out.println("\tMigrating key: " + rowid_group + "_" + rowid);

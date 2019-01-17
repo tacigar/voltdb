@@ -47,6 +47,7 @@ import org.voltdb.catalog.Procedure;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcedureCallback;
 import org.voltdb.iv2.MpInitiator;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A very simple adapter for import handler that deserializes bytes into client responses.
@@ -276,7 +277,7 @@ public class InternalClientResponseAdapter implements Connection, WriteStream {
             }
             enqueue(buf);
         } catch (IOException e) {
-            VoltDB.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, e);
+            Poisoner.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, e);
         }
     }
 
@@ -288,7 +289,7 @@ public class InternalClientResponseAdapter implements Connection, WriteStream {
         try {
             resp.initFromBuffer(b);
         } catch (IOException ex) {
-            VoltDB.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, ex);
+            Poisoner.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, ex);
         }
 
         final Callback callback = m_callbacks.get(resp.getClientHandle());

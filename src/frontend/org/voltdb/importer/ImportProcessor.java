@@ -20,18 +20,17 @@ package org.voltdb.importer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltdb.ImporterServerAdapterImpl;
-import org.voltdb.VoltDB;
 import org.voltdb.importer.formatter.FormatterBuilder;
 import org.voltdb.utils.CatalogUtil.ImportConfiguration;
-
-import com.google_voltpatches.common.base.Throwables;
-import java.util.concurrent.ExecutionException;
+import org.voltdb.utils.Poisoner;
 
 public class ImportProcessor implements ImportDataProcessor {
 
@@ -110,7 +109,7 @@ public class ImportProcessor implements ImportDataProcessor {
                         bw.m_importerTypeMgr.readyForData();
                     } catch (Exception ex) {
                         //Should never fail. crash.
-                        VoltDB.crashLocalVoltDB("Import failed to set Handler", true, ex);
+                        Poisoner.crashLocalVoltDB("Import failed to set Handler", true, ex);
                         m_logger.error("Failed to start the import handler: " + bw.m_importerFactory.getTypeName(), ex);
                     }
                 }
@@ -136,7 +135,7 @@ public class ImportProcessor implements ImportDataProcessor {
                     m_importers.clear();
                 } catch (Exception ex) {
                     m_logger.error("Failed to stop the import bundles.", ex);
-                    Throwables.propagate(ex);
+                    throw new RuntimeException(ex);
                 }
             }
         });
@@ -179,7 +178,7 @@ public class ImportProcessor implements ImportDataProcessor {
             wrapper.configure(properties, formatterBuilder);
         } catch(Throwable t) {
             m_logger.error("Failed to configure import handler for " + bundleJar, t);
-            Throwables.propagate(t);
+            throw new RuntimeException(t);
         }
     }
 

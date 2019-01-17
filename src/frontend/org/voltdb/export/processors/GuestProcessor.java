@@ -33,7 +33,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.Pair;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltType;
 import org.voltdb.export.AdvertisedDataSource;
 import org.voltdb.export.ExportDataProcessor;
@@ -46,6 +45,7 @@ import org.voltdb.exportclient.ExportClientBase;
 import org.voltdb.exportclient.ExportDecoderBase;
 import org.voltdb.exportclient.ExportDecoderBase.RestartBlockException;
 import org.voltdb.exportclient.ExportRow;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Preconditions;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
@@ -107,6 +107,7 @@ public class GuestProcessor implements ExportDataProcessor {
         }
     }
 
+    @Override
     public ExportClientBase getExportClient(final String tableName) {
         ExportClientBase client = null;
         synchronized (GuestProcessor.this) {
@@ -219,7 +220,9 @@ public class GuestProcessor implements ExportDataProcessor {
         //Utility method to build and add listener.
         private void buildListener(AdvertisedDataSource ads) {
             //Dont construct if we are shutdown
-            if (m_shutdown) return;
+            if (m_shutdown) {
+                return;
+            }
             final ExportDecoderBase edb = m_client.constructExportDecoder(ads);
             detectDecoder(m_client, edb);
             Pair<ExportDecoderBase, AdvertisedDataSource> pair = Pair.of(edb, ads);
@@ -257,7 +260,9 @@ public class GuestProcessor implements ExportDataProcessor {
                                 }
                                 m_source.setReadyForPolling(true); // Tell source it is OK to start polling now.
                                 synchronized (GuestProcessor.this) {
-                                    if (m_shutdown) return;
+                                    if (m_shutdown) {
+                                        return;
+                                    }
                                     buildListener(ads);
                                 }
                             } else {
@@ -267,34 +272,42 @@ public class GuestProcessor implements ExportDataProcessor {
                         } catch(InterruptedException e) {
                             resubmitSelf();
                         } catch (Exception e) {
-                            VoltDB.crashLocalVoltDB("Failed to initiate export binary deque poll", true, e);
+                            Poisoner.crashLocalVoltDB("Failed to initiate export binary deque poll", true, e);
                         }
                     }
 
                     private void resubmitSelf() {
                         synchronized (GuestProcessor.this) {
-                            if (m_shutdown) return;
-                            if (!m_source.getExecutorService().isShutdown()) try {
-                                m_source.getExecutorService().submit(this);
-                            } catch (RejectedExecutionException whenExportDataSourceIsClosed) {
-                                // it is truncated so we no longer need to wait
+                            if (m_shutdown) {
+                                return;
+                            }
+                            if (!m_source.getExecutorService().isShutdown()) {
+                                try {
+                                    m_source.getExecutorService().submit(this);
+                                } catch (RejectedExecutionException whenExportDataSourceIsClosed) {
+                                    // it is truncated so we no longer need to wait
 
-                                // TODO: When truncation is finished, generation roll-over does not happen.
-                                // Log a message to and revisit the error handling for this case
-                                m_logger.warn("Got rejected execution exception while waiting for truncation to finish");
+                                    // TODO: When truncation is finished, generation roll-over does not happen.
+                                    // Log a message to and revisit the error handling for this case
+                                    m_logger.warn("Got rejected execution exception while waiting for truncation to finish");
+                                }
                             }
                         }
                     }
                 };
-                if (m_shutdown) return;
-                if (!m_source.getExecutorService().isShutdown()) try {
-                    m_source.getExecutorService().submit(waitForBarrierRelease);
-                } catch (RejectedExecutionException whenExportDataSourceIsClosed) {
-                    // it is truncated so we no longer need to wait
+                if (m_shutdown) {
+                    return;
+                }
+                if (!m_source.getExecutorService().isShutdown()) {
+                    try {
+                        m_source.getExecutorService().submit(waitForBarrierRelease);
+                    } catch (RejectedExecutionException whenExportDataSourceIsClosed) {
+                        // it is truncated so we no longer need to wait
 
-                    // TODO: When truncation is finished, generation roll-over does not happen.
-                    // Log a message to and revisit the error handling for this case
-                    m_logger.warn("Got rejected execution exception while waiting for truncation to finish");
+                        // TODO: When truncation is finished, generation roll-over does not happen.
+                        // Log a message to and revisit the error handling for this case
+                        m_logger.warn("Got rejected execution exception while waiting for truncation to finish");
+                    }
                 }
             }
         }

@@ -22,8 +22,8 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.voltcore.utils.DBBPool.BBContainer;
-import org.voltdb.VoltDB;
 import org.voltdb.iv2.UniqueIdGenerator;
+import org.voltdb.utils.Poisoner;
 
 /*
  * The stream block has a default reference count of 1 for being in the queue.
@@ -71,7 +71,7 @@ public class StreamBlock {
             m_buffer.discard();
             m_buffer = null;
         } else if (count < 0) {
-            VoltDB.crashLocalVoltDB("Broken refcounting in export", true, null);
+            Poisoner.crashLocalVoltDB("Broken refcounting in export", true, null);
         }
     }
 

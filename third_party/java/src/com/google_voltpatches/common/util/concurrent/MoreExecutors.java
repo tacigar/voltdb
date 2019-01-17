@@ -17,16 +17,6 @@ package com.google_voltpatches.common.util.concurrent;
 import static com.google_voltpatches.common.base.Preconditions.checkArgument;
 import static com.google_voltpatches.common.base.Preconditions.checkNotNull;
 
-import com.google_voltpatches.common.annotations.Beta;
-import com.google_voltpatches.common.annotations.GwtCompatible;
-import com.google_voltpatches.common.annotations.GwtIncompatible;
-import com.google_voltpatches.common.annotations.VisibleForTesting;
-import com.google_voltpatches.common.base.Supplier;
-import com.google_voltpatches.common.base.Throwables;
-import com.google_voltpatches.common.collect.Lists;
-import com.google_voltpatches.common.collect.Queues;
-import com.google_voltpatches.common.util.concurrent.ForwardingListenableFuture.SimpleForwardingListenableFuture;
-import com.google_voltpatches.errorprone.annotations.CanIgnoreReturnValue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +39,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import javax.annotation_voltpatches.concurrent.GuardedBy;
+
+import com.google_voltpatches.common.annotations.Beta;
+import com.google_voltpatches.common.annotations.GwtCompatible;
+import com.google_voltpatches.common.annotations.GwtIncompatible;
+import com.google_voltpatches.common.annotations.VisibleForTesting;
+import com.google_voltpatches.common.base.Supplier;
+import com.google_voltpatches.common.collect.Lists;
+import com.google_voltpatches.common.collect.Queues;
+import com.google_voltpatches.common.util.concurrent.ForwardingListenableFuture.SimpleForwardingListenableFuture;
+import com.google_voltpatches.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * Factory and utility methods for {@link java.util.concurrent.Executor}, {@link ExecutorService},
@@ -623,7 +624,7 @@ public final class MoreExecutors {
           delegate.run();
         } catch (Throwable t) {
           setException(t);
-          throw Throwables.propagate(t);
+          throw new RuntimeException(t);
         }
       }
     }
@@ -766,7 +767,7 @@ public final class MoreExecutors {
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("Couldn't invoke ThreadManager.currentRequestThreadFactory", e);
     } catch (InvocationTargetException e) {
-      throw Throwables.propagate(e.getCause());
+      throw new RuntimeException(e.getCause());
     }
   }
 

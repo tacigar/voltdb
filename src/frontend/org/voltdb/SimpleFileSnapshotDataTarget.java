@@ -31,7 +31,6 @@ import org.voltcore.utils.Bits;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.DBBPool.BBContainer;
 
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
 
@@ -130,7 +129,9 @@ public class SimpleFileSnapshotDataTarget implements SnapshotDataTarget {
                     /*
                      * If a filter nulled out the buffer do nothing.
                      */
-                    if (data == null) return null;
+                    if (data == null) {
+                        return null;
+                    }
                     if (m_writeFailed) {
                         data.discard();
                         return null;
@@ -158,7 +159,7 @@ public class SimpleFileSnapshotDataTarget implements SnapshotDataTarget {
                 } catch (Throwable t) {
                     m_writeException = t;
                     m_writeFailed = true;
-                    throw Throwables.propagate(t);
+                    throw new RuntimeException(t);
                 }
                 return null;
             }

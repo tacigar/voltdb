@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.zookeeper_voltpatches.CreateMode;
 import org.apache.zookeeper_voltpatches.KeeperException;
@@ -67,17 +68,17 @@ import org.voltdb.client.ProcedureCallback;
 import org.voltdb.iv2.TxnEgo;
 import org.voltdb.messaging.SnapshotCheckRequestMessage;
 import org.voltdb.messaging.SnapshotCheckResponseMessage;
+import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTableUtil;
 
-import com.google_voltpatches.common.base.Throwables;
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.collect.Maps;
 import com.google_voltpatches.common.util.concurrent.Callables;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 import com.google_voltpatches.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google_voltpatches.common.util.concurrent.MoreExecutors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 
 /**
  * A scheduler of automated snapshots and manager of archived and retained snapshots.
@@ -265,7 +266,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                                 }
                                 electedTruncationLeader();
                             } catch (Exception e) {
-                                VoltDB.crashLocalVoltDB("Exception in snapshot daemon electing master via ZK", true, e);
+                                Poisoner.crashLocalVoltDB("Exception in snapshot daemon electing master via ZK", true, e);
                             }
                         }
                     });
@@ -532,7 +533,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             }
         } catch (KeeperException.NoNodeException e) {/*doesn't have to exist*/}
         catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Failed to retrieve per partition transaction ids for snapshot", false, e);
+            Poisoner.crashLocalVoltDB("Failed to retrieve per partition transaction ids for snapshot", false, e);
         }
         return retval;
     }
@@ -581,7 +582,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                 }
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Exception in snapshot daemon electing master via ZK", true, e);
+            Poisoner.crashLocalVoltDB("Exception in snapshot daemon electing master via ZK", true, e);
         }
     }
 
@@ -605,7 +606,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             truncationRequestExistenceCheck();
             userSnapshotRequestExistenceCheck(false);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Error while accepting snapshot daemon leadership", true, e);
+            Poisoner.crashLocalVoltDB("Error while accepting snapshot daemon leadership", true, e);
         }
     }
 
@@ -632,7 +633,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                     try {
                         processSnapshotTruncationRequestCreated(event);
                     } catch (Exception e) {
-                        VoltDB.crashLocalVoltDB("Error processing snapshot truncation request creation", true, e);
+                        Poisoner.crashLocalVoltDB("Error processing snapshot truncation request creation", true, e);
                     }
                 }
             }, truncationGatheringPeriod, TimeUnit.SECONDS);
@@ -644,7 +645,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
              * isn't set when that happens because it is part of processing the request and the watch should
              * either be canceled or have already fired.
              */
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Trunction request watcher fired with event type other then created: " + event.getType(),
                     true,
                     null);
@@ -683,7 +684,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             m_zk.setData(VoltZK.request_truncation_snapshot, payload.array(), -1);
         } catch (Exception e) {
             //Cause a cascading failure?
-            VoltDB.crashLocalVoltDB("Setting data on the truncation snapshot request in ZK should never fail", true, e);
+            Poisoner.crashLocalVoltDB("Setting data on the truncation snapshot request in ZK should never fail", true, e);
         }
         // for the snapshot save invocations
         JSONObject jsObj = new JSONObject();
@@ -702,7 +703,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             /*
              * Should never happen, so fail fast
              */
-            VoltDB.crashLocalVoltDB("", true, e);
+            Poisoner.crashLocalVoltDB("", true, e);
         }
 
         // for the snapshot save invocations
@@ -729,7 +730,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                             try {
                                 processTruncationRequestEvent(event);
                             } catch (Exception e) {
-                                VoltDB.crashLocalVoltDB("Error processing snapshot truncation request event", true, e);
+                                Poisoner.crashLocalVoltDB("Error processing snapshot truncation request event", true, e);
                             }
                         }
                     }, 5, TimeUnit.MINUTES);
@@ -786,11 +787,11 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                             }
                         }
                         if (!found) {
-                            VoltDB.crashLocalVoltDB(
+                            Poisoner.crashLocalVoltDB(
                                     "Could not match truncations snapshot request id while atepting its removal", true, null);
                         }
                     } catch (Exception e) {
-                        VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                                 "Unexpected error deleting truncation snapshot request", true, e);
                     }
 
@@ -809,7 +810,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                         try {
                             truncationRequestExistenceCheck();
                         } catch (Exception e) {
-                            VoltDB.crashLocalVoltDB(
+                            Poisoner.crashLocalVoltDB(
                                     "Unexpected error checking for existence of truncation snapshot request"
                                     , true, e);
                         }
@@ -825,7 +826,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                             try {
                                 processTruncationRequestEvent(event);
                             } catch (Exception e) {
-                                VoltDB.crashLocalVoltDB("Exception processing truncation request event", true, e);
+                                Poisoner.crashLocalVoltDB("Exception processing truncation request event", true, e);
                             }
                         }
                     }, 1, TimeUnit.MINUTES);
@@ -840,7 +841,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             /*
              * Should never happen, so fail fast
              */
-            VoltDB.crashLocalVoltDB("", true, e);
+            Poisoner.crashLocalVoltDB("", true, e);
         }
         return;
     }
@@ -858,12 +859,14 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
 
         @Override
         public void pProcess(final WatchedEvent event) {
-            if (event.getState() == KeeperState.Disconnected) return;
+            if (event.getState() == KeeperState.Disconnected) {
+                return;
+            }
             try {
                 // TRAIL [TruncSnap:4] watch event on zk node fires
                 processTruncationRequestEvent(event);
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Error procesing truncation request event", true, e);
+                Poisoner.crashLocalVoltDB("Error procesing truncation request event", true, e);
             }
         }
     };
@@ -876,7 +879,9 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
 
         @Override
         public void process(final WatchedEvent event) {
-            if (event.getState() == KeeperState.Disconnected) return;
+            if (event.getState() == KeeperState.Disconnected) {
+                return;
+            }
 
             m_es.execute(new Runnable() {
                 @Override
@@ -884,7 +889,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                     try {
                         processUserSnapshotRequestEvent(event);
                     } catch (Exception e) {
-                        VoltDB.crashLocalVoltDB("Error processing user snapshot request event", true, e);
+                        Poisoner.crashLocalVoltDB("Error processing user snapshot request event", true, e);
                     }
                 }
             });
@@ -944,7 +949,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                         try {
                             userSnapshotRequestExistenceCheck(true);
                         } catch (Exception e2) {
-                            VoltDB.crashLocalVoltDB("Error resetting watch for user snapshots", true, e2);
+                            Poisoner.crashLocalVoltDB("Error resetting watch for user snapshots", true, e2);
                         }
                     }
                 }
@@ -1100,7 +1105,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                                 try {
                                     userSnapshotRequestExistenceCheck(true);
                                 } catch (Exception e1) {
-                                    VoltDB.crashLocalVoltDB(
+                                    Poisoner.crashLocalVoltDB(
                                             "Error resetting watch for user snapshot requests", true, e1);
                                 }
                             }
@@ -1112,7 +1117,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                     try {
                         userSnapshotRequestExistenceCheck(true);
                     } catch (Exception e1) {
-                        VoltDB.crashLocalVoltDB("Error checking for existence of user snapshots", true, e1);
+                        Poisoner.crashLocalVoltDB("Error checking for existence of user snapshots", true, e1);
                     }
                 }
             }
@@ -1272,6 +1277,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
         private final String path;
         private final String nonce;
         private final Long txnId;
+        @SuppressWarnings("unused")
         private final SnapshotPathType stype;
 
         private Snapshot(String path, SnapshotPathType stype, String nonce, Long txnId) {
@@ -1387,7 +1393,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             /*
              * Should never happen, so fail fast
              */
-            VoltDB.crashLocalVoltDB("", false, e);
+            Poisoner.crashLocalVoltDB("", false, e);
         }
     }
 
@@ -1648,7 +1654,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                 try {
                     submitUserSnapshotRequest(invocation, c);
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Exception submitting user snapshot request", true, e);
+                    Poisoner.crashLocalVoltDB("Exception submitting user snapshot request", true, e);
                 }
             }
         });
@@ -1714,7 +1720,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                 try {
                     registerUserSnapshotResponseWatch(requestId, clientHandle, c, notifyChanges);
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Failed to register ZK watch on snapshot response", true, e);
+                    Poisoner.crashLocalVoltDB("Failed to register ZK watch on snapshot response", true, e);
                 }
             }
             else {
@@ -1776,7 +1782,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
         } catch (KeeperException.NodeExistsException e) {
             return null;
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Exception while attempting to create user snapshot request in ZK", true, e);
+            Poisoner.crashLocalVoltDB("Exception while attempting to create user snapshot request in ZK", true, e);
         }
 
         return requestId;
@@ -1791,7 +1797,9 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
         Stat exists = m_zk.exists(responseNode, new Watcher() {
             @Override
             public void process(final WatchedEvent event) {
-                if (event.getState() == KeeperState.Disconnected) return;
+                if (event.getState() == KeeperState.Disconnected) {
+                    return;
+                }
                 switch (event.getType()) {
                 case NodeCreated:
                     m_es.submit(new Runnable() {
@@ -1804,7 +1812,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                                             c,
                                             notifyChanges);
                             } catch (Exception e) {
-                                VoltDB.crashLocalVoltDB(
+                                Poisoner.crashLocalVoltDB(
                                         "Error retrieving user snapshot request response from ZK",
                                         true,
                                         e);
@@ -1860,7 +1868,9 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
             Watcher watcher = new Watcher() {
                 @Override
                 public void process(final WatchedEvent event) {
-                    if (event.getState() == KeeperState.Disconnected) return;
+                    if (event.getState() == KeeperState.Disconnected) {
+                        return;
+                    }
                     switch (event.getType()) {
                     case NodeCreated:
                         m_es.submit(new Runnable() {
@@ -1873,7 +1883,7 @@ public class SnapshotDaemon implements SnapshotCompletionInterest {
                                                 c,
                                                 false);
                                 } catch (Exception e) {
-                                    VoltDB.crashLocalVoltDB(
+                                    Poisoner.crashLocalVoltDB(
                                                 "Error retrieving user snapshot request response from ZK",
                                                 true,
                                                 e);

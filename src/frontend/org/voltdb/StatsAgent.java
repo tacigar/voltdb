@@ -32,6 +32,7 @@ import org.voltdb.catalog.Procedure;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.export.ExportManager;
 import org.voltdb.export.ExportManager.ExportStats;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.base.Suppliers;
@@ -49,8 +50,8 @@ public class StatsAgent extends OpsAgent
     {
         super("StatsAgent");
         StatsSelector selectors[] = StatsSelector.values();
-        for (int ii = 0; ii < selectors.length; ii++) {
-            m_registeredStatsSources.put(selectors[ii], new NonBlockingHashMap<Long,NonBlockingHashSet<StatsSource>>());
+        for (StatsSelector selector : selectors) {
+            m_registeredStatsSources.put(selector, new NonBlockingHashMap<Long,NonBlockingHashSet<StatsSource>>());
         }
     }
 
@@ -426,7 +427,7 @@ public class StatsAgent extends OpsAgent
             hostLog.warn("Error processing stats request " + obj.toString(4), e);
         } catch (Throwable t) {
             //Handle throwable because otherwise the future swallows up other exceptions
-            VoltDB.crashLocalVoltDB("Error processing stats request " + obj.toString(4), true, t);
+            Poisoner.crashLocalVoltDB("Error processing stats request " + obj.toString(4), true, t);
         }
     }
 
@@ -455,7 +456,7 @@ public class StatsAgent extends OpsAgent
         try {
             sendClientResponse(psr);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to return TOPO results to client.", true, e);
+            Poisoner.crashLocalVoltDB("Unable to return TOPO results to client.", true, e);
         }
     }
 
@@ -472,7 +473,7 @@ public class StatsAgent extends OpsAgent
         try {
             sendClientResponse(psr);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
+            Poisoner.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
         }
     }
 

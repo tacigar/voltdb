@@ -17,17 +17,19 @@
 
 package org.voltdb;
 
-import com.google_voltpatches.common.collect.ImmutableMap;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.apache.zookeeper_voltpatches.CreateMode;
 import org.apache.zookeeper_voltpatches.KeeperException;
 import org.apache.zookeeper_voltpatches.ZooDefs;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.zk.ZKUtil;
 import org.voltdb.sysprocs.saverestore.SnapshotWritePlan;
+import org.voltdb.utils.Poisoner;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.concurrent.Callable;
+import com.google_voltpatches.common.collect.ImmutableMap;
 
 /**
  * Wraps deferred snapshot setup work and run it on the snapshot IO agent thread.
@@ -111,7 +113,7 @@ public class DeferredSnapshotSetup implements Callable<DeferredSnapshotSetup> {
         } catch (KeeperException.NodeExistsException e) {
             SNAP_LOG.warn("Didn't expect the snapshot node to already exist", e);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
 
         try {
@@ -119,7 +121,7 @@ public class DeferredSnapshotSetup implements Callable<DeferredSnapshotSetup> {
         } catch (KeeperException.NodeExistsException e) {
             SNAP_LOG.warn("Didn't expect the snapshot node to already exist", e);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
     }
 

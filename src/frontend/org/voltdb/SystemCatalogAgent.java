@@ -19,6 +19,7 @@ package org.voltdb;
 import org.json_voltpatches.JSONObject;
 import org.voltcore.network.Connection;
 import org.voltdb.client.ClientResponse;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Agent responsible for collecting SystemCatalog on this host.
@@ -104,7 +105,7 @@ public class SystemCatalogAgent extends OpsAgent
         try {
             sendClientResponse(psr);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
+            Poisoner.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
         }
     }
 }

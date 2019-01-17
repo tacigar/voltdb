@@ -48,6 +48,7 @@ import org.voltdb.messaging.Iv2RepairLogResponseMessage;
 import org.voltdb.messaging.MigratePartitionLeaderMessage;
 import org.voltdb.messaging.RejoinMessage;
 import org.voltdb.messaging.RepairLogTruncationMessage;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 
@@ -184,7 +185,7 @@ public class InitiatorMailbox implements Mailbox
             // not blocking. shouldn't interrupt.
         } catch (ExecutionException crashme) {
             // this on the other hand seems tragic.
-            VoltDB.crashLocalVoltDB("Error constructiong InitiatorMailbox.", false, crashme);
+            Poisoner.crashLocalVoltDB("Error constructiong InitiatorMailbox.", false, crashme);
         }
 
         /*
@@ -226,7 +227,7 @@ public class InitiatorMailbox implements Mailbox
                 }
                 first = false;
             }
-            VoltDB.crashLocalVoltDB(msg, true, null);
+            Poisoner.crashLocalVoltDB(msg, true, null);
         }
         return true;
     }
@@ -399,7 +400,7 @@ public class InitiatorMailbox implements Mailbox
             leaderAppointee.start(true);
             leaderAppointee.put(pid, LeaderCache.suffixHSIdsWithMigratePartitionLeaderRequest(newLeaderHSId));
         } catch (InterruptedException | ExecutionException | KeeperException e) {
-            VoltDB.crashLocalVoltDB("fail to start MigratePartitionLeader",true, e);
+            Poisoner.crashLocalVoltDB("fail to start MigratePartitionLeader",true, e);
         } finally {
             try {
                 leaderAppointee.shutdown();
@@ -634,7 +635,9 @@ public class InitiatorMailbox implements Mailbox
     }
 
     public void notifyOfSnapshotNonce(String nonce, long snapshotSpHandle) {
-        if (m_joinProducer == null) return;
+        if (m_joinProducer == null) {
+            return;
+        }
         m_joinProducer.notifyOfSnapshotNonce(nonce, snapshotSpHandle);
     }
 

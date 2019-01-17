@@ -83,6 +83,7 @@ import org.voltdb.client.ClientResponse;
 import org.voltdb.common.Constants;
 import org.voltdb.settings.NodeSettings;
 import org.voltdb.utils.CatalogUtil;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
@@ -229,7 +230,7 @@ public class SnapshotUtil {
                     }
                     catch (IOException e) {
                         if (isTruncationSnapshot) {
-                            VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create digest for truncation snapshot",
+                            Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create digest for truncation snapshot",
                                     true, e);
                         }
                         throw new RuntimeException(e);
@@ -240,7 +241,7 @@ public class SnapshotUtil {
                         }
                         catch (IOException e) {
                             if (isTruncationSnapshot) {
-                                VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create digest for truncation snapshot",
+                                Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create digest for truncation snapshot",
                                         true, e);
                             }
                             throw new RuntimeException(e);
@@ -279,7 +280,7 @@ public class SnapshotUtil {
         if (file.exists()) {
             if (!file.delete()) {
                 if (isTruncationSnapshot) {
-                    VoltDB.crashLocalVoltDB("Unexpected exception while attempting to delete old hash file for truncation snapshot");
+                    Poisoner.crashLocalVoltDB("Unexpected exception while attempting to delete old hash file for truncation snapshot");
                 }
                 throw new IOException("Unable to replace existing hashinator config " + file);
             }
@@ -301,7 +302,7 @@ public class SnapshotUtil {
                     }
                     catch (IOException e) {
                         if (isTruncationSnapshot) {
-                            VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create hash file for truncation snapshot",
+                            Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create hash file for truncation snapshot",
                                     true, e);
                         }
                         throw new RuntimeException(e);
@@ -312,7 +313,7 @@ public class SnapshotUtil {
                         }
                         catch (IOException e) {
                             if (isTruncationSnapshot) {
-                                VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create hash file for truncation snapshot",
+                                Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create hash file for truncation snapshot",
                                         true, e);
                             }
                             throw new RuntimeException(e);
@@ -462,7 +463,7 @@ public class SnapshotUtil {
         catch (IOException ioe)
         {
             if (isTruncationSnapshot) {
-                VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create Catalog file for truncation snapshot",
+                Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create Catalog file for truncation snapshot",
                         true, ioe);
             }
             throw new IOException("Unable to write snapshot catalog to file: " +
@@ -479,7 +480,7 @@ public class SnapshotUtil {
         if (f.exists()) {
             if (!f.delete()) {
                 if (isTruncationSnapshot) {
-                    VoltDB.crashLocalVoltDB("Unexpected exception while attempting to remove old Completion file for truncation snapshot");
+                    Poisoner.crashLocalVoltDB("Unexpected exception while attempting to remove old Completion file for truncation snapshot");
                 }
                 throw new IOException("Failed to replace existing " + f.getName());
             }
@@ -491,7 +492,7 @@ public class SnapshotUtil {
                     f.createNewFile();
                 } catch (IOException e) {
                     if (isTruncationSnapshot) {
-                        VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create Completion file for truncation snapshot",
+                        Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create Completion file for truncation snapshot",
                                 true, e);
                     }
                     throw new RuntimeException("Failed to create .complete file for " + f.getName(), e);
@@ -1383,13 +1384,13 @@ public class SnapshotUtil {
             public void handleResponse(ClientResponse resp)
             {
                 if (resp == null) {
-                    VoltDB.crashLocalVoltDB("Failed to initiate snapshot", false, null);
+                    Poisoner.crashLocalVoltDB("Failed to initiate snapshot", false, null);
                 } else if (resp.getStatus() != ClientResponseImpl.SUCCESS) {
                     final String statusString = resp.getStatusString();
                     if (statusString != null && statusString.contains("Failure while running system procedure @SnapshotSave")) {
-                        VoltDB.crashLocalVoltDB("Failed to initiate snapshot due to node failure, aborting", false, null);
+                        Poisoner.crashLocalVoltDB("Failed to initiate snapshot due to node failure, aborting", false, null);
                     }
-                    VoltDB.crashLocalVoltDB("Failed to initiate snapshot: "
+                    Poisoner.crashLocalVoltDB("Failed to initiate snapshot: "
                                             + resp.getStatusString(), true, null);
                 }
 
@@ -1398,12 +1399,12 @@ public class SnapshotUtil {
                 if (SnapshotUtil.didSnapshotRequestSucceed(results)) {
                     String appStatus = resp.getAppStatusString();
                     if (appStatus == null) {
-                        VoltDB.crashLocalVoltDB("Snapshot request failed: "
+                        Poisoner.crashLocalVoltDB("Snapshot request failed: "
                                                 + resp.getStatusString(), false, null);
                     }
                     // else success
                 } else {
-                    VoltDB.crashLocalVoltDB("Snapshot request failed: " + results[0].toJSONString(),
+                    Poisoner.crashLocalVoltDB("Snapshot request failed: " + results[0].toJSONString(),
                                             false, null);
                 }
             }
@@ -1472,7 +1473,7 @@ public class SnapshotUtil {
                                 break;
                             }
                         } catch (InterruptedException e) {
-                            VoltDB.crashLocalVoltDB("Should never happen", true, e);
+                            Poisoner.crashLocalVoltDB("Should never happen", true, e);
                         }
 
                         VoltTable[] results = response.getResults();

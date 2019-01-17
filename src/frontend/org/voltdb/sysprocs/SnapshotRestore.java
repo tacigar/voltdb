@@ -109,6 +109,7 @@ import org.voltdb.sysprocs.saverestore.TableSaveFile;
 import org.voltdb.sysprocs.saverestore.TableSaveFileState;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.CompressionService;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 import org.voltdb.utils.VoltTableUtil;
 
@@ -685,7 +686,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
              */
             while (true) {
                 bpm = (BinaryPayloadMessage)m.recvBlocking();
-                if (bpm == null) continue;
+                if (bpm == null) {
+                    continue;
+                }
                 ByteBuffer wrappedMap = ByteBuffer.wrap(bpm.m_payload);
 
                 while (wrappedMap.hasRemaining()) {
@@ -707,7 +710,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
              */
             while (true) {
                 VoltMessage vm = m.recvBlocking(1000);
-                if (vm == null) continue;
+                if (vm == null) {
+                    continue;
+                }
 
                 if (vm instanceof FragmentTaskMessage) {
                     FragmentTaskMessage ftm = (FragmentTaskMessage)vm;
@@ -733,7 +738,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
                         try {
                             m_duplicateRowHandler.close();
                         } catch (Exception e) {
-                            VoltDB.crashLocalVoltDB("Error closing duplicate row handler during snapshot restore",
+                            Poisoner.crashLocalVoltDB("Error closing duplicate row handler during snapshot restore",
                                                      true,
                                                      e);
                         }
@@ -853,9 +858,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
 
             if (result == null) {
                 return new DependencyPair.TableDependencyPair(dependency_id, null);
-            }
-            else
+            } else {
                 return new DependencyPair.TableDependencyPair(dependency_id, result);
+            }
         }
 
         else if (fragmentId == SysProcFragmentId.PF_restoreLoadReplicatedTable)
@@ -1100,7 +1105,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
                                         int checkUniqueViolations,
                                         SystemProcedureExecutionContext context) throws Exception {
         if (uniqueViolations != null && m_duplicateRowHandler == null) {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Shouldn't get unique violations returned when duplicate row handler is null",
                     true,
                     null);
@@ -1553,8 +1558,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
 
         //Iterate the export tables
         for (Table t : db.getTables()) {
-            if (!CatalogUtil.isTableExportOnly(db, t))
+            if (!CatalogUtil.isTableExportOnly(db, t)) {
                 continue;
+            }
 
             String signature = t.getSignature();
             String name = t.getTypeName();
@@ -2202,7 +2208,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
                 Map<Long, Long> actualToGenerated = new HashMap<Long, Long>();
                 while (discoveredMailboxes < totalMailboxes) {
                     BinaryPayloadMessage bpm = (BinaryPayloadMessage)m.recvBlocking();
-                    if (bpm == null) continue;
+                    if (bpm == null) {
+                        continue;
+                    }
                     discoveredMailboxes++;
                     ByteBuffer payload = ByteBuffer.wrap(bpm.m_payload);
 
@@ -2235,7 +2243,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
                 int acksReceived = 0;
                 while (acksReceived < totalMailboxes) {
                     BinaryPayloadMessage bpm = (BinaryPayloadMessage)m.recvBlocking();
-                    if (bpm == null) continue;
+                    if (bpm == null) {
+                        continue;
+                    }
                     acksReceived++;
                 }
 
@@ -2948,7 +2958,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
             //Lightly spinning makes debugging easier by allowing inspection
             //of stuff on the stack
             VoltMessage vm = m.recvBlocking(1000);
-            if (vm == null) continue;
+            if (vm == null) {
+                continue;
+            }
 
             if (vm instanceof FragmentTaskMessage) {
                 FragmentTaskMessage ftm = (FragmentTaskMessage)vm;
@@ -3005,7 +3017,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
                     if (m_unexpectedDependencies.put(
                             dependencyId,
                             Arrays.asList(new VoltTable[] {frm.getTableAtIndex(0)})) != null) {
-                        VoltDB.crashGlobalVoltDB("Received a duplicate dependency", true, null);
+                        Poisoner.crashGlobalVoltDB("Received a duplicate dependency", true, null);
                     }
                 }
             }
@@ -3042,7 +3054,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
     }
 
     private void validateIncludeTables(final ClusterSaveFileState savefileState, List<String> include) {
-        if(include == null || include.size() == 0) return;
+        if(include == null || include.size() == 0) {
+            return;
+        }
         Set<String> savedTableNames = savefileState.getSavedTableNames();
         for(String s : include) {
             if(!savedTableNames.contains(s)) {

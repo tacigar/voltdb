@@ -49,7 +49,7 @@ import org.apache.zookeeper_voltpatches.data.Stat;
 import org.voltcore.utils.Pair;
 
 import com.google_voltpatches.common.base.Preconditions;
-import com.google_voltpatches.common.base.Throwables;
+
 
 public class ZKUtil {
 
@@ -234,7 +234,7 @@ public class ZKUtil {
         try {
             callback.get();
         } catch (Throwable t) {
-            Throwables.propagate(t);
+            throw new RuntimeException(t);
         }
     }
 
@@ -268,7 +268,7 @@ public class ZKUtil {
             }
         }
         catch (Throwable t) {
-            Throwables.propagate(t);
+            throw new RuntimeException(t);
         }
         return lastCallback;
     }

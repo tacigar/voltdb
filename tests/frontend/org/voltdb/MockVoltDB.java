@@ -68,6 +68,7 @@ import org.voltdb.settings.NodeSettings;
 import org.voltdb.snmp.DummySnmpTrapSender;
 import org.voltdb.snmp.SnmpTrapSender;
 import org.voltdb.utils.HTTPAdminListener;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
@@ -426,7 +427,7 @@ public class MockVoltDB implements VoltDBInterface
                 for (String child : children) {
                     byte[] data = zk.getData(VoltZK.start_action + "/" + child, false, null);
                     if (data == null) {
-                        VoltDB.crashLocalVoltDB("Couldn't find " + VoltZK.start_action + "/" + child);
+                        Poisoner.crashLocalVoltDB("Couldn't find " + VoltZK.start_action + "/" + child);
                     }
                     String startAction = new String(data);
                     if ((startAction.equals(StartAction.JOIN.toString()) ||
@@ -435,7 +436,7 @@ public class MockVoltDB implements VoltDBInterface
                             !initCompleted) {
                         int nodeId = VoltZK.getHostIDFromChildName(child);
                         if (nodeId == m_hostMessenger.getHostId()) {
-                            VoltDB.crashLocalVoltDB("This node was started with start action " + startAction +
+                            Poisoner.crashLocalVoltDB("This node was started with start action " + startAction +
                                     " during cluster creation. All nodes should be started with matching "
                                     + "create or recover actions when bring up a cluster. Join and Rejoin "
                                     + "are for adding nodes to an already running cluster.");
@@ -450,7 +451,7 @@ public class MockVoltDB implements VoltDBInterface
         } catch (KeeperException e) {
             logger.error("Failed to validate the start actions:" + e.getMessage());
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Interrupted during start action validation:" + e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB("Interrupted during start action validation:" + e.getMessage(), true, e);
         }
     }
 
@@ -473,8 +474,8 @@ public class MockVoltDB implements VoltDBInterface
     @Override
     public boolean shutdown(Thread mainSiteThread) throws InterruptedException
     {
-        VoltDB.wasCrashCalled = false;
-        VoltDB.crashMessage = null;
+        Poisoner.wasCrashCalled = false;
+        Poisoner.crashMessage = null;
         m_snapshotCompletionMonitor.shutdown();
         m_es.shutdown();
         m_es.awaitTermination( 1, TimeUnit.DAYS);

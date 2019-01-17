@@ -25,6 +25,7 @@ import org.voltcore.logging.VoltLogger;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A wrapper around the HSQLDB engine. This class can be used to execute SQL
@@ -56,7 +57,7 @@ public class HsqlBackend extends NonVoltDBBackend {
                 }
                 catch (final Exception ex) {
                     hostLog.fatal("Unable to construct HSQL backend");
-                    VoltDB.crashLocalVoltDB(ex.getMessage(), true, ex);
+                    Poisoner.crashLocalVoltDB(ex.getMessage(), true, ex);
                 }
             }
             return (HsqlBackend) m_backend;

@@ -44,6 +44,7 @@ import org.voltdb.compiler.PlannerTool;
 import org.voltdb.parser.SQLLexer;
 import org.voltdb.planner.StatementPartitioning;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTrace;
 
 import com.google_voltpatches.common.base.Charsets;
@@ -453,7 +454,7 @@ public abstract class AdHocNTBase extends UpdateApplicationBase {
             buf = plannedStmtBatch.flattenPlanArrayToBuffer();
         }
         catch (IOException e) {
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
         assert(buf.hasArray());
 

@@ -25,9 +25,9 @@ import java.util.concurrent.CancellationException;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltdb.SiteProcedureConnection;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
 import org.voltdb.rejoin.TaskLog;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Suppliers;
 
@@ -87,7 +87,7 @@ public class MpRepairTask extends SiteTasker
                     }
                 } catch (InterruptedException ie) {
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Terminally failed MPI repair.", true, e);
+                    Poisoner.crashLocalVoltDB("Terminally failed MPI repair.", true, e);
                 } finally {
                     m_repairRan = true;
 

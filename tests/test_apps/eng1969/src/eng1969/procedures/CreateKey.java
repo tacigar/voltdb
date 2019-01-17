@@ -43,7 +43,7 @@ public class CreateKey extends VoltProcedure {
             String key = group.toString() + "_" + id.toString();
             db.put(key.getBytes(), payload);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Failed to put a DB key.", true, e);
+            PoisonPill.crashLocalVoltDB("Failed to put a DB key.", true, e);
         }
 
         return 1L;

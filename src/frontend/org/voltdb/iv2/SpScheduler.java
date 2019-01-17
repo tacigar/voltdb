@@ -72,6 +72,7 @@ import org.voltdb.messaging.MPBacklogFlushMessage;
 import org.voltdb.messaging.MultiPartitionParticipantMessage;
 import org.voltdb.messaging.RepairLogTruncationMessage;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTrace;
 
 import com.google_voltpatches.common.collect.Sets;
@@ -506,7 +507,7 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
                 catch (Exception e) {
                     hostLog.fatal(e.getMessage());
                     hostLog.fatal("Invocation: " + message);
-                    VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                    Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
                 }
             }
 
@@ -834,7 +835,7 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
                 }
                 RealVoltDB.printDiagnosticInformation(VoltDB.instance().getCatalogContext(),
                         counter.getStoredProcedureName(), m_procSet);
-                VoltDB.crashLocalVoltDB("HASH MISMATCH: replicas produced different results.", true, null);
+                Poisoner.crashLocalVoltDB("HASH MISMATCH: replicas produced different results.", true, null);
             } else if (result == DuplicateCounter.ABORT) {
                 if (m_isLeader && m_sendToHSIds.length > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -846,7 +847,7 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
                 }
                 RealVoltDB.printDiagnosticInformation(VoltDB.instance().getCatalogContext(),
                         counter.getStoredProcedureName(), m_procSet);
-                VoltDB.crashLocalVoltDB("HASH MISMATCH: transaction succeeded on one replica but failed on another replica.", true, null);
+                Poisoner.crashLocalVoltDB("HASH MISMATCH: transaction succeeded on one replica but failed on another replica.", true, null);
             }
         }
         else {
@@ -1219,9 +1220,9 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
                 m_mailbox.send(counter.m_destinationId, resp);
             }
             else if (result == DuplicateCounter.MISMATCH) {
-                VoltDB.crashGlobalVoltDB("HASH MISMATCH running multi-part procedure.", true, null);
+                Poisoner.crashGlobalVoltDB("HASH MISMATCH running multi-part procedure.", true, null);
             } else if (result == DuplicateCounter.ABORT) {
-                VoltDB.crashGlobalVoltDB("PARTIAL ROLLBACK/ABORT running multi-part procedure.", true, null);
+                Poisoner.crashGlobalVoltDB("PARTIAL ROLLBACK/ABORT running multi-part procedure.", true, null);
             }
             // doing duplicate suppression: all done.
             return;
@@ -1506,7 +1507,7 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
                        CoreUtils.getHostIdFromHSId(msg.m_sourceHSId) + ":" + CoreUtils.getSiteIdFromHSId(msg.m_sourceHSId));
         RealVoltDB.printDiagnosticInformation(VoltDB.instance().getCatalogContext(),
                 msg.getProcName(), m_procSet);
-        VoltDB.crashLocalVoltDB("HASH MISMATCH", true, null);
+        Poisoner.crashLocalVoltDB("HASH MISMATCH", true, null);
     }
 
     @Override
@@ -1603,7 +1604,7 @@ public class SpScheduler extends Scheduler implements SnapshotCompletionInterest
             m_duplicateCounters.put(dpKey, counter);
         } else {
             existingDC.logWithCollidingDuplicateCounters(counter);
-            VoltDB.crashGlobalVoltDB("DUPLICATE COUNTER MISMATCH: two duplicate counter keys collided.", true, null);
+            Poisoner.crashGlobalVoltDB("DUPLICATE COUNTER MISMATCH: two duplicate counter keys collided.", true, null);
         }
     }
 

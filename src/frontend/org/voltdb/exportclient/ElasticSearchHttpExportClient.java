@@ -58,7 +58,7 @@ import org.voltdb.exportclient.decode.EndpointExpander;
 import org.voltdb.exportclient.decode.EntityDecoder;
 import org.voltdb.exportclient.decode.JsonStringDecoder;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Lists;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
@@ -356,7 +356,7 @@ public class ElasticSearchHttpExportClient extends ExportClientBase
             catch (URISyntaxException e) {
                 // should not get here as the endpoint URL syntax was validated at configure
                 LOG.error("Unable to create URI %s ", e, endpoint);
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             m_exportPath = path;
         }
@@ -460,7 +460,7 @@ public class ElasticSearchHttpExportClient extends ExportClientBase
             try {
                 m_es.awaitTermination(365, TimeUnit.DAYS);
             } catch (InterruptedException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
 

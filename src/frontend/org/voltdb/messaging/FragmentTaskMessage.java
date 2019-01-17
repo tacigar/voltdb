@@ -32,12 +32,12 @@ import org.voltcore.messaging.Subject;
 import org.voltcore.messaging.TransactionInfoBaseMessage;
 import org.voltcore.utils.CoreUtils;
 import org.voltdb.ParameterSet;
-import org.voltdb.VoltDB;
 import org.voltdb.client.BatchTimeoutOverrideType;
 import org.voltdb.common.Constants;
 import org.voltdb.iv2.TxnEgo;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.collect.ImmutableSet;
@@ -106,8 +106,9 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
             }
             if (m_inputDepIds != null && m_inputDepIds.size() > 0) {
                 sb.append("\n  INPUT_DEPENDENCY_IDS ");
-                for (long id : m_inputDepIds)
+                for (long id : m_inputDepIds) {
                     sb.append(id).append(", ");
+                }
                 sb.setLength(sb.lastIndexOf(", "));
             }
             if (m_fragmentPlan != null && m_fragmentPlan.length != 0) {
@@ -353,7 +354,7 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
                 parambytes.flip();
             }
             catch (IOException e) {
-                VoltDB.crashLocalVoltDB("Failed to serialize parameter for fragment: " + params.toString(), true, e);
+                Poisoner.crashLocalVoltDB("Failed to serialize parameter for fragment: " + params.toString(), true, e);
             }
         }
 
@@ -380,8 +381,9 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
         assert(index >= 0 && index < m_items.size());
         FragmentData item = m_items.get(index);
         assert(item != null);
-        if (item.m_inputDepIds == null)
+        if (item.m_inputDepIds == null) {
             item.m_inputDepIds = new ArrayList<Integer>();
+        }
         item.m_inputDepIds.add(depId);
         m_inputDepCount++;
     }
@@ -397,8 +399,9 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
         assert(index >= 0 && index < m_items.size());
         FragmentData item = m_items.get(index);
         assert(item != null);
-        if (item.m_inputDepIds == null)
+        if (item.m_inputDepIds == null) {
             return -1;
+        }
         assert(item.m_inputDepIds.size() == 1);
         return item.m_inputDepIds.get(0);
     }
@@ -582,7 +585,7 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
             catch (final IOException e) {
                 hostLog.l7dlog(Level.FATAL,
                         LogKeys.host_ExecutionSite_FailedDeserializingParamsForFragmentTask.name(), e);
-                VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
             }
         }
         else {
@@ -1107,13 +1110,14 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
         if (m_perFragmentStatsRecording) {
             sb.append("PER FRAGMENT STATS RECORDING\n");
         }
-        if (m_isReadOnly)
+        if (m_isReadOnly) {
             sb.append("  READ, COORD ");
-        else
-        if (m_nPartTxn)
+        } else
+        if (m_nPartTxn) {
             sb.append("  ").append(" N part WRITE, COORD ");
-        else
+        } else {
             sb.append("  WRITE, COORD ");
+        }
         sb.append(CoreUtils.hsIdToString(m_coordinatorHSId));
 
         if (!m_emptyForRestart) {
@@ -1127,10 +1131,12 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
             sb.append("  FRAGMENT EMPTY FOR RESTART SERIALIZATION");
         }
 
-        if (m_isFinal)
+        if (m_isFinal) {
             sb.append("\n  THIS IS THE FINAL TASK");
-        if (m_isForReplica)
+        }
+        if (m_isForReplica) {
             sb.append("\n  THIS IS SENT TO REPLICA");
+        }
 
         if (m_isForOldLeader) {
             sb.append("\n  EXECUTE ON ORIGNAL LEADER");
@@ -1153,8 +1159,9 @@ public class FragmentTaskMessage extends TransactionInfoBaseMessage
         }
         sb.append("\nBatch index:" + m_currentBatchIndex + " Dep count:" + m_inputDepCount);
 
-        if (m_emptyForRestart)
+        if (m_emptyForRestart) {
             sb.append("\n  THIS IS A NULL FRAGMENT TASK USED FOR RESTART");
+        }
 
         String procName = getProcedureName();
         if (procName != null) {

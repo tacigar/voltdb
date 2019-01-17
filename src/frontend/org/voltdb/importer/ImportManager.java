@@ -26,10 +26,6 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.BundleException;
-
-import com.google_voltpatches.common.base.Preconditions;
-import com.google_voltpatches.common.base.Throwables;
-
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.messaging.HostMessenger;
 import org.voltdb.CatalogContext;
@@ -42,6 +38,10 @@ import org.voltdb.importer.formatter.FormatterBuilder;
 import org.voltdb.modular.ModuleManager;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.CatalogUtil.ImportConfiguration;
+import org.voltdb.utils.Poisoner;
+
+import com.google_voltpatches.common.base.Preconditions;
+
 
 /**
  *
@@ -95,7 +95,9 @@ public class ImportManager implements ChannelChangeCallback {
     }
 
     private void initializeChannelDistributer() throws BundleException {
-        if (m_distributer != null) return;
+        if (m_distributer != null) {
+            return;
+        }
 
         m_distributer = new ChannelDistributer(m_messenger.getZK(), String.valueOf(m_myHostId));
         m_distributer.registerCallback("__IMPORT_MANAGER__", this);
@@ -130,7 +132,7 @@ public class ImportManager implements ChannelChangeCallback {
             Map<String, ImportConfiguration> newProcessorConfig = loadNewConfigAndBundles(catalogContext);
             restartImporters(newProcessorConfig);
         } catch (final Exception e) {
-            VoltDB.crashLocalVoltDB("Error creating import processor", true, e);
+            Poisoner.crashLocalVoltDB("Error creating import processor", true, e);
         }
     }
 
@@ -199,14 +201,14 @@ public class ImportManager implements ChannelChangeCallback {
                             URI moduleURI = URI.create(module);
                             formatterFactory = m_moduleManager.getService(moduleURI, AbstractFormatterFactory.class);
                             if (formatterFactory == null) {
-                                VoltDB.crashLocalVoltDB("Failed to initialize formatter from: " + module);
+                                Poisoner.crashLocalVoltDB("Failed to initialize formatter from: " + module);
                             }
                             m_formatterFactories.put(module, formatterFactory);
                         }
                         builder.setFormatterFactory(formatterFactory);
                     }
                 } catch(Throwable t) {
-                    VoltDB.crashLocalVoltDB("Failed to initialize formatter.");
+                    Poisoner.crashLocalVoltDB("Failed to initialize formatter.");
                 }
             }
         }
@@ -258,7 +260,7 @@ public class ImportManager implements ChannelChangeCallback {
             }
         } catch(Throwable t) {
             importLog.error("Failed to configure import handler for " + bundleJar, t);
-            Throwables.propagate(t);
+            throw new RuntimeException(t);
         }
         return true;
 }
@@ -300,7 +302,7 @@ public class ImportManager implements ChannelChangeCallback {
                 readyForDataInternal(VoltDB.instance().getMode());
             }
         } catch (final Exception e) {
-            VoltDB.crashLocalVoltDB("Error updating importers with new DDL and/or deployment.", true, e);
+            Poisoner.crashLocalVoltDB("Error updating importers with new DDL and/or deployment.", true, e);
         }
     }
 

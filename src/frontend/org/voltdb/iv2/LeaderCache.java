@@ -40,8 +40,7 @@ import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.ZKUtil;
 import org.voltcore.zk.ZKUtil.ByteArrayCallback;
-import org.voltdb.VoltZK;
-import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.collect.ImmutableMap;
@@ -240,7 +239,7 @@ public class LeaderCache implements LeaderCacheReader, LeaderCacheWriter {
             } catch (Exception e) {
                 // ignore post-shutdown session termination exceptions.
                 if (!m_shutdown.get()) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected failure in LeaderCache.", true, e);
+                    Poisoner.crashLocalVoltDB("Unexpected failure in LeaderCache.", true, e);
                 }
             }
         }
@@ -260,7 +259,7 @@ public class LeaderCache implements LeaderCacheReader, LeaderCacheWriter {
             } catch (Exception e) {
                 // ignore post-shutdown session termination exceptions.
                 if (!m_shutdown.get()) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected failure in LeaderCache.", true, e);
+                    Poisoner.crashLocalVoltDB("Unexpected failure in LeaderCache.", true, e);
                 }
             }
         }
@@ -278,7 +277,7 @@ public class LeaderCache implements LeaderCacheReader, LeaderCacheWriter {
                 if (m_es.isShutdown()) {
                     return;
                 } else {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
+                    Poisoner.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
                 }
             }
         }
@@ -296,7 +295,7 @@ public class LeaderCache implements LeaderCacheReader, LeaderCacheWriter {
                 if (m_es.isShutdown()) {
                     return;
                 } else {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
+                    Poisoner.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
                 }
             }
         }

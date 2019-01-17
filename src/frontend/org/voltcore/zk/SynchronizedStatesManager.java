@@ -45,8 +45,9 @@ import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.apache.zookeeper_voltpatches.data.Stat;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
+import org.voltdb.utils.Poisoner;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.collect.Sets;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
@@ -448,7 +449,9 @@ public class SynchronizedStatesManager {
                             // This is a race between another node who got the Distributed lock but
                             // Has not set up the result path yet. Keep Retrying.
                         }
-                    } while (!resultNodeFound);
+                    } while (!resultNodeFound) {
+                        ;
+                    }
                     m_lastProposalVersion = nodeStat.getVersion();
                     checkForBarrierParticipantsChange();
                 }
@@ -528,7 +531,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in getProposalVersion");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             return proposalVersion;
@@ -699,7 +702,7 @@ public class SynchronizedStatesManager {
                 }
                 unlockLocalState();
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             assert(!debugIsLocalStateLocked());
@@ -776,7 +779,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in getUncorrelatedResults");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             return results;
@@ -821,7 +824,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in getCorrelatedResults");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             return results;
@@ -901,7 +904,7 @@ public class SynchronizedStatesManager {
                         m_log.debug(m_stateMachineId + ": Received InterruptedException in processResultQuorum");
                     }
                 } catch (Exception e) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Unexpected failure in StateMachine.", true, e);
                 }
                 if (m_stateChangeInitiator) {
@@ -979,7 +982,7 @@ public class SynchronizedStatesManager {
                             m_log.debug(m_stateMachineId + ": Received InterruptedException in processResultQuorum");
                         }
                     } catch (Exception e) {
-                        org.voltdb.VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                                 "Unexpected failure in StateMachine.", true, e);
                         success = false;
                     }
@@ -1079,7 +1082,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in checkForBarrierResultsChanges");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
                 membersWithResults = new TreeSet<String>();
             }
@@ -1175,7 +1178,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in initializeFromActiveCommunity");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             if (readOnlyResult != null) {
@@ -1230,7 +1233,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in wakeCommunityWithProposal");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             return newProposalVersion;
@@ -1311,7 +1314,7 @@ public class SynchronizedStatesManager {
                         }
                         m_lockWaitingOn = "We died so we can't ever get the distributed lock";
                     } catch (Exception e) {
-                        org.voltdb.VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                                 "Unexpected failure in StateMachine.", true, e);
                     }
                     if (m_lockWaitingOn.equals(m_ourDistributedLockName) && m_currentParticipants == 0) {
@@ -1351,7 +1354,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in cancelDistributedLock");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in SynchronizedStatesManager.", true, e);
             }
             m_ourDistributedLockName = null;
@@ -1417,7 +1420,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in getLatestMembership");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in SynchronizedStatesManager.", true, e);
             }
         }
@@ -1492,7 +1495,7 @@ public class SynchronizedStatesManager {
                     m_log.debug(m_stateMachineId + ": Received InterruptedException in requestDistributedLock");
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
             return false;
@@ -1519,11 +1522,11 @@ public class SynchronizedStatesManager {
                 // is not hung. However, if a new proposal is submitted by another instance between that assignment
                 // and the call to checkForBarrierParticipantsChange, a second null result is assigned.
                 if (m_requestedInitialState == null || result != null) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Unexpected failure in StateMachine; Two results created for one proposal.", true, e);
                 }
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in StateMachine.", true, e);
             }
         }
@@ -1557,7 +1560,7 @@ public class SynchronizedStatesManager {
                         m_log.debug(m_stateMachineId + ": Received InterruptedException in assignStateChangeAgreement");
                     }
                 } catch (Exception e) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Unexpected failure in StateMachine.", true, e);
                 }
                 unlockLocalState();
@@ -1868,7 +1871,7 @@ public class SynchronizedStatesManager {
             disableComplete.get();
         }
         catch (ExecutionException e) {
-            Throwables.propagate(e.getCause());
+            throw new RuntimeException(e.getCause());
         }
 
     }
@@ -1892,7 +1895,7 @@ public class SynchronizedStatesManager {
                 // shutdown; ignore.
             } catch (InterruptedException e) {
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in SynchronizedStatesManager.", true, e);
             }
         }
@@ -1913,7 +1916,7 @@ public class SynchronizedStatesManager {
                 // shutdown; ignore.
             } catch (InterruptedException e) {
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in SynchronizedStatesManager.", true, e);
             }
         }
@@ -1966,7 +1969,7 @@ public class SynchronizedStatesManager {
             } catch (InterruptedException e) {
                 m_done.set(true);
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexpected failure in initializeInstances.", true, e);
                 m_done.set(true);
             }
@@ -1996,7 +1999,7 @@ public class SynchronizedStatesManager {
                 initComplete.get();
             }
             catch (ExecutionException e) {
-                Throwables.propagate(e.getCause());
+                throw new RuntimeException(e.getCause());
             }
         }
     }

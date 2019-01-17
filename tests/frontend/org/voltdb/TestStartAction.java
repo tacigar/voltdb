@@ -24,11 +24,13 @@
 package org.voltdb;
 
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.voltdb.utils.Poisoner;
 
 public class TestStartAction {
     private MockVoltDB m_mvoltdb;
@@ -51,13 +53,13 @@ public class TestStartAction {
         m_mvoltdb.createStartActionNode(1, StartAction.CREATE);
 
         try {
-            VoltDB.ignoreCrash = true;
+            Poisoner.ignoreCrash = true;
             m_mvoltdb.validateStartAction();
-            VoltDB.ignoreCrash = false;
+            Poisoner.ignoreCrash = false;
         } catch (AssertionError e) {}
 
-        assertTrue(VoltDB.wasCrashCalled);
-        VoltDB.wasCrashCalled = false;
+        assertTrue(Poisoner.wasCrashCalled);
+        Poisoner.wasCrashCalled = false;
     }
 
     @Test
@@ -66,13 +68,13 @@ public class TestStartAction {
         m_mvoltdb.createStartActionNode(1, StartAction.CREATE);
 
         try {
-            VoltDB.ignoreCrash = true;
+            Poisoner.ignoreCrash = true;
             m_mvoltdb.validateStartAction();
-            VoltDB.ignoreCrash = false;
+            Poisoner.ignoreCrash = false;
         } catch (AssertionError e) {}
 
-        assertTrue(VoltDB.wasCrashCalled);
-        VoltDB.wasCrashCalled = false;
+        assertTrue(Poisoner.wasCrashCalled);
+        Poisoner.wasCrashCalled = false;
     }
 
     @Test
@@ -81,13 +83,13 @@ public class TestStartAction {
         m_mvoltdb.createStartActionNode(1, StartAction.CREATE);
 
         try {
-            VoltDB.ignoreCrash = true;
+            Poisoner.ignoreCrash = true;
             m_mvoltdb.validateStartAction();
-            VoltDB.ignoreCrash = false;
+            Poisoner.ignoreCrash = false;
         } catch (AssertionError e) {}
 
-        assertTrue(VoltDB.wasCrashCalled);
-        VoltDB.wasCrashCalled = false;
+        assertTrue(Poisoner.wasCrashCalled);
+        Poisoner.wasCrashCalled = false;
     }
 
     @Test
@@ -96,13 +98,13 @@ public class TestStartAction {
         m_mvoltdb.createStartActionNode(1, StartAction.CREATE);
 
         try {
-            VoltDB.ignoreCrash = true;
+            Poisoner.ignoreCrash = true;
             m_mvoltdb.validateStartAction();
-            VoltDB.ignoreCrash = false;
+            Poisoner.ignoreCrash = false;
         } catch (AssertionError e) {}
 
-        assertFalse(VoltDB.wasCrashCalled);
-        VoltDB.wasCrashCalled = false;
+        assertFalse(Poisoner.wasCrashCalled);
+        Poisoner.wasCrashCalled = false;
     }
 
 }

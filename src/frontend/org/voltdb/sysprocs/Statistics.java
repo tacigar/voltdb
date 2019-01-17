@@ -23,16 +23,16 @@ import java.util.Map;
 import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 public class Statistics extends VoltSystemProcedure {
     public VoltTable[] run(SystemProcedureExecutionContext ctx,
             String selector, long interval) throws VoltAbortException
     {
         VoltTable[] results = null;
-        VoltDB.crashLocalVoltDB("The @Statistics sysproc should no longer be called anywhere.", false, null);
+        Poisoner.crashLocalVoltDB("The @Statistics sysproc should no longer be called anywhere.", false, null);
         return results;
     }
 

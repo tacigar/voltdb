@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.HdrHistogram_voltpatches.Histogram;
 
 import com.google_voltpatches.common.base.Charsets;
-import com.google_voltpatches.common.base.Throwables;
+
 
 /**
  * <p>Essentially a set of counters for a specific context with helper
@@ -502,7 +502,7 @@ public class ClientStats {
         try {
             pw = new PrintStream(baos, false, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
 
         //Get a latency report in milliseconds

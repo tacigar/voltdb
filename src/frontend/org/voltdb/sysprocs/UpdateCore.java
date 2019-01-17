@@ -49,6 +49,7 @@ import org.voltdb.exceptions.SpecifiedException;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.Encoder;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTableUtil;
 
 /**
@@ -326,7 +327,7 @@ public class UpdateCore extends VoltSystemProcedure {
                             CoreUtils.hsIdToString(m_site.getCorrespondingSiteId())));
             }
             else {
-                VoltDB.crashLocalVoltDB("Invalid catalog update.  Expected version: " + expectedCatalogVersion +
+                Poisoner.crashLocalVoltDB("Invalid catalog update.  Expected version: " + expectedCatalogVersion +
                         ", current version: " + context.getCatalogVersion(), false, null);
             }
 
@@ -339,7 +340,7 @@ public class UpdateCore extends VoltSystemProcedure {
             return new DependencyPair.TableDependencyPair(DEP_updateCatalogAggregate, result);
         }
         else {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Received unrecognized plan fragment id " + fragmentId + " in UpdateApplicationCatalog",
                     false,
                     null);

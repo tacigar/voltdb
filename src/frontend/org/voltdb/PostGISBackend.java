@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.Encoder;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A wrapper around a PostgreSQL database server that supports PostGIS (a
@@ -275,7 +276,7 @@ public class PostGISBackend extends PostgreSQLBackend {
             }
             catch (final Exception e) {
                 hostLog.fatal("Unable to construct PostGIS backend");
-                VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
             }
             return (PostGISBackend) m_backend;
         }

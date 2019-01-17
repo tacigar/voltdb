@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.voltcore.logging.Level;
 import org.voltcore.logging.VoltLogger;
 
-import com.google_voltpatches.common.base.Throwables;
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.cache.Cache;
 import com.google_voltpatches.common.cache.CacheBuilder;
 
@@ -68,11 +68,14 @@ public class RateLimitedLogger {
                         case FATAL:
                             m_logger.fatal(message); break;
                         case INFO:
+                        case ALL:
                             m_logger.info(message); break;
                         case TRACE:
                             m_logger.trace(message); break;
                         case WARN:
                             m_logger.warn(message); break;
+                        case OFF:
+                            break;
                     }
                     m_lastLogTime = now;
                 }
@@ -101,11 +104,14 @@ public class RateLimitedLogger {
                         case FATAL:
                             m_logger.fatal(message); break;
                         case INFO:
+                        case ALL:
                             m_logger.info(message); break;
                         case TRACE:
                             m_logger.trace(message); break;
                         case WARN:
                             m_logger.warn(message); break;
+                        case OFF:
+                            break;
                     }
                     m_lastLogTime = now;
                 }
@@ -176,7 +182,7 @@ public class RateLimitedLogger {
             rll = m_loggersCached.get(format, builder);
             rll.log(now, level, null, format, parameters);
         } catch (ExecutionException ex) {
-            Throwables.propagate(Throwables.getRootCause(ex));
+            throw new RuntimeException(Throwables.getRootCause(ex));
         }
     }
 
@@ -209,7 +215,7 @@ public class RateLimitedLogger {
             rll = m_loggersCached.get(stemformat, builder);
             rll.log(now, level, cause, stemformat, parameters);
         } catch (ExecutionException ex) {
-            Throwables.propagate(Throwables.getRootCause(ex));
+            throw new RuntimeException(Throwables.getRootCause(ex));
         }
     }
 }

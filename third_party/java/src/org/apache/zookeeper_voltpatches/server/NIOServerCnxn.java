@@ -65,7 +65,7 @@ import org.apache.zookeeper_voltpatches.server.auth.AuthenticationProvider;
 import org.apache.zookeeper_voltpatches.server.auth.ProviderRegistry;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This class handles communication with clients using NIO. There is one per
@@ -151,7 +151,7 @@ public class NIOServerCnxn implements Watcher, ServerCnxn {
             } catch (IOException e) {
                 CoreUtils.printPortsInUse(new VoltLogger("HOST"));
                 String msg = "ZooKeeper service unable to bind to port : " + addr.getPort();
-                VoltDB.crashLocalVoltDB(msg, false, e);
+                Poisoner.crashLocalVoltDB(msg, false, e);
             }
         }
 
@@ -232,7 +232,9 @@ public class NIOServerCnxn implements Watcher, ServerCnxn {
             // this lock)
             synchronized (ipMap) {
                 Set<NIOServerCnxn> s = ipMap.get(cl);
-                if (s == null) return 0;
+                if (s == null) {
+                    return 0;
+                }
                 return s.size();
             }
         }
@@ -968,7 +970,9 @@ public class NIOServerCnxn implements Watcher, ServerCnxn {
 
         @Override
         public void close() throws IOException {
-            if (sb == null) return;
+            if (sb == null) {
+                return;
+            }
             checkFlush(true);
             sb = null; // clear out the ref to ensure no reuse
         }
@@ -1277,6 +1281,7 @@ public class NIOServerCnxn implements Watcher, ServerCnxn {
         } else if (len == setTraceMaskCmd) {
             int rc = sock.read(incomingBuffer);
             if (rc < 0) {
+                pwriter.close();
                 throw new IOException("Read error");
             }
 
@@ -1319,6 +1324,7 @@ public class NIOServerCnxn implements Watcher, ServerCnxn {
             wcmd.start();
             return true;
         }
+        pwriter.close();
         return false;
     }
 

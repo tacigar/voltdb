@@ -32,7 +32,9 @@ import org.voltcore.logging.VoltNullLogger.CoreNullLogger;
 import org.voltcore.utils.EstTime;
 import org.voltcore.utils.RateLimitedLogger;
 
-import com.google_voltpatches.common.base.Throwables;
+import com.google.common.base.Throwables;
+
+
 
 /**
  * Class that implements the core functionality of a Log4j logger
@@ -146,7 +148,9 @@ public class VoltLogger {
      * and wait for the task to complete.
      */
     private void submit(final Level level, final Object message, final Throwable t) {
-        if (!m_logger.isEnabledFor(level)) return;
+        if (!m_logger.isEnabledFor(level)) {
+            return;
+        }
 
         if (m_asynchLoggerPool == null) {
             m_logger.log(level, message, t);
@@ -157,7 +161,7 @@ public class VoltLogger {
         try {
             m_asynchLoggerPool.submit(runnableLoggingTask).get();
         } catch (Exception e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -166,7 +170,9 @@ public class VoltLogger {
      * but don't wait for the task to complete for info, debug, trace, and warn
      */
     private void execute(final Level level, final Object message, final Throwable t) {
-        if (!m_logger.isEnabledFor(level)) return;
+        if (!m_logger.isEnabledFor(level)) {
+            return;
+        }
 
         if (m_asynchLoggerPool == null) {
             m_logger.log(level, message, t);
@@ -236,7 +242,7 @@ public class VoltLogger {
                 try {
                     m_asynchLoggerPool.submit(runnableLoggingTask).get();
                 } catch (Exception e) {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 break;
             default:

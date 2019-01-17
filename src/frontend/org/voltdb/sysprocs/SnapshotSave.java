@@ -51,6 +51,7 @@ import org.voltdb.iv2.TxnEgo;
 import org.voltdb.sysprocs.saverestore.HashinatorSnapshotData;
 import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTableUtil;
 
 import com.google_voltpatches.common.collect.Sets;
@@ -307,7 +308,7 @@ public class SnapshotSave extends VoltSystemProcedure
                     createCallback.get();
                 } catch (KeeperException.NodeExistsException e) {
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Unexpected exception logging snapshot completion to ZK", true, e);
+                    Poisoner.crashLocalVoltDB("Unexpected exception logging snapshot completion to ZK", true, e);
                 }
 
                 SnapshotSaveAPI.logParticipatingHostCount(txnId, participantCount);

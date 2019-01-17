@@ -65,7 +65,7 @@ import org.voltdb.common.Constants;
 import org.voltdb.iv2.TxnEgo;
 import org.voltdb.types.TimestampType;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -291,7 +291,7 @@ public class ExportOnServerVerifier {
                 if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
                     existsOrIsDir = false;
                 } else {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
             }
             if (!existsOrIsDir) {
@@ -1253,7 +1253,7 @@ public class ExportOnServerVerifier {
                     channel.rm(path);
                 } catch (Exception e)
                 {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
             }
         };

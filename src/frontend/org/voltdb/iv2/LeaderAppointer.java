@@ -58,6 +58,7 @@ import org.voltdb.TheHashinator;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSortedSet;
@@ -165,7 +166,7 @@ public class LeaderAppointer implements Promotable
             if (m_state.get() == AppointerState.CLUSTER_START) {
                 // We can't yet tolerate a host failure during startup.  Crash it all
                 if (missingHSIds.size() > 0) {
-                    VoltDB.crashGlobalVoltDB("Node failure detected during startup.", false, null);
+                    Poisoner.crashGlobalVoltDB("Node failure detected during startup.", false, null);
                 }
                 // ENG-3166: Eventually we would like to get rid of the extra replicas beyond k_factor,
                 // but for now we just look to see how many replicas of this partition we actually expect
@@ -214,12 +215,12 @@ public class LeaderAppointer implements Promotable
                 }
                  // Check for k-safety
                 if (!isClusterKSafe(null)) {
-                    VoltDB.crashGlobalVoltDB("Some partitions have no replicas.  Cluster has become unviable.",
+                    Poisoner.crashGlobalVoltDB("Some partitions have no replicas.  Cluster has become unviable.",
                             false, null);
                 }
                 // Check if replay has completed
                 if (m_replayComplete.get() == false) {
-                    VoltDB.crashGlobalVoltDB("Detected node failure during command log replay. Cluster will shut down.",
+                    Poisoner.crashGlobalVoltDB("Detected node failure during command log replay. Cluster will shut down.",
                                              false, null);
                 }
                 // If we are still a DR replica (not promoted) and starting from a snapshot,
@@ -227,7 +228,7 @@ public class LeaderAppointer implements Promotable
                 if (VoltDB.instance().getReplicationRole() == ReplicationRole.REPLICA &&
                     m_expectingDrSnapshot && m_snapshotSyncComplete.get() == false
                         && !(m_currentLeader == Long.MAX_VALUE && !updatedHSIds.isEmpty()))  {
-                    VoltDB.crashGlobalVoltDB("Detected node failure before DR sync snapshot completes. Cluster will shut down.",
+                    Poisoner.crashGlobalVoltDB("Detected node failure before DR sync snapshot completes. Cluster will shut down.",
                                              false, null);
                 }
                 // If we survived the above gauntlet of fail, appoint a new leader for this partition.
@@ -313,7 +314,7 @@ public class LeaderAppointer implements Promotable
             try {
                 m_iv2appointees.put(partitionId, masterPair);
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Unable to appoint new master for partition " + partitionId, true, e);
+                Poisoner.crashLocalVoltDB("Unable to appoint new master for partition " + partitionId, true, e);
             }
             return masterHSId;
         }
@@ -336,7 +337,7 @@ public class LeaderAppointer implements Promotable
                     }
                 } catch (IllegalAccessException e) {
                     // This should never happen
-                    VoltDB.crashLocalVoltDB("Failed to get partition count", true, e);
+                    Poisoner.crashLocalVoltDB("Failed to get partition count", true, e);
                 }
             } else {
                 // update partition call backs with correct current leaders after MigratePartitionLeader
@@ -367,7 +368,7 @@ public class LeaderAppointer implements Promotable
                         }
                         tmLog.info(WHOMIM + "Done " + m_partitionWatchers.keySet());
                     } catch (Exception e) {
-                        VoltDB.crashLocalVoltDB("Cannot read leader initiator directory", false, e);
+                        Poisoner.crashLocalVoltDB("Cannot read leader initiator directory", false, e);
                     }
                 }
             });
@@ -444,7 +445,9 @@ public class LeaderAppointer implements Promotable
             });
             blocker.get();
         } catch (RejectedExecutionException e) {
-            if (m_es.isShutdown()) return;
+            if (m_es.isShutdown()) {
+                return;
+            }
             throw new RejectedExecutionException(e);
         }
     }
@@ -470,11 +473,11 @@ public class LeaderAppointer implements Promotable
                         (appointees.size() != masters.size())) {
                     // If we are promoted and the appointees or masters set is partial, the previous appointer failed
                     // during startup (at least for now, until we add remove a partition on the fly).
-                    VoltDB.crashGlobalVoltDB("Detected failure during startup, unable to start", false, null);
+                    Poisoner.crashGlobalVoltDB("Detected failure during startup, unable to start", false, null);
                 }
             } catch (IllegalAccessException e) {
                 // This should never happen
-                VoltDB.crashLocalVoltDB("Failed to get partition count", true, e);
+                Poisoner.crashLocalVoltDB("Failed to get partition count", true, e);
             }
         }
         else {
@@ -503,7 +506,7 @@ public class LeaderAppointer implements Promotable
                 }
             } catch (IllegalAccessException e) {
                 // This should never happen
-                VoltDB.crashLocalVoltDB("Failed to get partition count on startup", true, e);
+                Poisoner.crashLocalVoltDB("Failed to get partition count on startup", true, e);
             }
 
             //Asynchronously wait for this to finish otherwise it deadlocks
@@ -606,7 +609,7 @@ public class LeaderAppointer implements Promotable
         try {
             partitionDirs = m_zk.getChildren(VoltZK.leaders_initiators, null);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to read partitions from ZK", true, e);
+            Poisoner.crashLocalVoltDB("Unable to read partitions from ZK", true, e);
         }
 
         //Don't fetch the values serially do it asynchronously
@@ -616,7 +619,9 @@ public class LeaderAppointer implements Promotable
             //skip checking MP, not relevant to KSafety
             String partitionDir = it.next();
             int pid = LeaderElector.getPartitionFromElectionDir(partitionDir);
-            if (pid == MpInitiator.MP_INIT_PID) continue;
+            if (pid == MpInitiator.MP_INIT_PID) {
+                continue;
+            }
 
             String dir = ZKUtil.joinZKPath(VoltZK.leaders_initiators, partitionDir);
             try {
@@ -633,11 +638,11 @@ public class LeaderAppointer implements Promotable
                 if ( e instanceof KeeperException) {
                     KeeperException ke = (KeeperException)e;
                     if (ke.code() != KeeperException.Code.NONODE) {
-                        VoltDB.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
+                        Poisoner.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
                     }
                     it.remove();
                 } else {
-                    VoltDB.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
+                    Poisoner.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
                 }
             }
         }
@@ -650,7 +655,9 @@ public class LeaderAppointer implements Promotable
         final long statTs = System.currentTimeMillis();
         for (String partitionDir : partitionDirs) {
             int pid = LeaderElector.getPartitionFromElectionDir(partitionDir);
-            if (pid == MpInitiator.MP_INIT_PID) continue;
+            if (pid == MpInitiator.MP_INIT_PID) {
+                continue;
+            }
 
             try {
                 // The data of the partition dir indicates whether the partition has finished
@@ -715,7 +722,7 @@ public class LeaderAppointer implements Promotable
                 }
             } catch (Exception e) {
                 String dir = ZKUtil.joinZKPath(VoltZK.leaders_initiators, partitionDir);
-                VoltDB.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
+                Poisoner.crashLocalVoltDB("Unable to read replicas in ZK dir: " + dir, true, e);
             }
         }
         // update the statistics
@@ -727,11 +734,15 @@ public class LeaderAppointer implements Promotable
                 Integer pid = entry.getKey();
                 Long hsId = entry.getValue();
                 //ignore MPI
-                if (pid == MpInitiator.MP_INIT_PID) continue;
+                if (pid == MpInitiator.MP_INIT_PID) {
+                    continue;
+                }
                 int hostId = CoreUtils.getHostIdFromHSId(hsId);
 
                 //ignore the failed hosts
-                if (failedHosts.contains(hostId)) continue;
+                if (failedHosts.contains(hostId)) {
+                    continue;
+                }
                 Host host = hostLeaderMap.get(hostId);
                 if (host == null) {
                     host = new Host(hostId);

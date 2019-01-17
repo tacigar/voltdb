@@ -29,7 +29,7 @@ import org.json_voltpatches.JSONObject;
 import org.voltdb.StartAction;
 import org.voltdb.common.NodeState;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.ImmutableList;
 
 /**
@@ -194,7 +194,7 @@ public class HostCriteria {
             jo.put(SAFE_MODE, m_safeMode);
             jo.put(TERMINUS_NONCE, m_terminusNonce);
         } catch (JSONException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         return jo;
     }

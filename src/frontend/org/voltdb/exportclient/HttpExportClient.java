@@ -17,6 +17,8 @@
 
 package org.voltdb.exportclient;
 
+import static org.voltdb.utils.HDFSUtils.OctetStreamContentTypeHeader;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +39,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
@@ -85,6 +88,7 @@ import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltdb.VoltDB;
 import org.voltdb.export.AdvertisedDataSource;
+import org.voltdb.export.ExportManager;
 import org.voltdb.exportclient.decode.AvroEntityDecoder;
 import org.voltdb.exportclient.decode.CSVEntityDecoder;
 import org.voltdb.exportclient.decode.EndpointExpander;
@@ -94,18 +98,13 @@ import org.voltdb.utils.Encoder;
 import org.voltdb.utils.HDFSUtils;
 import org.voltdb.utils.VoltFile;
 
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.base.Preconditions;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableList;
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Lists;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
-import java.util.Objects;
-
-import org.voltdb.export.ExportManager;
-
-import static org.voltdb.utils.HDFSUtils.OctetStreamContentTypeHeader;
 
 public class HttpExportClient extends ExportClientBase {
     private static final VoltLogger m_logger = new VoltLogger("ExportClient");
@@ -179,7 +178,9 @@ public class HttpExportClient extends ExportClientBase {
         }
 
         static DecodedStatus fromResponse(HttpResponse rsp) {
-            if (rsp == null) return FAIL;
+            if (rsp == null) {
+                return FAIL;
+            }
             switch (rsp.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_OK:
             case HttpStatus.SC_CREATED:
@@ -350,10 +351,12 @@ public class HttpExportClient extends ExportClientBase {
 
         m_method = HttpMethod.POST;
         String method = config.getProperty("method","").trim().toUpperCase();
-        if (!m_isHdfs && !method.isEmpty()) try {
-            m_method = HttpMethod.valueOf(method);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("method may only be 'post','get', and 'put'");
+        if (!m_isHdfs && !method.isEmpty()) {
+            try {
+                m_method = HttpMethod.valueOf(method);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("method may only be 'post','get', and 'put'");
+            }
         }
 
         m_secret = config.getProperty("secret");
@@ -371,10 +374,12 @@ public class HttpExportClient extends ExportClientBase {
         if (format.isEmpty()) {
             format = config.getProperty("contentType","").trim().toUpperCase();
         }
-        if (!format.isEmpty()) try {
-            m_decodeType = DecodeType.valueOf(format);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("contentType may only be 'form', 'csv', or 'avro'");
+        if (!format.isEmpty()) {
+            try {
+                m_decodeType = DecodeType.valueOf(format);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("contentType may only be 'form', 'csv', or 'avro'");
+            }
         }
 
         m_compress = Boolean.parseBoolean(config.getProperty("avro.compress","false"));
@@ -471,7 +476,9 @@ public class HttpExportClient extends ExportClientBase {
                 dirMaker.setHeader(OctetStreamContentTypeHeader);
             }
             status = checkResponse(m_client.execute(dirMaker,null).get());
-            if (status != DecodedStatus.OK) return status;
+            if (status != DecodedStatus.OK) {
+                return status;
+            }
         } catch (InterruptedException|ExecutionException|URISyntaxException e) {
             rateLimitedLogError(m_logger, "error creating parent directory for %s %s", path, Throwables.getStackTraceAsString(e));
             throw new PathHandlingException("error creating parent directory for " + path, e);
@@ -503,7 +510,9 @@ public class HttpExportClient extends ExportClientBase {
                     HttpGet statusGetter = HDFSUtils.createFileStatusRequest(path);
                     HttpResponse response = m_client.execute(statusGetter, null).get();
                     status = checkResponse(response);
-                    if (status != DecodedStatus.OK) continue;
+                    if (status != DecodedStatus.OK) {
+                        continue;
+                    }
 
                     String fileStatus = EntityUtils.toString(response.getEntity(), Charsets.UTF_8);
                     Matcher mtc = modtimeRE.matcher(fileStatus);
@@ -519,7 +528,9 @@ public class HttpExportClient extends ExportClientBase {
                         renameDoer.setHeader(OctetStreamContentTypeHeader);
                     }
                     status = checkResponse(m_client.execute(renameDoer,null).get());
-                    if (status != DecodedStatus.OK) continue;
+                    if (status != DecodedStatus.OK) {
+                        continue;
+                    }
 
                     HttpPut fileMaker = HDFSUtils.createFileRequest(path);
                     if (headerEntity != null) {
@@ -599,7 +610,9 @@ public class HttpExportClient extends ExportClientBase {
             }
             Future<HttpResponse> fut = m_client.execute(dirMaker,null);
 
-            if (checkResponse(fut.get()) != DecodedStatus.OK) return false;
+            if (checkResponse(fut.get()) != DecodedStatus.OK) {
+                return false;
+            }
         } catch (InterruptedException|ExecutionException|URISyntaxException e) {
             rateLimitedLogError(m_logger, "error creating parent directory %s", Throwables.getStackTraceAsString(e));
             throw new PathHandlingException("error creating parent directory",e);
@@ -613,7 +626,9 @@ public class HttpExportClient extends ExportClientBase {
             fileMaker.setEntity(schemaEntity);
             Future<HttpResponse> fut = m_client.execute(fileMaker,null);
 
-            if (checkResponse(fut.get()) != DecodedStatus.OK) return false;
+            if (checkResponse(fut.get()) != DecodedStatus.OK) {
+                return false;
+            }
 
         } catch (InterruptedException | ExecutionException | URISyntaxException e) {
             rateLimitedLogError(m_logger, "error writing avro schema file %s", Throwables.getStackTraceAsString(e));
@@ -930,18 +945,20 @@ public class HttpExportClient extends ExportClientBase {
                     throw new RestartBlockException(true);
                 }
             }
-            if (!m_startedProcessingRows) try {
-                if (m_isHdfs) {
-                    DecodedStatus status = makePath(exportPath, getHeaderEntity(row));
-                    if (status != DecodedStatus.OK) {
-                        throw new PathHandlingException("hdfs makePath returned false for " + exportPath);
+            if (!m_startedProcessingRows) {
+                try {
+                    if (m_isHdfs) {
+                        DecodedStatus status = makePath(exportPath, getHeaderEntity(row));
+                        if (status != DecodedStatus.OK) {
+                            throw new PathHandlingException("hdfs makePath returned false for " + exportPath);
+                        }
                     }
+                    writeAvroSchema(row);
+                    m_startedProcessingRows = true;
+                } catch (PathHandlingException e) {
+                        rateLimitedLogError(m_logger, "Unable to prime http export client to %s %s", exportPath, Throwables.getStackTraceAsString(e));
+                    throw new RestartBlockException(true);
                 }
-                writeAvroSchema(row);
-                m_startedProcessingRows = true;
-            } catch (PathHandlingException e) {
-                    rateLimitedLogError(m_logger, "Unable to prime http export client to %s %s", exportPath, Throwables.getStackTraceAsString(e));
-                throw new RestartBlockException(true);
             }
 
             HttpUriRequest rqst;
@@ -989,7 +1006,7 @@ public class HttpExportClient extends ExportClientBase {
             try {
                 m_es.awaitTermination(365, TimeUnit.DAYS);
             } catch (InterruptedException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
 
@@ -1114,7 +1131,9 @@ public class HttpExportClient extends ExportClientBase {
                     }
                 }
 
-                if (first == null) return;
+                if (first == null) {
+                    return;
+                }
                 StringEntity enty = ((AvroEntityDecoder)m_entityDecoder).getSchemaAsEntity(row.generation, row.tableName, row.types, row.names);
                 if (isHdfs) {
                     writeAvroSchemaToHdfs(row, enty);

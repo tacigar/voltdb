@@ -19,6 +19,7 @@ package org.voltdb;
 
 import org.voltdb.catalog.Table;
 import org.voltdb.expressions.AbstractExpression;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A class identifying a table that should be snapshotted as well as the destination
@@ -48,7 +49,7 @@ public class SnapshotTableTask
     public void setTarget(SnapshotDataTarget target)
     {
         if (target == null) {
-            VoltDB.crashLocalVoltDB("Attempted to set null target on snapshot table task", true, null);
+            Poisoner.crashLocalVoltDB("Attempted to set null target on snapshot table task", true, null);
         }
         m_target = target;
     }
@@ -61,7 +62,7 @@ public class SnapshotTableTask
     public SnapshotDataTarget getTarget(boolean canBeNull)
     {
         if (m_target == null && !canBeNull) {
-            VoltDB.crashLocalVoltDB("Attempted to operate on snapshot table task with a null target", true, null);
+            Poisoner.crashLocalVoltDB("Attempted to operate on snapshot table task with a null target", true, null);
         }
         return m_target;
     }

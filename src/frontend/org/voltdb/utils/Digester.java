@@ -25,7 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 public final class Digester {
 
@@ -48,7 +48,7 @@ public final class Digester {
         try {
             md = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         md.reset();
         return md.digest(buf);
@@ -60,7 +60,7 @@ public final class Digester {
         try {
             md = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         md.reset();
         return md.digest(buf);
@@ -72,7 +72,7 @@ public final class Digester {
         try {
             md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         md.reset();
         return md.digest(buf);

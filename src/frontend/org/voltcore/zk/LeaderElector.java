@@ -34,6 +34,7 @@ import org.apache.zookeeper_voltpatches.Watcher;
 import org.apache.zookeeper_voltpatches.ZooDefs.Ids;
 import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.voltcore.utils.CoreUtils;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.collect.Sets;
@@ -75,7 +76,7 @@ public class LeaderElector {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexepected failure in LeaderElector.", true, e);
             }
 
@@ -107,7 +108,7 @@ public class LeaderElector {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (Exception e) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unexepected failure in LeaderElector.", true, e);
             }
         }

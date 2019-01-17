@@ -22,8 +22,8 @@ import java.util.Date;
 import org.voltcore.TransactionIdManager;
 import org.voltcore.logging.Level;
 import org.voltcore.logging.VoltLogger;
-import org.voltdb.VoltDB;
 import org.voltdb.common.Constants;
+import org.voltdb.utils.Poisoner;
 
 /**
  * <p>The UniqueIdGenerator creates unique ids that
@@ -200,7 +200,7 @@ public class UniqueIdGenerator {
                     // if the loop above ended because it ran too much, time is pretty darn wonky.
                     // Going to let it crash in this instance
                     if (count < 0) {
-                        VoltDB.crashLocalVoltDB("VoltDB was unable to recover after the system time was externally negatively adusted. " +
+                        Poisoner.crashLocalVoltDB("VoltDB was unable to recover after the system time was externally negatively adusted. " +
                                 "It is possible that there is a serious system time or NTP error. ", false, null);
                     }
                 }

@@ -46,6 +46,7 @@ import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
 import org.voltdb.iv2.RepairAlgo.RepairResult;
 import org.voltdb.iv2.SpScheduler.DurableUniqueIdListener;
 import org.voltdb.messaging.MigratePartitionLeaderMessage;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Sets;
@@ -136,7 +137,7 @@ public class SpInitiator extends BaseInitiator implements Promotable
         try {
             m_leaderCache.start(true);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to configure SpInitiator.", true, e);
+            Poisoner.crashLocalVoltDB("Unable to configure SpInitiator.", true, e);
         }
 
         super.configureCommon(backend, catalogContext, serializedCatalog,
@@ -223,7 +224,7 @@ public class SpInitiator extends BaseInitiator implements Promotable
                             + "rejoining site can not be promoted to leader. Terminating.");
                     // rejoining not completed. The node will be shutdown @RealVoltDB.hostFailed() anyway.
                     // do not log extra fatal message.
-                    VoltDB.crashLocalVoltDB("A rejoining site can not be promoted to leader.", false, null, false);
+                    Poisoner.crashLocalVoltDB("A rejoining site can not be promoted to leader.", false, null, false);
                     return;
                 }
 
@@ -280,7 +281,7 @@ public class SpInitiator extends BaseInitiator implements Promotable
                 ExportManager.instance().takeMastership(m_partitionId);
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Terminally failed leader promotion.", true, e);
+            Poisoner.crashLocalVoltDB("Terminally failed leader promotion.", true, e);
         }
     }
 

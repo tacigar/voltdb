@@ -19,16 +19,11 @@ package org.voltdb.utils;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import org.voltcore.logging.VoltLogger;
-import org.voltdb.VoltDB;
-
 public class VoltUncaughtExceptionHandler implements UncaughtExceptionHandler {
-
-    private final VoltLogger log = new VoltLogger("HOST");
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        VoltDB.crashLocalVoltDB("VoltDB has encountered an unrecoverable error and is exiting."
+        Poisoner.crashLocalVoltDB("VoltDB has encountered an unrecoverable error and is exiting."
                 + "\nThe log may contain additional information.", true, e);
     }
 

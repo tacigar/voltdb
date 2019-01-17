@@ -65,6 +65,7 @@ import org.voltdb.exportclient.ExportClientBase;
 import org.voltdb.iv2.MpInitiator;
 import org.voltdb.sysprocs.ExportControl.OperationMode;
 import org.voltdb.utils.CatalogUtil;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.base.Preconditions;
@@ -690,7 +691,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                 m_tuplesPending.addAndGet((int)newTuples);
                 m_committedBuffers.offer(sb);
             } catch (IOException e) {
-                VoltDB.crashLocalVoltDB("Unable to write to export overflow.", true, e);
+                Poisoner.crashLocalVoltDB("Unable to write to export overflow.", true, e);
             }
         }
         if (sync) {
@@ -699,7 +700,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                 //to a file. @Quiesce or blocking snapshot will do the sync
                 m_committedBuffers.sync(true);
             } catch (IOException e) {
-                VoltDB.crashLocalVoltDB("Unable to write to export overflow.", true, e);
+                Poisoner.crashLocalVoltDB("Unable to write to export overflow.", true, e);
             }
         }
         if (poll) {
@@ -728,7 +729,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
             try {
                 pushExportBufferImpl(startSequenceNumber, tupleCount, uniqueId, buffer, sync, false);
             } catch (Throwable t) {
-                VoltDB.crashLocalVoltDB("Error pushing export  buffer", true, t);
+                Poisoner.crashLocalVoltDB("Error pushing export  buffer", true, t);
             } finally {
                 m_bufferPushPermits.release();
             }
@@ -743,7 +744,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                             pushExportBufferImpl(startSequenceNumber, tupleCount, uniqueId, buffer, sync, m_readyForPolling);
                         }
                     } catch (Throwable t) {
-                        VoltDB.crashLocalVoltDB("Error pushing export  buffer", true, t);
+                        Poisoner.crashLocalVoltDB("Error pushing export  buffer", true, t);
                     } finally {
                         m_bufferPushPermits.release();
                     }
@@ -779,7 +780,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                     // Need to update pending tuples in rejoin
                     resetStateInRejoinOrRecover(sequenceNumber, isRecover);
                 } catch (Throwable t) {
-                    VoltDB.crashLocalVoltDB("Error while trying to truncate export to seq " +
+                    Poisoner.crashLocalVoltDB("Error while trying to truncate export to seq " +
                             sequenceNumber, true, t);
                 }
             }
@@ -902,7 +903,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                     } catch (Exception e) {
                         exportLog.error("Exception polling export buffer", e);
                     } catch (Error e) {
-                        VoltDB.crashLocalVoltDB("Error polling export buffer", true, e);
+                        Poisoner.crashLocalVoltDB("Error polling export buffer", true, e);
                     }
                 }
             });
@@ -971,7 +972,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                 }
             } catch (RuntimeException e) {
                 if (e.getCause() instanceof IOException) {
-                    VoltDB.crashLocalVoltDB("Error attempting to find unpolled export data", true, e);
+                    Poisoner.crashLocalVoltDB("Error attempting to find unpolled export data", true, e);
                 } else {
                     throw e;
                 }
@@ -1056,7 +1057,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                         } catch (Exception e) {
                             exportLog.error("Error acking export buffer", e);
                         } catch (Error e) {
-                            VoltDB.crashLocalVoltDB("Error acking export buffer", true, e);
+                            Poisoner.crashLocalVoltDB("Error acking export buffer", true, e);
                         }
                     }
                 });
@@ -1171,7 +1172,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                 } catch (Exception e) {
                     exportLog.error("Error acking export buffer", e);
                 } catch (Error e) {
-                    VoltDB.crashLocalVoltDB("Error acking export buffer", true, e);
+                    Poisoner.crashLocalVoltDB("Error acking export buffer", true, e);
                 }
             }
         });
@@ -1185,7 +1186,7 @@ public class ExportDataSource implements Comparable<ExportDataSource> {
                 cleanupEmptySource();
                 mastershipCheckpoint(seq);
             } catch (IOException e) {
-                VoltDB.crashLocalVoltDB("Error attempting to release export bytes", true, e);
+                Poisoner.crashLocalVoltDB("Error attempting to release export bytes", true, e);
                 return;
             }
         }

@@ -30,13 +30,13 @@ import org.voltdb.ExpectedProcedureException;
 import org.voltdb.ProcedureRunner;
 import org.voltdb.SiteProcedureConnection;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.dtxn.TransactionState;
 import org.voltdb.messaging.InitiateResponseMessage;
 import org.voltdb.messaging.Iv2InitiateTaskMessage;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
 abstract public class ProcedureTask extends TransactionTask
 {
@@ -154,7 +154,7 @@ abstract public class ProcedureTask extends TransactionTask
             // and converted them to error responses. Java errors are re-thrown, and not caught by this
             // exception clause. A truly unexpected exception reached this point. Crash. It's a defect.
             hostLog.l7dlog( Level.ERROR, LogKeys.host_ExecutionSite_UnexpectedProcedureException.name(), e);
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
         return response;
     }

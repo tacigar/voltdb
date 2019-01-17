@@ -31,7 +31,6 @@ import org.voltdb.StatsSelector;
 import org.voltdb.TableStreamType;
 import org.voltdb.TheHashinator.HashinatorConfig;
 import org.voltdb.UserDefinedFunctionManager.UserDefinedFunctionRunner;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltType;
 import org.voltdb.common.Constants;
@@ -43,9 +42,10 @@ import org.voltdb.largequery.LargeBlockTask;
 import org.voltdb.messaging.FastDeserializer;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
 import org.voltdb.types.GeographyValue;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.SerializationHelper;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 /**
  * Wrapper for native Execution Engine library.
@@ -79,7 +79,7 @@ public class ExecutionEngineJNI extends ExecutionEngine {
     static {
         EE_COMPACTION_THRESHOLD = Integer.getInteger("EE_COMPACTION_THRESHOLD", 95);
         if (EE_COMPACTION_THRESHOLD < 0 || EE_COMPACTION_THRESHOLD > 99) {
-            VoltDB.crashLocalVoltDB("EE_COMPACTION_THRESHOLD " + EE_COMPACTION_THRESHOLD + " is not valid, must be between 0 and 99", false, null);
+            Poisoner.crashLocalVoltDB("EE_COMPACTION_THRESHOLD " + EE_COMPACTION_THRESHOLD + " is not valid, must be between 0 and 99", false, null);
         }
         HOST_TRACE_ENABLED = LOG.isTraceEnabled();
     }
@@ -533,7 +533,7 @@ public class ExecutionEngineJNI extends ExecutionEngine {
                 return null;
             }
             if (length < 0) {
-                VoltDB.crashLocalVoltDB("Length shouldn't be < 0", true, null);
+                Poisoner.crashLocalVoltDB("Length shouldn't be < 0", true, null);
             }
 
             byte uniqueViolations[] = new byte[length];
@@ -901,9 +901,8 @@ public class ExecutionEngineJNI extends ExecutionEngine {
             checkErrorCode(errorCode);
             return (byte[])m_nextDeserializer.readArray(byte.class);
         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override

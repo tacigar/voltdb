@@ -59,7 +59,7 @@ import org.apache.zookeeper_voltpatches.proto.SyncRequest;
 import org.apache.zookeeper_voltpatches.proto.SyncResponse;
 import org.apache.zookeeper_voltpatches.server.DataTree;
 import org.voltcore.logging.VoltLogger;
-import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This is the main class of ZooKeeper client library. To use a ZooKeeper
@@ -400,7 +400,7 @@ public class ZooKeeper {
 
     private void verbotenThreadCheck() {
         if (verbotenThreads.contains(Thread.currentThread().getId())) {
-            VoltDB.crashLocalVoltDB("Thread " + Thread.currentThread().getName() + " attempted to use ZK", true, null);
+            Poisoner.crashLocalVoltDB("Thread " + Thread.currentThread().getName() + " attempted to use ZK", true, null);
         }
     }
 
@@ -1582,11 +1582,13 @@ public class ZooKeeper {
     protected boolean testableWaitForShutdown(int wait)
             throws InterruptedException {
         cnxn.sendThread.join(wait);
-        if (cnxn.sendThread.isAlive())
+        if (cnxn.sendThread.isAlive()) {
             return false;
+        }
         cnxn.eventThread.join(wait);
-        if (cnxn.eventThread.isAlive())
+        if (cnxn.eventThread.isAlive()) {
             return false;
+        }
         return true;
     }
 

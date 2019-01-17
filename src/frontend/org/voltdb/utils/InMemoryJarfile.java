@@ -273,7 +273,7 @@ public class InMemoryJarfile extends TreeMap<String, byte[]> {
         try {
             md = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            VoltDB.crashLocalVoltDB("Bad JVM has no SHA-1 hash.", true, e);
+            Poisoner.crashLocalVoltDB("Bad JVM has no SHA-1 hash.", true, e);
         }
 
         for (Entry<String, byte[]> e : super.entrySet()) {

@@ -54,6 +54,7 @@ import org.voltdb.messaging.FastDeserializer;
 import org.voltdb.planner.ActivePlanRepository;
 import org.voltdb.types.PlanNodeType;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTableUtil;
 import org.voltdb.utils.VoltTrace;
 
@@ -342,7 +343,7 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
             if (dependencies == null) {
                 hostLog.l7dlog(Level.FATAL, LogKeys.host_ExecutionSite_DependencyNotFound.name(),
                                new Object[] { dependencyId }, null);
-                VoltDB.crashLocalVoltDB("No additional info.", false, null);
+                Poisoner.crashLocalVoltDB("No additional info.", false, null);
                 // Prevent warnings.
                 return;
             }
@@ -351,7 +352,7 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
                     hostLog.l7dlog(Level.FATAL, LogKeys.host_ExecutionSite_DependencyContainedNull.name(),
                                    new Object[] { dependencyId },
                             null);
-                    VoltDB.crashLocalVoltDB("No additional info.", false, null);
+                    Poisoner.crashLocalVoltDB("No additional info.", false, null);
                     // Prevent warnings.
                     return;
                 }
@@ -363,7 +364,7 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
                 if (!(dependency instanceof VoltTable)) {
                     hostLog.l7dlog(Level.FATAL, LogKeys.host_ExecutionSite_DependencyNotVoltTable.name(),
                                    new Object[] { dependencyId }, null);
-                    VoltDB.crashLocalVoltDB("No additional info.", false, null);
+                    Poisoner.crashLocalVoltDB("No additional info.", false, null);
                 }
             }
 
@@ -392,7 +393,7 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
                 hostLog.fatal(trace);
             }
         }
-        VoltDB.crashLocalVoltDB(re + " In " + fn + ":" + lineno, true, null);
+        Poisoner.crashLocalVoltDB(re + " In " + fn + ":" + lineno, true, null);
     }
 
     /**

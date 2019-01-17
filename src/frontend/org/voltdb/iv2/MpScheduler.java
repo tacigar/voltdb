@@ -37,7 +37,6 @@ import org.voltdb.CatalogContext;
 import org.voltdb.CommandLog;
 import org.voltdb.SystemProcedureCatalog;
 import org.voltdb.SystemProcedureCatalog.Config;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.dtxn.TransactionState;
 import org.voltdb.exceptions.SerializableException;
@@ -52,6 +51,7 @@ import org.voltdb.messaging.Iv2EndOfLogMessage;
 import org.voltdb.messaging.Iv2InitiateTaskMessage;
 import org.voltdb.sysprocs.BalancePartitionsRequest;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTrace;
 
 import com.google_voltpatches.common.collect.Maps;
@@ -505,10 +505,10 @@ public class MpScheduler extends Scheduler
                 m_leaderMigrationMap.remove(message.m_sourceHSId);
 
                 // Leader migration has updated the leader, send the request to the new leader
-                m_mailbox.send(newLeader, (Iv2InitiateTaskMessage)counter.getOpenMessage());
+                m_mailbox.send(newLeader, counter.getOpenMessage());
             } else {
                 // Leader migration not done yet.
-                m_mailbox.send(message.m_sourceHSId, (Iv2InitiateTaskMessage)counter.getOpenMessage());
+                m_mailbox.send(message.m_sourceHSId, counter.getOpenMessage());
             }
             return;
         }
@@ -528,9 +528,9 @@ public class MpScheduler extends Scheduler
                 m_mailbox.send(counter.m_destinationId, message);
             }
             else if (result == DuplicateCounter.MISMATCH) {
-                VoltDB.crashLocalVoltDB("HASH MISMATCH running every-site system procedure.", true, null);
+                Poisoner.crashLocalVoltDB("HASH MISMATCH running every-site system procedure.", true, null);
             } else if (result == DuplicateCounter.ABORT) {
-                VoltDB.crashLocalVoltDB("PARTIAL ROLLBACK/ABORT running every-site system procedure.", true, null);
+                Poisoner.crashLocalVoltDB("PARTIAL ROLLBACK/ABORT running every-site system procedure.", true, null);
             }
             // doing duplicate suppresion: all done.
         }
@@ -648,7 +648,7 @@ public class MpScheduler extends Scheduler
         if (existingDC != null) {
             // this is a collision and is bad
             existingDC.logWithCollidingDuplicateCounters(counter);
-            VoltDB.crashGlobalVoltDB("DUPLICATE COUNTER MISMATCH: two duplicate counter keys collided.", true, null);
+            Poisoner.crashGlobalVoltDB("DUPLICATE COUNTER MISMATCH: two duplicate counter keys collided.", true, null);
         }
         else {
             m_duplicateCounters.put(dpKey, counter);

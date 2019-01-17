@@ -53,9 +53,10 @@ import org.voltdb.security.AuthenticationRequest;
 import org.voltdb.utils.Base64;
 import org.voltdb.utils.Encoder;
 
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.base.Suppliers;
-import com.google_voltpatches.common.base.Throwables;
+
 
 public class HTTPClientInterface {
 
@@ -178,7 +179,9 @@ public class HTTPClientInterface {
     }
 
     public final static String asJsonp(String jsonp, String msg) {
-        if (jsonp == null) return msg;
+        if (jsonp == null) {
+            return msg;
+        }
         StringBuilder sb = new StringBuilder(jsonp.length() + msg.length() + 8);
         return sb.append(jsonp).append("( ").append(msg).append(" )").toString();
     }
@@ -457,7 +460,9 @@ public class HTTPClientInterface {
         assert((hashedPasswordBytes == null) || (hashedPasswordBytes.length == 20) || (hashedPasswordBytes.length == 32));
 
         String fromAddress = request.getRemoteAddr();
-        if (fromAddress == null) fromAddress = "NULL";
+        if (fromAddress == null) {
+            fromAddress = "NULL";
+        }
 
         if (m_spnegoEnabled) {
             final String principal = spnegoLogin(token);
@@ -538,7 +543,9 @@ public class HTTPClientInterface {
     //Clear session of any auth attributes and invalidate as well. Just invalidate is not enough for some reason jetty
     //reuses it and happily validates it.
     public void unauthenticate(HttpServletRequest request) {
-        if (HTTP_DONT_USE_SESSION) return;
+        if (HTTP_DONT_USE_SESSION) {
+            return;
+        }
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.removeAttribute(AUTH_USER_SESSION_KEY);

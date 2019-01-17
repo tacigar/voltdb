@@ -2410,7 +2410,7 @@ public abstract class CatalogUtil {
         try {
             md = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            VoltDB.crashLocalVoltDB("Bad JVM has no SHA-1 hash.", true, e);
+            Poisoner.crashLocalVoltDB("Bad JVM has no SHA-1 hash.", true, e);
         }
         md.update(inbytes);
         byte[] hash = md.digest();
@@ -2441,7 +2441,7 @@ public abstract class CatalogUtil {
                 catalogHash = (new InMemoryJarfile(catalogBytes)).getSha1Hash();
             }
             catch (IOException ioe) {
-                VoltDB.crashLocalVoltDB("Unable to build InMemoryJarfile from bytes, should never happen.",
+                Poisoner.crashLocalVoltDB("Unable to build InMemoryJarfile from bytes, should never happen.",
                         true, ioe);
             }
         }

@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.voltcore.logging.VoltLogger.CoreVoltLogger;
 import org.voltcore.utils.ShutdownHooks;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Implements the core logging functionality for VoltLogger specific to
@@ -46,7 +47,7 @@ public class VoltLog4jLogger implements CoreVoltLogger {
         } catch (MissingResourceException e) {
             System.err.println("Couldn't find voltdb_logstrings resource bundle. Should be in voltdb_logstrings.properties.");
             e.printStackTrace(System.err);
-            org.voltdb.VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Couldn't find voltdb_logstrings resource bundle. Should be in voltdb_logstrings.properties.",
                     true, e);
         }
@@ -132,8 +133,9 @@ public class VoltLog4jLogger implements CoreVoltLogger {
     @Override
     public long getLogLevels(VoltLogger[] voltloggers) {
         Logger[] loggers = new Logger[voltloggers.length];
-        for (int i = 0; i < voltloggers.length; i++)
+        for (int i = 0; i < voltloggers.length; i++) {
             loggers[i] = ((VoltLog4jLogger)voltloggers[i].m_logger).m_logger;
+        }
 
         long logLevels = 0;
         for (int ii = 0; ii < loggers.length; ii++) {
@@ -209,10 +211,14 @@ public class VoltLog4jLogger implements CoreVoltLogger {
         Enumeration<Appender> appen = rootLogger.getAllAppenders();
         while (appen.hasMoreElements()) {
             Appender appndr = appen.nextElement();
-            if (!(appndr instanceof DailyRollingFileAppender)) continue;
+            if (!(appndr instanceof DailyRollingFileAppender)) {
+                continue;
+            }
             oap = (DailyRollingFileAppender)appndr;
             File logFH = new File(oap.getFile());
-            if (!logFH.isAbsolute()) break;
+            if (!logFH.isAbsolute()) {
+                break;
+            }
             oap = null;
         }
         if (oap == null) {

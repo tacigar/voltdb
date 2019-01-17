@@ -42,6 +42,7 @@ import org.voltcore.utils.EstTime;
 import org.voltcore.utils.RateLimitedLogger;
 import org.voltdb.OperationMode;
 import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.StackTrace;
 
 public class ForeignHost {
@@ -341,7 +342,7 @@ public class ForeignHost {
              * If it is for the wrong host, that definitely isn't cool
              */
             if (m_hostMessenger.getHostId() != (int)destinationHSId) {
-                VoltDB.crashLocalVoltDB("Received a message at wrong host", false, null);
+                Poisoner.crashLocalVoltDB("Received a message at wrong host", false, null);
             }
             return;
         }
@@ -380,7 +381,7 @@ public class ForeignHost {
                 //Killing myself.
                 VoltDB.instance().halt();
             } else if (cause == ForeignHost.CRASH_ALL || cause == ForeignHost.CRASH_SPECIFIED) {
-                org.voltdb.VoltDB.crashLocalVoltDB(message, false, null);
+                Poisoner.crashLocalVoltDB(message, false, null);
             } else if (cause == ForeignHost.PRINT_STACKTRACE) {
                 //collect thread dumps
                 String dumpDir = new File(VoltDB.instance().getVoltDBRootPath(), "thread_dumps").getAbsolutePath();

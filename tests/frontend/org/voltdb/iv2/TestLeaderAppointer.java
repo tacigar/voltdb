@@ -55,6 +55,7 @@ import org.voltdb.VoltDB;
 import org.voltdb.VoltDBInterface;
 import org.voltdb.VoltZK;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Maps;
@@ -89,8 +90,8 @@ public class TestLeaderAppointer extends ZKTestBase {
         final VoltDBInterface mock = mock(VoltDBInterface.class);
         when(mock.getReplicationRole()).thenReturn(ReplicationRole.NONE);
         VoltDB.replaceVoltDBInstanceForTest(mock);
-        VoltDB.ignoreCrash = false;
-        VoltDB.wasCrashCalled = false;
+        Poisoner.ignoreCrash = false;
+        Poisoner.wasCrashCalled = false;
         setUpZK(NUM_AGREEMENT_SITES);
     }
 
@@ -224,7 +225,7 @@ public class TestLeaderAppointer extends ZKTestBase {
         configure(2, 2, 1, false);
         // Write an appointee before we start to simulate a failure during startup
         m_cache.put(0, 0L);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         boolean threw = false;
         try {
             m_dut.acceptPromotion();
@@ -235,7 +236,7 @@ public class TestLeaderAppointer extends ZKTestBase {
             }
         }
         assertTrue(threw);
-        assertTrue(VoltDB.wasCrashCalled);
+        assertTrue(Poisoner.wasCrashCalled);
     }
 
     @Test
@@ -247,7 +248,7 @@ public class TestLeaderAppointer extends ZKTestBase {
         m_cache.put(1, 1L);
         waitForAppointee(1);
         registerLeader(0, 0L);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         boolean threw = false;
         try {
             m_dut.acceptPromotion();
@@ -258,7 +259,7 @@ public class TestLeaderAppointer extends ZKTestBase {
             }
         }
         assertTrue(threw);
-        assertTrue(VoltDB.wasCrashCalled);
+        assertTrue(Poisoner.wasCrashCalled);
     }
 
     @Test
@@ -297,7 +298,7 @@ public class TestLeaderAppointer extends ZKTestBase {
                                     new KSafetyStats(),
                                     false);
         m_newAppointee.set(false);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         boolean threw = false;
         try {
             m_dut.acceptPromotion();
@@ -305,7 +306,7 @@ public class TestLeaderAppointer extends ZKTestBase {
             threw = true;
         }
         assertTrue(threw);
-        assertTrue(VoltDB.wasCrashCalled);
+        assertTrue(Poisoner.wasCrashCalled);
     }
 
     @Test
@@ -353,7 +354,7 @@ public class TestLeaderAppointer extends ZKTestBase {
     {
         // run once to get to a startup state
         configure(2, 2, 1, false);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         Thread dutthread = new Thread() {
             @Override
             public void run() {
@@ -383,7 +384,7 @@ public class TestLeaderAppointer extends ZKTestBase {
         assertEquals(1L, (long)m_cache.pointInTimeCache().get(0));
         // now, kill the other replica and watch everything BURN
         deleteReplica(0, m_cache.pointInTimeCache().get(0));
-        while (!VoltDB.wasCrashCalled) {
+        while (!Poisoner.wasCrashCalled) {
             Thread.sleep(0);
         }
     }
@@ -393,7 +394,7 @@ public class TestLeaderAppointer extends ZKTestBase {
     {
         // run once to get to a startup state
         configure(2, 2, 1, false);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         Thread dutthread = new Thread() {
             @Override
             public void run() {
@@ -438,7 +439,7 @@ public class TestLeaderAppointer extends ZKTestBase {
     {
         // run once to get to a startup state
         configure(2, 2, 1, false);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         Thread dutthread = new Thread() {
             @Override
             public void run() {
@@ -459,12 +460,12 @@ public class TestLeaderAppointer extends ZKTestBase {
         registerLeader(0, m_cache.pointInTimeCache().get(0));
         registerLeader(1, m_cache.pointInTimeCache().get(1));
         dutthread.join();
-        assertFalse(VoltDB.wasCrashCalled);
+        assertFalse(Poisoner.wasCrashCalled);
 
         // Create a partition dir
         LeaderElector.createRootIfNotExist(m_zk, LeaderElector.electionDirForPartition(VoltZK.leaders_initiators, 2));
         Thread.sleep(500); // I'm evil
-        assertFalse(VoltDB.wasCrashCalled);
+        assertFalse(Poisoner.wasCrashCalled);
 
         // Now, add a replica for partition 2, should be promoted
         m_newAppointee.set(false);
@@ -477,12 +478,12 @@ public class TestLeaderAppointer extends ZKTestBase {
 
         // Now deleting the only replica for partition 2 shouldn't crash because it isn't on the ring
         // for elastic, but for legacy it should crash immediately
-        VoltDB.wasCrashCalled = false;
+        Poisoner.wasCrashCalled = false;
         deleteReplica(2, m_cache.pointInTimeCache().get(2));
 
         //For elastic hashinator do more testing
         Thread.sleep(1000);
-        assertFalse(VoltDB.wasCrashCalled);
+        assertFalse(Poisoner.wasCrashCalled);
 
         // Now, add a replica for partition 2, should be promoted
         m_newAppointee.set(false);
@@ -495,7 +496,7 @@ public class TestLeaderAppointer extends ZKTestBase {
         TheHashinator.initialize(TheHashinator.getConfiguredHashinatorClass(), TheHashinator.getConfigureBytes(4));
         //Deleting it now should cause a crash, now that the partition is on the ring
         deleteReplica(2, m_cache.pointInTimeCache().get(2));
-        while (!VoltDB.wasCrashCalled) {
+        while (!Poisoner.wasCrashCalled) {
             Thread.yield();
         }
     }
@@ -541,7 +542,7 @@ public class TestLeaderAppointer extends ZKTestBase {
                                     true);
         m_dut.onReplayCompletion();
         m_newAppointee.set(false);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
         boolean threw = false;
         try {
             m_dut.acceptPromotion();
@@ -549,12 +550,12 @@ public class TestLeaderAppointer extends ZKTestBase {
             threw = true;
         }
         assertTrue(threw);
-        assertTrue(VoltDB.wasCrashCalled);
+        assertTrue(Poisoner.wasCrashCalled);
 
         // Promote the replica to a master before sync snapshot, failure should not crash now.
         doReturn(ReplicationRole.NONE).when(mVolt).getReplicationRole();
-        VoltDB.wasCrashCalled = false;
+        Poisoner.wasCrashCalled = false;
         m_dut.acceptPromotion();
-        assertFalse(VoltDB.wasCrashCalled);
+        assertFalse(Poisoner.wasCrashCalled);
     }
 }

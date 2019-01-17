@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import org.voltcore.utils.DeferredSerialization;
 
 public class MockWriteStream implements WriteStream {
@@ -50,7 +50,7 @@ public class MockWriteStream implements WriteStream {
             ds.serialize(buf);
             m_messages.offer(buf);
         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

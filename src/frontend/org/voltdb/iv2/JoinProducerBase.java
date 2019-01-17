@@ -35,6 +35,7 @@ import org.voltdb.rejoin.StreamSnapshotSink.RestoreWork;
 import org.voltdb.rejoin.TaskLog;
 import org.voltdb.utils.CachedByteBufferAllocator;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.util.concurrent.SettableFuture;
 
@@ -155,9 +156,9 @@ public abstract class JoinProducerBase extends SiteTasker {
                 taskLogConstructor = taskLogKlass.getConstructor(int.class, File.class);
                 return (TaskLog) taskLogConstructor.newInstance(pid, overflowDir);
             } catch (InvocationTargetException e) {
-                VoltDB.crashLocalVoltDB("Unable to construct join task log", true, e.getCause());
+                Poisoner.crashLocalVoltDB("Unable to construct join task log", true, e.getCause());
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Unable to construct join task log", true, e);
+                Poisoner.crashLocalVoltDB("Unable to construct join task log", true, e);
             }
         }
         return null;

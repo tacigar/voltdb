@@ -70,7 +70,7 @@ import org.voltdb.client.ClientStatusListenerExt.AutoConnectionStatus;
 import org.voltdb.client.ClientStatusListenerExt.DisconnectCause;
 import org.voltdb.common.Constants;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.ImmutableList;
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.collect.ImmutableSortedMap;
@@ -274,7 +274,7 @@ class Distributer {
                             subscribeToNewNode();
                         } catch (Throwable t) {
                             t.printStackTrace();
-                            Throwables.propagate(t);
+                            throw new RuntimeException(t);
                         }
                     }
                 }, 2, TimeUnit.MINUTES);
@@ -1016,7 +1016,7 @@ class Distributer {
             } catch (IOException e1) {
                 //Don't care connection is already lost anyways
             }
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         cxn.setConnection(c);
 
@@ -1268,7 +1268,7 @@ class Distributer {
             try {
                 buf = serializeSPI(invocation);
             } catch (Exception e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             cxn.createWork(nowNanos, invocation.getHandle(), invocation.getProcName(), buf, cb, ignoreBackpressure, timeoutNanos);
         }

@@ -39,10 +39,11 @@ import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.Pair;
 import org.voltdb.DRConsumerDrIdTracker.DRSiteDrIdTracker;
 import org.voltdb.SnapshotCompletionInterest.SnapshotCompletionEvent;
+import org.voltdb.sysprocs.saverestore.SnapshotPathType;
+import org.voltdb.sysprocs.saverestore.SnapshotUtil;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
-import org.voltdb.sysprocs.saverestore.SnapshotUtil;
-import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 
 public class SnapshotCompletionMonitor {
     private static final VoltLogger SNAP_LOG = new VoltLogger("SNAPSHOT");
@@ -123,7 +124,7 @@ public class SnapshotCompletionMonitor {
                 }
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Exception in snapshot completion monitor", true, e);
+            Poisoner.crashLocalVoltDB("Exception in snapshot completion monitor", true, e);
         }
     }
 
@@ -150,7 +151,7 @@ public class SnapshotCompletionMonitor {
             processSnapshotData(data);
         } catch (NoNodeException e) {
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Exception in snapshot completion monitor", true, e);
+            Poisoner.crashLocalVoltDB("Exception in snapshot completion monitor", true, e);
         }
     }
 
@@ -180,13 +181,11 @@ public class SnapshotCompletionMonitor {
             final JSONObject exportSequenceJSON = jsonObj.getJSONObject("exportSequenceNumbers");
             final ImmutableMap.Builder<String, Map<Integer, Pair<Long, Long>>> builder =
                     ImmutableMap.builder();
-            @SuppressWarnings("unchecked")
             final Iterator<String> tableKeys = exportSequenceJSON.keys();
             while (tableKeys.hasNext()) {
                 final String tableName = tableKeys.next();
                 final JSONObject tableSequenceNumbers = exportSequenceJSON.getJSONObject(tableName);
                 ImmutableMap.Builder<Integer, Pair<Long, Long>> tableBuilder = ImmutableMap.builder();
-                @SuppressWarnings("unchecked")
                 final Iterator<String> partitionKeys = tableSequenceNumbers.keys();
                 while (partitionKeys.hasNext()) {
                     final String partitionString = partitionKeys.next();
@@ -286,7 +285,7 @@ public class SnapshotCompletionMonitor {
                     m_lastKnownSnapshots =
                         new TreeSet<String>(m_zk.getChildren(VoltZK.completed_snapshots, m_newSnapshotWatcher));
                 } catch (Exception e) {
-                    VoltDB.crashLocalVoltDB("Error initializing snapshot completion monitor", true, e);
+                    Poisoner.crashLocalVoltDB("Error initializing snapshot completion monitor", true, e);
                 }
             }
         });

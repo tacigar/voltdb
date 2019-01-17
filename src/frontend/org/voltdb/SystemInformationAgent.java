@@ -21,6 +21,7 @@ import org.json_voltpatches.JSONObject;
 import org.voltcore.network.Connection;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.sysprocs.SystemInformation;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Agent responsible for collecting SystemInformation on this host.
@@ -150,7 +151,7 @@ public class SystemInformationAgent extends OpsAgent
         try {
             sendClientResponse(psr);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
+            Poisoner.crashLocalVoltDB("Unable to return PARTITIONCOUNT to client", true, e);
         }
     }
 }

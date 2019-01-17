@@ -56,6 +56,7 @@ import org.voltcore.utils.ssl.MessagingChannel;
 import org.voltcore.utils.ssl.SSLConfiguration;
 import org.voltdb.client.TLSHandshaker;
 import org.voltdb.common.Constants;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSet;
@@ -289,7 +290,7 @@ public class SocketJoiner {
                     !m_internalInterface.equals(m_coordIp.getAddress().getCanonicalHostName()) &&
                     !m_internalInterface.equals(m_coordIp.getAddress().getHostAddress()))
                 {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             String.format("The provided internal interface (%s) does not match the "
                                     + "specified leader address (%s, %s). "
                                     + "This will result in either a cluster which fails to start or an unintended network topology. "
@@ -340,7 +341,7 @@ public class SocketJoiner {
                 } catch (InterruptedException e) {
 
                 } catch (Throwable e) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Error in socket joiner run loop", true, e);
+                    Poisoner.crashLocalVoltDB("Error in socket joiner run loop", true, e);
                 }
             }
         });
@@ -673,7 +674,7 @@ public class SocketJoiner {
             if (!versionChecker.getBuildString().equals(remoteBuildString)) {
                 // ignore test/eclipse build string so tests still work
                 if (!versionChecker.getBuildString().equals("VoltDB") && !remoteBuildString.equals("VoltDB")) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("For VoltDB version " + versionChecker.getVersionString() +
+                    Poisoner.crashLocalVoltDB("For VoltDB version " + versionChecker.getVersionString() +
                             " git tag/hash is not identical across the cluster. Node join failed.\n" +
                             "  joining build string:  " + versionChecker.getBuildString() + "\n" +
                             "  existing build string: " + remoteBuildString, false, null);
@@ -683,7 +684,7 @@ public class SocketJoiner {
         }
         else if (!remoteAcceptsLocalVersion) {
             if (!versionChecker.isCompatibleVersionString(remoteVersionString)) {
-                org.voltdb.VoltDB.crashLocalVoltDB("Cluster contains nodes running VoltDB version " + remoteVersionString +
+                Poisoner.crashLocalVoltDB("Cluster contains nodes running VoltDB version " + remoteVersionString +
                         " which is incompatibile with local version " + versionChecker.getVersionString() +
                         ".\n", false, null);
                 return null;
@@ -919,7 +920,7 @@ public class SocketJoiner {
             if (!responseBody.optBoolean(ACCEPTED, true)) {
                 socket.close();
                 if (!responseBody.optBoolean(MAY_RETRY, false)) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Request to join cluster is rejected: "
                             + responseBody.optString(REASON, "rejection reason is not available"));
                 }
@@ -1016,7 +1017,7 @@ public class SocketJoiner {
         }
 
         if (overallSkew > MAX_CLOCKSKEW) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Clock skew is " + overallSkew +
+            Poisoner.crashLocalVoltDB("Clock skew is " + overallSkew +
                     " which is > than the " + MAX_CLOCKSKEW + " millisecond limit. Make sure NTP is running.", false, null);
         } else if (overallSkew > CRITICAL_CLOCKSKEW) {
             final String msg = "Clock skew is " + overallSkew +
@@ -1043,7 +1044,7 @@ public class SocketJoiner {
             // trim the trailing comma + space
             versions = versions.substring(0, versions.length() - 2);
 
-            org.voltdb.VoltDB.crashLocalVoltDB("Cluster already is running mixed voltdb versions (" + versions +").\n" +
+            Poisoner.crashLocalVoltDB("Cluster already is running mixed voltdb versions (" + versions +").\n" +
                                     "Adding version " + localVersion + " would add a third version.\n" +
                                     "VoltDB hotfix support supports only two unique versions simulaniously.", false, null);
         }

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.voltcore.messaging.HostMessenger;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This class centralizes construction of and access to much of the OpsAgent machinery.
@@ -43,7 +44,7 @@ public class OpsRegistrar {
                 newAgent.setDummyMode(true);
                 m_agents.put(selector, newAgent);
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unable to instantiate OpsAgent for selector: "
                                 + selector.name(), true, e);
             }

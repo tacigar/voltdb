@@ -17,17 +17,21 @@
 
 package org.voltdb.utils;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.server.Request;
 import org.voltdb.AuthenticationResult;
 import org.voltdb.HTTPClientInterface;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.utils.DeploymentRequestServlet.MapperHolder;
+
+import com.google.common.base.Throwables;
 
 /**
  *
@@ -68,7 +72,9 @@ public class UserProfileServlet extends VoltBaseServlet {
         String jsonp = request.getParameter(HTTPClientInterface.JSONP);
         AuthenticationResult authResult = null;
         String target = request.getPathInfo();
-        if (target == null) target = "/";
+        if (target == null) {
+            target = "/";
+        }
         try {
             response.setContentType(HTTPAdminListener.JSON_CONTENT_TYPE);
             if (!HTTPClientInterface.validateJSONP(jsonp, (Request )request, response)) {

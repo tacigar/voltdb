@@ -844,7 +844,7 @@ public class LocalCluster extends VoltServerConfig {
         VoltServerConfig.addInstance(this);
 
         // needs to be called before any call to pick a filename
-        VoltDB.setDefaultTimezone();
+        VoltDB.setDefaultTimeZone();
 
         if (m_isPaused) {
             // Set paused mode

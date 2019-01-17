@@ -52,8 +52,8 @@ import org.voltcore.messaging.VoltMessage;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.LeaderElector;
 import org.voltcore.zk.ZKTestBase;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.Lists;
 import com.google_voltpatches.common.collect.Maps;
@@ -245,11 +245,13 @@ public class TestCartographer extends ZKTestBase {
         for (int pid = 0; pid < totalPartitions; pid++) {
             LeaderElector.createRootIfNotExist(zk, LeaderElector.electionDirForPartition(VoltZK.leaders_initiators, pid));
             Thread.sleep(500); // I'm evil
-            assertFalse(VoltDB.wasCrashCalled);
+            assertFalse(Poisoner.wasCrashCalled);
             // add replica
             for (int k = 0; k <= kfactor; k++) {
                 int hid = hostIdCounter++ % hostCount;
-                if (deadHosts.contains(hid)) continue;
+                if (deadHosts.contains(hid)) {
+                    continue;
+                }
                 long HSId = CoreUtils.getHSIdFromHostAndSite(hid, siteIds[hid]++);
                 LeaderElector.createParticipantNode(zk,
                         LeaderElector.electionDirForPartition(VoltZK.leaders_initiators, pid),

@@ -62,6 +62,7 @@ import org.voltdb.VoltZK.MailboxType;
 import org.voltdb.common.Constants;
 import org.voltdb.export.ExportManager;
 import org.voltdb.iv2.LeaderCache.LeaderCallBackInfo;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Preconditions;
 import com.google_voltpatches.common.collect.ArrayListMultimap;
@@ -121,7 +122,7 @@ public class Cartographer extends StatsSource
                     bpm);
         }
         catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to propogate leader promotion to client interface.", true, e);
+            Poisoner.crashLocalVoltDB("Unable to propogate leader promotion to client interface.", true, e);
         }
     }
 
@@ -250,7 +251,7 @@ public class Cartographer extends StatsSource
             m_iv2Masters.start(true);
             m_iv2Mpi.start(true);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Screwed", true, e);
+            Poisoner.crashLocalVoltDB("Screwed", true, e);
         }
     }
 
@@ -383,9 +384,9 @@ public class Cartographer extends StatsSource
                 partitions.add(LeaderElector.getPartitionFromElectionDir(child));
             }
         } catch (KeeperException e) {
-            VoltDB.crashLocalVoltDB("Failed to get partition IDs from ZK", true, e);
+            Poisoner.crashLocalVoltDB("Failed to get partition IDs from ZK", true, e);
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Failed to get partition IDs from ZK", true, e);
+            Poisoner.crashLocalVoltDB("Failed to get partition IDs from ZK", true, e);
         }
         return partitions;
     }
@@ -479,7 +480,7 @@ public class Cartographer extends StatsSource
         catch (KeeperException.NoNodeException e) {
             //Can happen when partitions are being removed
         } catch (KeeperException | InterruptedException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Exception getting replicas for partition: " + partition,
+            Poisoner.crashLocalVoltDB("Exception getting replicas for partition: " + partition,
                     true, e);
         }
 
@@ -528,11 +529,11 @@ public class Cartographer extends StatsSource
             } catch (KeeperException.NoNodeException e) {
                 //This can happen when a partition is being removed from the system
             } catch (KeeperException ke) {
-                org.voltdb.VoltDB.crashLocalVoltDB("KeeperException getting replicas for partition: " + partition,
+                Poisoner.crashLocalVoltDB("KeeperException getting replicas for partition: " + partition,
                         true, ke);
             }
             catch (InterruptedException ie) {
-                org.voltdb.VoltDB.crashLocalVoltDB("InterruptedException getting replicas for partition: " +
+                Poisoner.crashLocalVoltDB("InterruptedException getting replicas for partition: " +
                         partition, true, ie);
             }
         }

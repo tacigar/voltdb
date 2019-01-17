@@ -33,6 +33,7 @@ import org.voltcore.logging.VoltLogger;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
 /**
  * A wrapper around a PostgreSQL database server, and JDBC connection. This
@@ -536,7 +537,7 @@ public class PostgreSQLBackend extends NonVoltDBBackend {
             }
             catch (final Exception e) {
                 hostLog.fatal("Unable to construct PostgreSQL backend");
-                VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
             }
             return (PostgreSQLBackend) m_backend;
         }

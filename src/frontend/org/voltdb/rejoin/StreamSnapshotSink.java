@@ -31,10 +31,10 @@ import org.voltcore.utils.Pair;
 import org.voltdb.PrivateVoltTableFactory;
 import org.voltdb.SiteProcedureConnection;
 import org.voltdb.TheHashinator;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.dtxn.UndoAction;
 import org.voltdb.utils.CachedByteBufferAllocator;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Preconditions;
 
@@ -257,7 +257,7 @@ public class StreamSnapshotSink {
         RestoreWork restoreWork = null;
         try {
             if (msg.m_msgType == StreamSnapshotMessageType.FAILURE) {
-                VoltDB.crashLocalVoltDB("Rejoin source sent failure message.", false, null);
+                Poisoner.crashLocalVoltDB("Rejoin source sent failure message.", false, null);
 
                 // for test code only
                 if (m_expectedEOFs.decrementAndGet() == 0) {
@@ -303,7 +303,7 @@ public class StreamSnapshotSink {
                 ByteBuffer block = msg.m_container.b();
 
                 if (!m_schemas.containsKey(msg.m_tableId)) {
-                    VoltDB.crashLocalVoltDB("No schema for table with ID " + msg.m_tableId,
+                    Poisoner.crashLocalVoltDB("No schema for table with ID " + msg.m_tableId,
                                             false, null);
                 }
 

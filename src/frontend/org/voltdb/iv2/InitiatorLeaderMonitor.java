@@ -36,8 +36,8 @@ import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.LeaderElector;
 import org.voltcore.zk.ZKUtil;
 import org.voltcore.zk.ZKUtil.ChildrenCallback;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Monitors initiator leaders for each partition. When a new partition is
@@ -67,7 +67,7 @@ public class InitiatorLeaderMonitor {
             try {
                 watchPartitions();
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB(e.getMessage(), false, e);
+                Poisoner.crashLocalVoltDB(e.getMessage(), false, e);
             }
         }
     };
@@ -100,7 +100,7 @@ public class InitiatorLeaderMonitor {
             try {
                 watchInitiatorLeader(partition, path);
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("Failed to get initiator leaders", false, e);
+                Poisoner.crashLocalVoltDB("Failed to get initiator leaders", false, e);
             }
         }
     };

@@ -54,7 +54,7 @@ import org.voltdb.common.Constants;
 import org.voltdb.settings.NodeSettings;
 import org.voltdb.types.TimestampType;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 public class Collector {
     private final static String ZIP_ENTRY_FOLDER_BASE_SUFFIX =  "_volt_collect_logs_";
@@ -200,7 +200,7 @@ public class Collector {
             InputStream systemStatsIS = new FileInputStream(systemStatsPath);
             m_systemStats.load(systemStatsIS);
         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
 
 

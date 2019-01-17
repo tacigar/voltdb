@@ -20,6 +20,8 @@ package org.voltcore.messaging;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.voltdb.utils.Poisoner;
+
 public class VoltMessageFactory {
     // Identify each message
     final public static byte AGREEMENT_TASK_ID = 1;
@@ -88,7 +90,7 @@ public class VoltMessageFactory {
             message = new SiteFailureForwardMessage();
             break;
         default:
-            org.voltdb.VoltDB.crashLocalVoltDB("Unrecognized message type " + messageType, true, null);
+            Poisoner.crashLocalVoltDB("Unrecognized message type " + messageType, true, null);
         }
         return message;
     }

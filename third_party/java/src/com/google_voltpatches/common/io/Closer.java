@@ -16,18 +16,20 @@ package com.google_voltpatches.common.io;
 
 import static com.google_voltpatches.common.base.Preconditions.checkNotNull;
 
-import com.google_voltpatches.common.annotations.Beta;
-import com.google_voltpatches.common.annotations.GwtIncompatible;
-import com.google_voltpatches.common.annotations.VisibleForTesting;
-import com.google_voltpatches.common.base.Throwables;
-import com.google_voltpatches.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
+
 import javax.annotation_voltpatches.Nullable;
+
+import com.google.common.base.Throwables;
+import com.google_voltpatches.common.annotations.Beta;
+import com.google_voltpatches.common.annotations.GwtIncompatible;
+import com.google_voltpatches.common.annotations.VisibleForTesting;
+import com.google_voltpatches.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * A {@link Closeable} that collects {@code Closeable} resources and closes them all when it is

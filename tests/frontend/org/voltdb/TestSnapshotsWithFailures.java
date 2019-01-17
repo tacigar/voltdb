@@ -51,6 +51,7 @@ import org.voltdb.compiler.VoltProjectBuilder;
 import org.voltdb.regressionsuites.JUnit4LocalClusterTest;
 import org.voltdb.regressionsuites.LocalCluster;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.SnapshotVerifier;
 
 import com.google_voltpatches.common.collect.Sets;
@@ -74,7 +75,7 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
         deleteTestFiles(TESTNONCE);
         DefaultSnapshotDataTarget.m_simulateFullDiskWritingChunk = false;
         DefaultSnapshotDataTarget.m_simulateFullDiskWritingHeader = false;
-        VoltDB.wasCrashCalled = false;
+        Poisoner.wasCrashCalled = false;
         SnapshotSiteProcessor.ExecutionSitesCurrentlySnapshotting.clear();
         SnapshotSiteProcessor.m_tasksOnSnapshotCompletion.clear();
         org.voltdb.sysprocs.SnapshotRegistry.clear();
@@ -82,7 +83,9 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
 
     @Test
     public void testTruncationSnapshotWithDataFailure() throws Exception {
-        if (!MiscUtils.isPro()) return;
+        if (!MiscUtils.isPro()) {
+            return;
+        }
 
         System.out.println("Starting testTruncationSnapshotWithDataFailure");
         try {
@@ -100,17 +103,19 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
             c.drain();
             verifySnapshotStatus(c, "COMMANDLOG", 3, true);
             validateSnapshot(cluster.getServerSpecificRoot("0") + "/command_log_snapshot", null, true);
-            assertTrue(VoltDB.wasCrashCalled);
+            assertTrue(Poisoner.wasCrashCalled);
         } finally {
             DefaultSnapshotDataTarget.m_simulateFullDiskWritingChunk = false;
-            VoltDB.wasCrashCalled = false;
+            Poisoner.wasCrashCalled = false;
             cleanup();
         }
     }
 
     @Test
     public void testTruncationSnapshotWithHeaderFailure() throws Exception {
-        if (!MiscUtils.isPro()) return;
+        if (!MiscUtils.isPro()) {
+            return;
+        }
 
         System.out.println("Starting testTruncationSnapshotWithHeaderFailure");
         try {
@@ -128,10 +133,10 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
             c.drain();
             verifySnapshotStatus(c, "COMMANDLOG", 3, true);
             validateSnapshot(cluster.getServerSpecificRoot("0") + "/command_log_snapshot", null, false);
-            assertTrue(VoltDB.wasCrashCalled);
+            assertTrue(Poisoner.wasCrashCalled);
         } finally {
             DefaultSnapshotDataTarget.m_simulateFullDiskWritingHeader = false;
-            VoltDB.wasCrashCalled = false;
+            Poisoner.wasCrashCalled = false;
             cleanup();
         }
     }
@@ -161,7 +166,7 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
 
             verifySnapshotStatus(c, "MANUAL", 3, false);
             validateSnapshot(TMPDIR, TESTNONCE, false);
-            assertFalse(VoltDB.wasCrashCalled);
+            assertFalse(Poisoner.wasCrashCalled);
         } finally {
             DefaultSnapshotDataTarget.m_simulateFullDiskWritingChunk = false;
             cleanup();
@@ -194,7 +199,7 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
 
             verifySnapshotStatus(c, "MANUAL", 3, false);
             validateSnapshot(TMPDIR, TESTNONCE, false);
-            assertFalse(VoltDB.wasCrashCalled);
+            assertFalse(Poisoner.wasCrashCalled);
         } finally {
             DefaultSnapshotDataTarget.m_simulateFullDiskWritingHeader = false;
             cleanup();
@@ -226,8 +231,9 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
             }
             boolean deleted = f.delete();
             if (!deleted) {
-                if (!f.exists())
+                if (!f.exists()) {
                     return;
+                }
                 System.err.println("Couldn't delete " + f.getPath());
                 System.err.println("Remaining files are:");
                 for (File f2 : f.listFiles()) {
@@ -239,8 +245,9 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
         } else {
             boolean deleted = f.delete();
             if (!deleted) {
-                if (!f.exists())
+                if (!f.exists()) {
                     return;
+                }
                 System.err.println("Couldn't delete " + f.getPath());
             }
             assertTrue(deleted);
@@ -371,7 +378,9 @@ public class TestSnapshotsWithFailures extends JUnit4LocalClusterTest {
                     success &= rslt.getString("RESULT").equals("SUCCESS");
                 }
             }
-            if (!success && !(checkVoltDBCrashed && !VoltDB.wasCrashCalled)) break;
+            if (!success && !(checkVoltDBCrashed && !Poisoner.wasCrashCalled)) {
+                break;
+            }
             Thread.sleep(100);
             ++cnt;
         }

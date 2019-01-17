@@ -39,7 +39,7 @@ import org.voltdb.utils.BinaryDeque.TruncatorResponse.Status;
 import org.voltdb.utils.PBDSegment.PBDSegmentReader;
 
 import com.google_voltpatches.common.base.Joiner;
-import com.google_voltpatches.common.base.Throwables;
+
 
 /**
  * A deque that specializes in providing persistence of binary objects to disk. Any object placed
@@ -354,7 +354,7 @@ public class PersistentBinaryDeque implements BinaryDeque {
             if (e.getCause() instanceof IOException) {
                 throw new IOException(e);
             }
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
 
         Long lastKey = null;
@@ -891,7 +891,7 @@ public class PersistentBinaryDeque implements BinaryDeque {
                 }
                 assert numObjects == cursor.getNumObjects() : numObjects + " != " + cursor.getNumObjects();
             } catch (Exception e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
     }

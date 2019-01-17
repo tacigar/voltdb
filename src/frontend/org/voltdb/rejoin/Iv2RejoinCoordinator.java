@@ -43,6 +43,7 @@ import org.voltdb.messaging.RejoinMessage.Type;
 import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
 import org.voltdb.sysprocs.saverestore.StreamSnapshotRequestConfig;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Preconditions;
 import com.google_voltpatches.common.base.Stopwatch;
@@ -101,7 +102,7 @@ public class Iv2RejoinCoordinator extends JoinCoordinator {
             m_liveRejoin = liveRejoin;
             m_pendingSites = new LinkedList<Long>(sites);
             if (m_pendingSites.isEmpty()) {
-                VoltDB.crashLocalVoltDB("No execution sites to rejoin", false, null);
+                Poisoner.crashLocalVoltDB("No execution sites to rejoin", false, null);
             }
 
             // clear overflow dir in case there are files left from previous runs
@@ -183,7 +184,7 @@ public class Iv2RejoinCoordinator extends JoinCoordinator {
             }
         }
 
-        VoltDB.crashLocalVoltDB("Rejoin node is timed out " + maxWaitTime +
+        Poisoner.crashLocalVoltDB("Rejoin node is timed out " + maxWaitTime +
                 " seconds waiting for catalog update or elastic join, please retry node rejoin later manually.");
     }
 
@@ -208,7 +209,7 @@ public class Iv2RejoinCoordinator extends JoinCoordinator {
         boolean allDone = false;
         synchronized (m_lock) {
             if (!m_rejoiningSites.remove(HSId)) {
-                VoltDB.crashLocalVoltDB("Unknown site " + CoreUtils.hsIdToString(HSId) +
+                Poisoner.crashLocalVoltDB("Unknown site " + CoreUtils.hsIdToString(HSId) +
                         " finished rejoin", false, null);
             }
             String msg = "Finished rejoining site " + CoreUtils.hsIdToString(HSId);
@@ -283,7 +284,7 @@ public class Iv2RejoinCoordinator extends JoinCoordinator {
     @Override
     public void deliver(VoltMessage message) {
         if (!(message instanceof RejoinMessage)) {
-            VoltDB.crashLocalVoltDB("Unknown message type " +
+            Poisoner.crashLocalVoltDB("Unknown message type " +
                     message.getClass().toString() + " sent to the rejoin coordinator",
                     false, null);
         }
@@ -300,7 +301,7 @@ public class Iv2RejoinCoordinator extends JoinCoordinator {
             onSiteInitialized(rm.m_sourceHSId, rm.getMasterHSId(), rm.getSnapshotSinkHSId(),
                               rm.schemaHasNoTables());
         } else {
-            VoltDB.crashLocalVoltDB("Wrong rejoin message of type " + type +
+            Poisoner.crashLocalVoltDB("Wrong rejoin message of type " + type +
                                     " sent to the rejoin coordinator", false, null);
         }
     }

@@ -47,6 +47,7 @@ import org.voltdb.settings.NodeSettings;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.InMemoryJarfile;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
@@ -369,7 +370,7 @@ public class CatalogContext {
             return m_catalogInfo.m_jarfile.writeToFile(catalogFile);
         }
 
-        VoltDB.crashLocalVoltDB("Unsupported mode to write catalog jar", true, null);
+        Poisoner.crashLocalVoltDB("Unsupported mode to write catalog jar", true, null);
         return null;
     }
 
@@ -537,7 +538,7 @@ public class CatalogContext {
                     new ByteArrayInputStream(m_catalogInfo.m_deploymentBytes));
             // This should NEVER happen
             if (m_memoizedDeployment == null) {
-                VoltDB.crashLocalVoltDB("The internal deployment bytes are invalid.  This should never occur; please contact VoltDB support with your logfiles.");
+                Poisoner.crashLocalVoltDB("The internal deployment bytes are invalid.  This should never occur; please contact VoltDB support with your logfiles.");
             }
         }
         return m_memoizedDeployment;

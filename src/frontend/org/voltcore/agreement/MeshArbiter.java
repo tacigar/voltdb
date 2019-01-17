@@ -40,7 +40,7 @@ import org.voltcore.messaging.VoltMessage;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.Pair;
 import org.voltcore.utils.RateLimitedLogger;
-import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Lists;
@@ -359,7 +359,9 @@ public class MeshArbiter {
                 .failures(decision.keySet());
 
         Set<Long> dests = Sets.filter(m_seeker.getSurvivors(), not(equalTo(m_hsId)));
-        if (dests.isEmpty()) return true;
+        if (dests.isEmpty()) {
+            return true;
+        }
 
         sfmb.survivors(Sets.difference(m_seeker.getSurvivors(), decision.keySet()));
         sfmb.safeTxnIds(getSafeTxnIdsForSites(hsIds));
@@ -542,7 +544,9 @@ public class MeshArbiter {
 
             if(  !hsIds.contains(e.getKey())
                || m_hsId == e.getKey()
-               || e.getKey() == sfm.m_sourceHSId) continue;
+               || e.getKey() == sfm.m_sourceHSId) {
+                continue;
+            }
 
             m_failedSitesLedger.put(
                     Pair.of(sfm.m_sourceHSId, e.getKey()),
@@ -553,7 +557,9 @@ public class MeshArbiter {
     protected void addForwardCandidate(SiteFailureForwardMessage sffm) {
         SiteFailureForwardMessage prev = m_forwardCandidates.get(sffm.m_reportingHSId);
 
-        if (prev != null && prev.m_survivors.size() < sffm.m_survivors.size()) return;
+        if (prev != null && prev.m_survivors.size() < sffm.m_survivors.size()) {
+            return;
+        }
 
         m_forwardCandidates.put(sffm.m_reportingHSId, sffm);
     }
@@ -598,7 +604,9 @@ public class MeshArbiter {
 
                 if (  !m_seeker.getSurvivors().contains(m.m_sourceHSId)
                     || m_failedSites.contains(m.m_sourceHSId)
-                    || m_failedSites.containsAll(sfm.getFailedSites())) continue;
+                    || m_failedSites.containsAll(sfm.getFailedSites())) {
+                    continue;
+                }
 
                 if (!sfm.m_decision.isEmpty()) {
                     m_decidedSurvivors.put(sfm.m_sourceHSId, sfm);
@@ -626,7 +634,9 @@ public class MeshArbiter {
                 if (   !hsIds.contains(fsfm.m_sourceHSId)
                     || m_seeker.getSurvivors().contains(fsfm.m_reportingHSId)
                     || m_failedSites.contains(fsfm.m_reportingHSId)
-                    || m_failedSites.containsAll(fsfm.getFailedSites())) continue;
+                    || m_failedSites.containsAll(fsfm.getFailedSites())) {
+                    continue;
+                }
 
                 m_seeker.add(fsfm);
 
@@ -700,7 +710,9 @@ public class MeshArbiter {
             sb.append('[');
             boolean first = true;
             for (Pair<Long, Long> p : missingMessages) {
-                if (!first) sb.append(", ");
+                if (!first) {
+                    sb.append(", ");
+                }
                 first = false;
                 sb.append(CoreUtils.hsIdToString(p.getFirst()));
                 sb.append("+>");
@@ -721,7 +733,7 @@ public class MeshArbiter {
     private Map<Long, Long> extractGlobalFaultData(Set<Long> hsIds) {
 
         if (!haveNecessaryFaultInfo(m_seeker.getSurvivors(), false)) {
-            VoltDB.crashLocalVoltDB("Error extracting fault data", true, null);
+            Poisoner.crashLocalVoltDB("Error extracting fault data", true, null);
         }
 
         Set<Long> toBeKilled = m_seeker.nextKill();
@@ -765,7 +777,9 @@ public class MeshArbiter {
         sb.append("{ ");
         int count = 0;
         for (Map.Entry<Long, Boolean> e : m_inTrouble.entrySet()) {
-            if (count++ > 0) sb.append(", ");
+            if (count++ > 0) {
+                sb.append(", ");
+            }
             sb.append(CoreUtils.hsIdToString(e.getKey())).append(":").append(e.getValue());
         };
         sb.append(" }");

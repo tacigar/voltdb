@@ -64,6 +64,7 @@ import org.voltdb.benchmark.tpcc.TPCCProjectBuilder;
 import org.voltdb.catalog.Database;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.messaging.RejoinMessage;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 // I made a separate test class for live rejoin's use of the
@@ -93,7 +94,7 @@ public class TestIv2RejoinCoordinatorLive {
         m_volt = mock(VoltDBInterface.class);
         doReturn(RealVoltDB.extractBuildInfo(new VoltLogger("HOST"))[0]).when(m_volt).getVersionString();
         VoltDB.replaceVoltDBInstanceForTest(m_volt);
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         m_catalog = TPCCProjectBuilder.getTPCCSchemaCatalog()
                                       .getClusters().get("cluster")
@@ -134,7 +135,7 @@ public class TestIv2RejoinCoordinatorLive {
         m_snapshotDaemon = null;
         m_clientInterface = null;
         reset(m_volt);
-        VoltDB.wasCrashCalled = false;
+        Poisoner.wasCrashCalled = false;
     }
 
     protected void verifySent(List<Long> hsIds, RejoinMessage expected) {
@@ -250,6 +251,6 @@ public class TestIv2RejoinCoordinatorLive {
         }
         assertTrue(threw);
         // crash should be called
-        assertTrue(VoltDB.wasCrashCalled);
+        assertTrue(Poisoner.wasCrashCalled);
     }
 }

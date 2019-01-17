@@ -17,10 +17,21 @@ package com.google_voltpatches.common.eventbus;
 import static com.google_voltpatches.common.base.Preconditions.checkArgument;
 import static com.google_voltpatches.common.base.Preconditions.checkNotNull;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.annotation_voltpatches.Nullable;
+
 import com.google_voltpatches.common.annotations.VisibleForTesting;
 import com.google_voltpatches.common.base.MoreObjects;
 import com.google_voltpatches.common.base.Objects;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.cache.CacheBuilder;
 import com.google_voltpatches.common.cache.CacheLoader;
 import com.google_voltpatches.common.cache.LoadingCache;
@@ -34,16 +45,6 @@ import com.google_voltpatches.common.collect.Multimap;
 import com.google_voltpatches.common.reflect.TypeToken;
 import com.google_voltpatches.common.util.concurrent.UncheckedExecutionException;
 import com.google_voltpatches.j2objc.annotations.Weak;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import javax.annotation_voltpatches.Nullable;
 
 /**
  * Registry of subscribers to a single event bus.
@@ -222,14 +223,14 @@ final class SubscriberRegistry {
 
   /**
    * Flattens a class's type hierarchy into a set of {@code Class} objects including all
-   * superclasses (transitively) and all interfaces implemented by these superclasses.
+   * super classes (transitively) and all interfaces implemented by these superclasses.
    */
   @VisibleForTesting
   static ImmutableSet<Class<?>> flattenHierarchy(Class<?> concreteClass) {
     try {
       return flattenHierarchyCache.getUnchecked(concreteClass);
     } catch (UncheckedExecutionException e) {
-      throw Throwables.propagate(e.getCause());
+      throw new RuntimeException(e.getCause());
     }
   }
 

@@ -32,6 +32,7 @@ import org.voltdb.compiler.PlannerTool;
 import org.voltdb.compiler.StatementCompiler;
 import org.voltdb.sysprocs.LowImpactDeleteNT.ComparisonOperation;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 
@@ -113,7 +114,7 @@ public class LoadedProcedureSet {
                 m_userProcs = catalogContext.getPreparedUserProcedureRunners(m_site);
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Error trying to load user procedures: " + e.getMessage());
+            Poisoner.crashLocalVoltDB("Error trying to load user procedures: " + e.getMessage());
         }
     }
 
@@ -210,7 +211,7 @@ public class LoadedProcedureSet {
                             // TODO: remove the extra meaningless parameter "0"
                             new Object[] { site.getCorrespondingSiteId(), 0 },
                             e);
-                    VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                    Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
                 }
 
                 try {

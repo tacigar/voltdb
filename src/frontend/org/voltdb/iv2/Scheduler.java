@@ -29,10 +29,10 @@ import org.voltdb.LoadedProcedureSet;
 import org.voltdb.QueueDepthTracker;
 import org.voltdb.SiteProcedureConnection;
 import org.voltdb.StarvationTracker;
-import org.voltdb.VoltDB;
 import org.voltdb.iv2.SpScheduler.DurableUniqueIdListener;
 import org.voltdb.messaging.MultiPartitionParticipantMessage;
 import org.voltdb.rejoin.TaskLog;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Scheduler's rough current responsibility is to take appropriate local action
@@ -116,7 +116,7 @@ abstract public class Scheduler implements InitiatorMessageHandler
     {
         final TxnEgo ego = new TxnEgo(maxSeenTxnId);
         if (m_txnEgo.getPartitionId() != ego.getPartitionId()) {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Received a transaction id at partition " + m_txnEgo.getPartitionId() +
                     " for partition " + ego.getPartitionId() + ". The partition ids should match.", true, null);
         }

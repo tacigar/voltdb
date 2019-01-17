@@ -37,6 +37,7 @@ import org.voltdb.messaging.RejoinMessage;
 import org.voltdb.rejoin.StreamSnapshotSink;
 import org.voltdb.rejoin.StreamSnapshotSink.RestoreWork;
 import org.voltdb.rejoin.TaskLog;
+import org.voltdb.utils.Poisoner;
 
 public class ElasticJoinProducer extends JoinProducerBase implements TaskLog {
     private static final VoltLogger JOINLOG = new VoltLogger("JOIN");
@@ -81,7 +82,7 @@ public class ElasticJoinProducer extends JoinProducerBase implements TaskLog {
             partitionTxnIdsBytes = zk.getData(VoltZK.perPartitionTxnIds, false, null);
         } catch (KeeperException.NoNodeException e){return null;}//Can be no node if the cluster was never restored
         catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Error retrieving per partition txn ids", true, e);
+            Poisoner.crashLocalVoltDB("Error retrieving per partition txn ids", true, e);
         }
         ByteBuffer buf = ByteBuffer.wrap(partitionTxnIdsBytes);
 
@@ -109,7 +110,9 @@ public class ElasticJoinProducer extends JoinProducerBase implements TaskLog {
     private void applyPerPartitionTxnId(SiteProcedureConnection connection) {
         //If there was no ID nothing to do
         long partitionTxnIds[] = fetchPerPartitionTxnId();
-        if (partitionTxnIds == null) return;
+        if (partitionTxnIds == null) {
+            return;
+        }
         connection.setPerPartitionTxnIds(partitionTxnIds, true);
     }
 
@@ -197,9 +200,9 @@ public class ElasticJoinProducer extends JoinProducerBase implements TaskLog {
                                     event.clusterCreateTime);
                 } catch (InterruptedException e) {
                     // isDone() already returned true, this shouldn't happen
-                    VoltDB.crashLocalVoltDB("Impossible interruption happend", true, e);
+                    Poisoner.crashLocalVoltDB("Impossible interruption happend", true, e);
                 } catch (ExecutionException e) {
-                    VoltDB.crashLocalVoltDB("Error waiting for snapshot to finish", true, e);
+                    Poisoner.crashLocalVoltDB("Error waiting for snapshot to finish", true, e);
                 }
             } else {
                 m_taskQueue.offer(this);

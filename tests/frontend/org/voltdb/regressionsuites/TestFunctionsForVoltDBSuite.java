@@ -1178,7 +1178,7 @@ public class TestFunctionsForVoltDBSuite extends RegressionSuite {
         Client client = getClient();
         ClientResponse cr;
         VoltTable result;
-        VoltDB.setDefaultTimezone();
+        VoltDB.setDefaultTimeZone();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         //System.out.println(dateFormat.getTimeZone());

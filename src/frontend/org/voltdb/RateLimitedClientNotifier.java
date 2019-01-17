@@ -29,11 +29,12 @@ import java.util.concurrent.TimeUnit;
 import org.voltcore.network.Connection;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.DeferredSerialization;
+import org.voltdb.utils.Poisoner;
 
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.base.Preconditions;
 import com.google_voltpatches.common.base.Predicate;
 import com.google_voltpatches.common.base.Supplier;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.cache.Cache;
 import com.google_voltpatches.common.cache.CacheBuilder;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
@@ -84,12 +85,20 @@ public class RateLimitedClientNotifier {
 
         @Override
         public boolean equals(Object o) {
-            if (o == this) return true;
-            if (o == null) return false;
-            if (!(o instanceof Node)) return false;
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof Node)) {
+                return false;
+            }
             Node other = (Node)o;
             if (other.notification == notification) {
-                if (other.next == next) return true;
+                if (other.next == next) {
+                    return true;
+                }
                 if (other.next != null && next != null) {
                     return next.equals(other.next);
                 }
@@ -99,7 +108,9 @@ public class RateLimitedClientNotifier {
 
         @Override
         public int hashCode() {
-            if (next == null) return notification.hashCode();
+            if (next == null) {
+                return notification.hashCode();
+            }
             final int prime = 31;
             int result = 1;
             Node head = this;
@@ -121,7 +132,7 @@ public class RateLimitedClientNotifier {
             try {
                 RateLimitedClientNotifier.this.run();
             } catch (Throwable t) {
-                VoltDB.crashLocalVoltDB("Unexpected exception in client notifier", true, t);
+                Poisoner.crashLocalVoltDB("Unexpected exception in client notifier", true, t);
             }
         }
     };
@@ -130,7 +141,9 @@ public class RateLimitedClientNotifier {
 
     private void run() throws Exception {
         while (true) {
-            if (m_es.isShutdown()) return;
+            if (m_es.isShutdown()) {
+                return;
+            }
             if (m_clientsPendingNotification.isEmpty()) {
                 //Block until submissions create further work
                 runSubmissions(true);
@@ -142,7 +155,9 @@ public class RateLimitedClientNotifier {
             }
 
             //Regenerate the iterator every time we are done sweeping the map
-            if (m_iter == null) m_iter = m_clientsPendingNotification.entrySet().iterator();
+            if (m_iter == null) {
+                m_iter = m_clientsPendingNotification.entrySet().iterator();
+            }
 
             if (m_iter.hasNext()) {
                 //The limiter has no dependencies so this will never pause for long waiting to acquire
@@ -204,7 +219,9 @@ public class RateLimitedClientNotifier {
             @Override
             public void run() {
                 for (ClientInterfaceHandleManager cihm : connections) {
-                    if (!wantsNotificationPredicate.apply(cihm)) continue;
+                    if (!wantsNotificationPredicate.apply(cihm)) {
+                        continue;
+                    }
                     final Connection c = cihm.connection;
 
                     /*
@@ -218,7 +235,9 @@ public class RateLimitedClientNotifier {
                             m_clientsPendingNotification.put(c, notification);
                         } else if (pendingNotifications instanceof Supplier) {
                             //Identity duplicate check
-                            if (pendingNotifications == notification) return;
+                            if (pendingNotifications == notification) {
+                                return;
+                            }
                             //Convert to a two node linked list
                             @SuppressWarnings("unchecked")
                             Node n1 = new Node((Supplier<DeferredSerialization>)pendingNotifications, null);
@@ -238,14 +257,16 @@ public class RateLimitedClientNotifier {
                                 head = head.next;
                             }
                             //If it's a dupe, no new work
-                            if (dup) continue;
+                            if (dup) {
+                                continue;
+                            }
                             //Otherwise replace the head of the list which is the value in the map
                             Node replacement = new Node(notification, (Node)pendingNotifications);
                             replacement = m_cachedNodes.get(replacement, replacement);
                             m_clientsPendingNotification.put(c, replacement);
                         }
                     } catch (ExecutionException e) {
-                        VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                                 "Unexpected exception pushing client notifications",
                                 true,
                                 Throwables.getRootCause(e));

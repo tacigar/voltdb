@@ -17,7 +17,7 @@
 
 package org.voltdb.utils;
 
-import com.google_voltpatches.common.base.Throwables;
+
 
 public abstract class SusceptibleRunnable implements Runnable {
 
@@ -26,7 +26,7 @@ public abstract class SusceptibleRunnable implements Runnable {
         try {
             susceptibleRun();
         } catch (Exception ex) {
-            Throwables.propagate(ex);
+            throw new RuntimeException(ex);
         }
     }
 

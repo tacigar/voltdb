@@ -63,6 +63,7 @@ import org.voltdb.sysprocs.saverestore.SnapshotUtil.TableFiles;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.InMemoryJarfile;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableSet;
 
@@ -229,7 +230,7 @@ SnapshotCompletionInterest, Promotable
             }
             catch (Exception e)
             {
-                VoltDB.crashGlobalVoltDB("Failed to safely enter recovery: " + e.getMessage(),
+                Poisoner.crashGlobalVoltDB("Failed to safely enter recovery: " + e.getMessage(),
                                          true, e);
             }
         }
@@ -371,7 +372,7 @@ SnapshotCompletionInterest, Promotable
                 stringer.endObject();
                 return new JSONObject(stringer.toString());
             } catch (JSONException e) {
-                VoltDB.crashLocalVoltDB("Invalid JSON communicate snapshot info.", true, e);
+                Poisoner.crashLocalVoltDB("Invalid JSON communicate snapshot info.", true, e);
             }
             throw new RuntimeException("impossible.");
         }
@@ -425,7 +426,7 @@ SnapshotCompletionInterest, Promotable
                 }
             }
         } catch (Exception e) {
-            VoltDB.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
+            Poisoner.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
                                      false, e);
         }
     }
@@ -459,7 +460,7 @@ SnapshotCompletionInterest, Promotable
                         for (VoltTable result : results) {
                             LOG.fatal(result);
                         }
-                        VoltDB.crashGlobalVoltDB("Failed to restore from snapshot: " +
+                        Poisoner.crashGlobalVoltDB("Failed to restore from snapshot: " +
                                 res.getStatusString(), false, null);
                     } else {
                         Thread networkHandoff = new Thread() {
@@ -518,7 +519,7 @@ SnapshotCompletionInterest, Promotable
                                                                     m_liveHosts);
             }
         } catch (Exception e) {
-            VoltDB.crashGlobalVoltDB("Unable to instantiate command log reinitiator",
+            Poisoner.crashGlobalVoltDB("Unable to instantiate command log reinitiator",
                                      true, e);
         }
         m_replayAgent.setCallback(this);
@@ -545,7 +546,7 @@ SnapshotCompletionInterest, Promotable
         try {
             m_snapshotToRestore = generatePlans();
         } catch (Exception e) {
-            VoltDB.crashGlobalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashGlobalVoltDB(e.getMessage(), true, e);
         }
 
         if (m_snapshotToRestore != null) {
@@ -571,7 +572,7 @@ SnapshotCompletionInterest, Promotable
             m_generatedRestoreBarrier2 = m_zk.create(VoltZK.restore_barrier2 + "/counter", null,
                         Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
         } catch (Exception e) {
-            VoltDB.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
+            Poisoner.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
                                      false, e);
         }
     }
@@ -584,7 +585,7 @@ SnapshotCompletionInterest, Promotable
         try {
             m_zk.delete(m_generatedRestoreBarrier2, -1);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unable to delete zk node " + m_generatedRestoreBarrier2, false, e);
+            Poisoner.crashLocalVoltDB("Unable to delete zk node " + m_generatedRestoreBarrier2, false, e);
         }
 
         if (m_callback != null) {
@@ -597,7 +598,7 @@ SnapshotCompletionInterest, Promotable
             try {
                 children = m_zk.getChildren(VoltZK.restore_barrier2, false);
             } catch (KeeperException e2) {
-                VoltDB.crashGlobalVoltDB(e2.getMessage(), false, e2);
+                Poisoner.crashGlobalVoltDB(e2.getMessage(), false, e2);
             } catch (InterruptedException e2) {
                 continue;
             }
@@ -793,7 +794,9 @@ SnapshotCompletionInterest, Promotable
         try
         {
             JSONObject digest_detail = SnapshotUtil.CRCCheck(digest, LOG);
-            if (digest_detail == null) throw new IOException();
+            if (digest_detail == null) {
+                throw new IOException();
+            }
             catalog_crc = digest_detail.getLong("catalogCRC");
 
             if (digest_detail.has("partitionTransactionIds")) {
@@ -945,7 +948,7 @@ SnapshotCompletionInterest, Promotable
             m_zk.create(VoltZK.restore_snapshot_id, jsonData.getBytes(Constants.UTF8_ENCODING),
                         Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         } catch (Exception e) {
-            VoltDB.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
+            Poisoner.crashGlobalVoltDB("Failed to create Zookeeper node: " + e.getMessage(),
                                      false, e);
         }
     }
@@ -973,10 +976,10 @@ SnapshotCompletionInterest, Promotable
                 m_replayAgent.setSnapshotTxnId(null);
             }
         } catch (KeeperException e2) {
-            VoltDB.crashGlobalVoltDB(e2.getMessage(), false, e2);
+            Poisoner.crashGlobalVoltDB(e2.getMessage(), false, e2);
         } catch (InterruptedException e2) {
         } catch (JSONException je) {
-            VoltDB.crashLocalVoltDB(je.getMessage(), true, je);
+            Poisoner.crashLocalVoltDB(je.getMessage(), true, je);
         }
     }
 
@@ -1191,7 +1194,9 @@ SnapshotCompletionInterest, Promotable
             Long clStartTxnId = null;
             for (String node : children) {
                 //This might be created before we are done fetching the restore info
-                if (node.equals("snapshot_id")) continue;
+                if (node.equals("snapshot_id")) {
+                    continue;
+                }
 
                 byte[] data = null;
                 data = m_zk.getData(VoltZK.restore + "/" + node, false, null);
@@ -1208,7 +1213,7 @@ SnapshotCompletionInterest, Promotable
                 if (remoteRecover != recover) {
                     String msg = "Database actions are not consistent. Remote node action is not 'recover'. " +
                                  "Please enter the same database action on the command-line.";
-                    VoltDB.crashLocalVoltDB(msg, false, null);
+                    Poisoner.crashLocalVoltDB(msg, false, null);
                 }
 
                 JSONArray snapInfos = json.getJSONArray("snapInfos");
@@ -1226,7 +1231,7 @@ SnapshotCompletionInterest, Promotable
             }
             return clStartTxnId;
         } catch (JSONException je) {
-            VoltDB.crashLocalVoltDB("Error exchanging snapshot information", true, je);
+            Poisoner.crashLocalVoltDB("Error exchanging snapshot information", true, je);
         }
         throw new RuntimeException("impossible");
     }
@@ -1255,7 +1260,7 @@ SnapshotCompletionInterest, Promotable
             stringer.endObject();
             return stringer.toString();
         } catch (JSONException je) {
-            VoltDB.crashLocalVoltDB("Error exchanging snapshot info", true, je);
+            Poisoner.crashLocalVoltDB("Error exchanging snapshot info", true, je);
         }
         throw new RuntimeException("impossible codepath.");
     }
@@ -1310,7 +1315,7 @@ SnapshotCompletionInterest, Promotable
             // Call balance partitions after enabling transactions on the node to shorten the recovery time
             if (m_isLeader) {
                 if (!m_replayAgent.checkAndBalancePartitions()) {
-                    VoltDB.crashLocalVoltDB("Failed to finish balancing partitions", false, null);
+                    Poisoner.crashLocalVoltDB("Failed to finish balancing partitions", false, null);
                 }
             }
         }
@@ -1324,7 +1329,7 @@ SnapshotCompletionInterest, Promotable
              * This means we didn't restore any snapshot, and there's no command
              * log to replay. But the user asked for recover
              */
-            VoltDB.crashGlobalVoltDB("Nothing to recover from", false, null);
+            Poisoner.crashGlobalVoltDB("Nothing to recover from", false, null);
         } else if (!m_clEnabled && !m_replayAgent.hasReplayedTxns()) {
             // Nothing was replayed, so no need to initiate truncation snapshot
             m_state = State.TRUNCATE;
@@ -1372,7 +1377,7 @@ SnapshotCompletionInterest, Promotable
                 } catch (KeeperException.NodeExistsException e) {
                     LOG.info("Initial Truncation request failed as one is in progress: " + truncationRequest);
                 } catch (Exception e) {
-                    VoltDB.crashGlobalVoltDB("Requesting a truncation snapshot " +
+                    Poisoner.crashGlobalVoltDB("Requesting a truncation snapshot " +
                                              "via ZK should always succeed",
                                              false, e);
                 }
@@ -1417,7 +1422,7 @@ SnapshotCompletionInterest, Promotable
     @Override
     public CountDownLatch snapshotCompleted(SnapshotCompletionEvent event) {
         if (!event.truncationSnapshot || !event.didSucceed) {
-            VoltDB.crashGlobalVoltDB("Failed to truncate command logs by snapshot",
+            Poisoner.crashGlobalVoltDB("Failed to truncate command logs by snapshot",
                                      false, null);
         } else {
             m_truncationSnapshot = event.multipartTxnId;

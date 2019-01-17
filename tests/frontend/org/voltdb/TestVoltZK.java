@@ -23,16 +23,17 @@
 
 package org.voltdb;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.zookeeper_voltpatches.ZooKeeper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.voltcore.zk.CoreZK;
 import org.voltcore.zk.ZKTestBase;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.voltdb.utils.Poisoner;
 
 public class TestVoltZK extends ZKTestBase {
     private ZooKeeper m_zk = null;
@@ -40,8 +41,8 @@ public class TestVoltZK extends ZKTestBase {
     @Before
     public void setUp() throws Exception
     {
-        VoltDB.ignoreCrash = false;
-        VoltDB.wasCrashCalled = false;
+        Poisoner.ignoreCrash = false;
+        Poisoner.wasCrashCalled = false;
         setUpZK(1);
         m_zk = getClient(0);
         VoltZK.createPersistentZKNodes(m_zk);

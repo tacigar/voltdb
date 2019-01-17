@@ -40,6 +40,7 @@ import org.json_voltpatches.JSONObject;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.zk.ZKUtil.ByteArrayCallback;
 import org.voltdb.common.Constants;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
@@ -164,7 +165,7 @@ public class MapCache implements MapCacheReader, MapCacheWriter {
             } catch (Exception e) {
                 // ignore post-shutdown session termination exceptions.
                 if (!m_shutdown.get()) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected failure in MapCache.", true, e);
+                    Poisoner.crashLocalVoltDB("Unexpected failure in MapCache.", true, e);
                 }
             }
         }
@@ -184,7 +185,7 @@ public class MapCache implements MapCacheReader, MapCacheWriter {
             } catch (Exception e) {
                 // ignore post-shutdown session termination exceptions.
                 if (!m_shutdown.get()) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected failure in MapCache.", true, e);
+                    Poisoner.crashLocalVoltDB("Unexpected failure in MapCache.", true, e);
                 }
             }
         }
@@ -202,7 +203,7 @@ public class MapCache implements MapCacheReader, MapCacheWriter {
                 if (m_es.isShutdown()) {
                     return;
                 } else {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
+                    Poisoner.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
                 }
             }
         }
@@ -220,7 +221,7 @@ public class MapCache implements MapCacheReader, MapCacheWriter {
                 if (m_es.isShutdown()) {
                     return;
                 } else {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
+                    Poisoner.crashLocalVoltDB("Unexpected rejected execution exception", false, e);
                 }
             }
         }

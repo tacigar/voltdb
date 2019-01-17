@@ -52,6 +52,7 @@ import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
 import org.voltdb.sysprocs.saverestore.SnapshotWritePlan;
 import org.voltdb.sysprocs.saverestore.StreamSnapshotWritePlan;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.collect.Sets;
@@ -292,7 +293,7 @@ public class SnapshotSaveAPI
 
                                 assert deferredSnapshotSetup != null;
                                 if (m_isTruncation && deferredSnapshotSetup.getError() != null) {
-                                    VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create truncation snapshot headers",
+                                    Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create truncation snapshot headers",
                                             true, deferredSnapshotSetup.getError());
                                 }
                                 context.getSiteSnapshotConnection().startSnapshotWithTargets(
@@ -305,7 +306,7 @@ public class SnapshotSaveAPI
                 SnapshotSiteProcessor.m_snapshotCreateFinishBarrier.await(120, TimeUnit.SECONDS);
             }
         } catch (TimeoutException e) {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Timed out waiting 120 seconds for all threads to arrive and start snapshot", true, null);
         } catch (InterruptedException | InterruptException | BrokenBarrierException | IllegalArgumentException e) {
             result.addRow(
@@ -392,7 +393,7 @@ public class SnapshotSaveAPI
                                                                      boolean isTruncation,
                                                                      String truncReqId) {
         if (!(txnId > 0)) {
-            VoltDB.crashGlobalVoltDB("Txnid must be greather than 0", true, null);
+            Poisoner.crashGlobalVoltDB("Txnid must be greather than 0", true, null);
         }
 
         byte nodeBytes[] = null;
@@ -412,7 +413,7 @@ public class SnapshotSaveAPI
             JSONObject jsonObj = new JSONObject(stringer.toString());
             nodeBytes = jsonObj.toString(4).getBytes(Charsets.UTF_8);
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Error serializing snapshot completion node JSON", true, e);
+            Poisoner.crashLocalVoltDB("Error serializing snapshot completion node JSON", true, e);
         }
 
         ZKUtil.StringCallback cb = new ZKUtil.StringCallback();
@@ -452,18 +453,18 @@ public class SnapshotSaveAPI
                     // If snapshot creation failed for some reason, the node won't exist. ignore
                     return;
                 }
-                VoltDB.crashLocalVoltDB("Failed to get snapshot completion node", true, e);
+                Poisoner.crashLocalVoltDB("Failed to get snapshot completion node", true, e);
             } catch (InterruptedException e) {
-                VoltDB.crashLocalVoltDB("Interrupted getting snapshot completion node", true, e);
+                Poisoner.crashLocalVoltDB("Interrupted getting snapshot completion node", true, e);
             }
             if (data == null) {
-                VoltDB.crashLocalVoltDB("Data should not be null if the node exists", false, null);
+                Poisoner.crashLocalVoltDB("Data should not be null if the node exists", false, null);
             }
 
             try {
                 JSONObject jsonObj = new JSONObject(new String(data, Charsets.UTF_8));
                 if (jsonObj.getLong("txnId") != txnId) {
-                    VoltDB.crashLocalVoltDB("TxnId should match", false, null);
+                    Poisoner.crashLocalVoltDB("TxnId should match", false, null);
                 }
 
                 int hostCount = jsonObj.getInt("hostCount");
@@ -474,7 +475,7 @@ public class SnapshotSaveAPI
             } catch (KeeperException.BadVersionException e) {
                 continue;
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("This ZK call should never fail", true, e);
+                Poisoner.crashLocalVoltDB("This ZK call should never fail", true, e);
             }
 
             success = true;

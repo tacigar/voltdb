@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.voltcore.logging.VoltLogger;
+import org.voltdb.utils.Poisoner;
 
 /**
  * <p>The TransactionIdManager creates Transaction ids that
@@ -183,14 +184,14 @@ public class TransactionIdManager {
                     }
                     // if the loop above ended because it ran too much
                     if (count < 0) {
-                        org.voltdb.VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                               "VoltDB was unable to recover after the system time was externally negatively adusted. " +
                                "It is possible that there is a serious system time or NTP error. ", false, null);
                     }
                 }
                 // crash immediately if time has gone backwards by too much
                 else {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             String.format("%.2f is larger than the max allowable number of seconds that " +
                                     "the clock can be negatively adjusted (%d)",
                                 diffSeconds, BACKWARD_TIME_FORGIVENESS_WINDOW_MS / 1000), false, null);
@@ -293,8 +294,11 @@ public class TransactionIdManager {
         String retval = "";
         long mask = 0x8000000000000000L;
         for(int i = 0; i < 64; i++) {
-            if ((txnId & mask) == 0) retval += "0";
-            else retval += "1";
+            if ((txnId & mask) == 0) {
+                retval += "0";
+            } else {
+                retval += "1";
+            }
             mask >>>= 1;
         }
         return retval;

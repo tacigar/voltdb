@@ -22,8 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hsqldb_voltpatches.FunctionForVoltDB;
 import org.voltcore.logging.VoltLogger;
@@ -34,8 +32,9 @@ import org.voltdb.types.GeographyPointValue;
 import org.voltdb.types.GeographyValue;
 import org.voltdb.types.TimestampType;
 import org.voltdb.types.VoltDecimalHelper;
-import org.voltdb.utils.SerializationHelper;
 import org.voltdb.utils.JavaBuiltInFunctions;
+import org.voltdb.utils.Poisoner;
+import org.voltdb.utils.SerializationHelper;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 
@@ -82,11 +81,11 @@ public class UserDefinedFunctionManager {
             catch (final ClassNotFoundException e) {
                 if (className.startsWith("org.voltdb.")) {
                     String msg = String.format(ORGVOLTDB_FUNCCNAME_ERROR_FMT, className);
-                    VoltDB.crashLocalVoltDB(msg, false, null);
+                    Poisoner.crashLocalVoltDB(msg, false, null);
                 }
                 else {
                     String msg = String.format(UNABLETOLOAD_ERROR_FMT, className);
-                    VoltDB.crashLocalVoltDB(msg, false, null);
+                    Poisoner.crashLocalVoltDB(msg, false, null);
                 }
             }
             Object funcInstance = null;

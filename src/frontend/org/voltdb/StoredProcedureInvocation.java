@@ -32,6 +32,7 @@ import org.voltdb.client.BatchTimeoutOverrideType;
 import org.voltdb.client.ProcedureInvocationExtensions;
 import org.voltdb.client.ProcedureInvocationType;
 import org.voltdb.common.Constants;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.SerializationHelper;
 
 /**
@@ -149,7 +150,7 @@ public class StoredProcedureInvocation implements JSONString {
         try {
             return params.get();
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Interrupted while deserializing a parameter set", false, e);
+            Poisoner.crashLocalVoltDB("Interrupted while deserializing a parameter set", false, e);
         } catch (ExecutionException e) {
             // Don't rethrow Errors as RuntimeExceptions because we will eat their
             // delicious goodness later
@@ -324,8 +325,12 @@ public class StoredProcedureInvocation implements JSONString {
 
         // there are two possible extensions, count which apply
         byte extensionCount = 0;
-        if (m_batchTimeout != BatchTimeoutOverrideType.NO_TIMEOUT) ++extensionCount;
-        if (m_allPartition) ++extensionCount;
+        if (m_batchTimeout != BatchTimeoutOverrideType.NO_TIMEOUT) {
+            ++extensionCount;
+        }
+        if (m_allPartition) {
+            ++extensionCount;
+        }
         // write the count as one byte
         buf.put(extensionCount);
         // write any extensions that apply
@@ -515,12 +520,13 @@ public class StoredProcedureInvocation implements JSONString {
     public String toString() {
         String retval = type.name() + " Invocation: " + procName + "(";
         ParameterSet params = getParams();
-        if (params != null)
+        if (params != null) {
             for (Object o : params.toArray()) {
                 retval += String.valueOf(o) + ", ";
             }
-        else
+        } else {
             retval += "null";
+        }
         retval += ")";
         retval += " type=" + String.valueOf(type);
         retval += " batchTimeout=" + BatchTimeoutOverrideType.toString(m_batchTimeout);

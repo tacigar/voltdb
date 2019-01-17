@@ -22,10 +22,10 @@ import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
 import org.voltdb.PrivateVoltTableFactory;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.messaging.FastDeserializer;
 import org.voltdb.types.ConstraintType;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Exception generated when a constraint is violated. Contains more information then a SQLException.
@@ -48,7 +48,7 @@ public class ConstraintFailureException extends SQLException {
         catch (IOException e) {
             // implies that the EE created an invalid constraint
             // failure, which would be a corruption/defect.
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
         if (exceptionBuffer.hasRemaining()) {
             int tableSize = exceptionBuffer.getInt();

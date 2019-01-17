@@ -23,14 +23,14 @@
 
 package org.voltdb_testprocs.regressionsuites.failureprocs;
 
-import org.voltdb.VoltDB;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 public class CrashVoltDBProc extends VoltProcedure {
 
     public VoltTable[] run() {
-        VoltDB.crashGlobalVoltDB("Let it burn.", false, null);
+        Poisoner.crashGlobalVoltDB("Let it burn.", false, null);
         return null;
     }
 }

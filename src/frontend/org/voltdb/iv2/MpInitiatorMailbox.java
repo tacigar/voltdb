@@ -31,7 +31,7 @@ import org.voltdb.messaging.CompleteTransactionMessage;
 import org.voltdb.messaging.Iv2InitiateTaskMessage;
 
 import com.google_voltpatches.common.base.Supplier;
-import com.google_voltpatches.common.base.Throwables;
+
 
 /**
  * InitiatorMailbox accepts initiator work and proxies it to the
@@ -99,7 +99,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
             try {
                 ra = ft.get();
             } catch (Exception e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         } else {
             ra = new MpPromoteAlgo(survivors.get(), deadHost, this, m_restartSeqGenerator, whoami, balanceSPI);
@@ -125,7 +125,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
         try {
             cdl.await();
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -145,7 +145,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
         try {
             cdl.await();
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -166,7 +166,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
         try {
             cdl.await();
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -186,7 +186,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
         try {
             cdl.await();
         } catch (InterruptedException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -292,7 +292,7 @@ public class MpInitiatorMailbox extends InitiatorMailbox
             try {
                 cdl.await();
             } catch (InterruptedException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
 

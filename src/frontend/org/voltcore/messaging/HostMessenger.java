@@ -62,7 +62,6 @@ import org.json_voltpatches.JSONObject;
 import org.json_voltpatches.JSONStringer;
 import org.voltcore.agreement.AgreementSite;
 import org.voltcore.agreement.InterfaceToMessenger;
-import org.voltdb.common.Constants;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.network.CipherExecutor;
 import org.voltcore.network.PicoNetwork;
@@ -78,7 +77,9 @@ import org.voltcore.utils.ssl.MessagingChannel;
 import org.voltcore.zk.CoreZK;
 import org.voltcore.zk.ZKUtil;
 import org.voltdb.AbstractTopology;
+import org.voltdb.common.Constants;
 import org.voltdb.probe.MeshProber;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Preconditions;
 import com.google_voltpatches.common.base.Predicate;
@@ -520,7 +521,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
         if (makePPDDecision(m_localHostId, previousHosts, currentHosts, m_partitionDetectionEnabled.get())) {
             // record here so we can ensure this only happens once for this node
             m_partitionDetected = true;
-            org.voltdb.VoltDB.crashLocalVoltDB("Partition detection logic will stop this process to ensure against split brains.",
+            Poisoner.crashLocalVoltDB("Partition detection logic will stop this process to ensure against split brains.",
                         false, null);
         }
     }
@@ -687,7 +688,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
              */
             final int selectedHostId = selectNewHostId(m_config.coordinatorIp.toString());
             if (selectedHostId != 0) {
-                org.voltdb.VoltDB.crashLocalVoltDB("Selected host id for coordinator was not 0, " + selectedHostId, false, null);
+                Poisoner.crashLocalVoltDB("Selected host id for coordinator was not 0, " + selectedHostId, false, null);
             }
 
             /*
@@ -773,7 +774,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
             putForeignHost(hostId, fhost);
             fhost.enableRead(VERBOTEN_THREADS);
         } catch (java.io.IOException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("", true, e);
+            Poisoner.crashLocalVoltDB("", true, e);
         }
         m_acceptor.accrue(hostId, jo);
     }
@@ -970,7 +971,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
                 reportForeignHostFailed(hostId);
             }
         } catch (Throwable e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("", true, e);
+            Poisoner.crashLocalVoltDB("", true, e);
         }
     }
 
@@ -1085,7 +1086,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
                         listeningAddresses[ii], createPicoNetwork(sslEngines[ii], sockets[ii], false));
                 putForeignHost(hosts[ii], fhost);
             } catch (java.io.IOException e) {
-                org.voltdb.VoltDB.crashLocalVoltDB("Failed to instantiate foreign host", true, e);
+                Poisoner.crashLocalVoltDB("Failed to instantiate foreign host", true, e);
             }
         }
 
@@ -1217,14 +1218,14 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
                  * because two or more hosts killed themselves
                  */
                 if ( numChildren > expectedHosts) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Expected to find " + expectedHosts +
+                    Poisoner.crashLocalVoltDB("Expected to find " + expectedHosts +
                             " hosts in cluster at startup but found " + numChildren +
                             ".  Terminating this host.", false, null);
                 }
                 fw.get();
             }
         } catch (Exception e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
+            Poisoner.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
         }
 
         assert hostInfos.size() == expectedHosts;
@@ -1626,7 +1627,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
                 fw.get();
             }
         } catch (KeeperException | InterruptedException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
+            Poisoner.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
         }
     }
 
@@ -1647,7 +1648,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
                 fw.get();
             }
         } catch (KeeperException | InterruptedException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
+            Poisoner.crashLocalVoltDB("Error waiting for hosts to be ready", false, e);
         }
     }
 
@@ -1679,7 +1680,7 @@ public class HostMessenger implements SocketJoiner.JoinHandler, InterfaceToMesse
         long hsId = 0;
         if (proposedHSId != null) {
             if (m_siteMailboxes.containsKey(proposedHSId)) {
-                org.voltdb.VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Attempted to create a mailbox for site " +
                         CoreUtils.hsIdToString(proposedHSId) + " twice", true, null);
             }

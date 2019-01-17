@@ -58,7 +58,7 @@ import org.voltdb.exportclient.ExportDecoderBase.BinaryEncoding;
 import org.voltdb.exportclient.decode.CSVWriterDecoder;
 import org.voltdb.utils.VoltFile;
 
-import com.google_voltpatches.common.base.Throwables;
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
 
 import au.com.bytecode.opencsv_voltpatches.CSVWriter;
@@ -265,7 +265,7 @@ public class ExportToFileClient extends ExportClientBase {
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
-                                Throwables.propagate(e);
+                                throw new RuntimeException(e);
                             }
                         }
                     } while (dirContainingFiles.exists());
@@ -633,7 +633,7 @@ public class ExportToFileClient extends ExportClientBase {
                         resetWriter();
                         throw new RestartBlockException("Fail to start the block", e.getCause(),true);
                     } else {
-                        Throwables.propagate(e);
+                        throw new RuntimeException(e);
                     }
                 } finally {
                     m_batchLock.writeLock().unlock();
@@ -663,7 +663,7 @@ public class ExportToFileClient extends ExportClientBase {
                     throw new RestartBlockException("Fail to start the block", e.getCause(),true);
                 }
                 else {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -692,7 +692,7 @@ public class ExportToFileClient extends ExportClientBase {
                 m_writer.flush();
             }
             catch (Throwable t) {
-                Throwables.propagate(t);
+                throw new RuntimeException(t);
             }
             finally {
                 m_batchLock.readLock().unlock();
@@ -724,7 +724,7 @@ public class ExportToFileClient extends ExportClientBase {
                     m_es = null;
                 }
                 catch (InterruptedException e) {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -742,7 +742,7 @@ public class ExportToFileClient extends ExportClientBase {
             m_scheduledFileRotatorService.awaitTermination(365, TimeUnit.DAYS);
         }
         catch( InterruptedException iex) {
-            Throwables.propagate(iex);
+            throw new RuntimeException(iex);
         }
         m_batchLock.writeLock().lock();
         try {

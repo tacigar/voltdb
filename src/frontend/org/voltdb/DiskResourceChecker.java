@@ -30,6 +30,7 @@ import org.voltdb.snmp.FaultFacility;
 import org.voltdb.snmp.SnmpTrapSender;
 import org.voltdb.snmp.ThresholdType;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
@@ -186,7 +187,7 @@ public class DiskResourceChecker
         boolean canWrite = (s_testFileCheck==null) ? filePath.canWrite() : s_testFileCheck.canWrite(filePath);
         ThresholdType snmpCriteria = percThreshold > 0? ThresholdType.PERCENT:ThresholdType.LIMIT;
         if (!canWrite) {
-            org.voltdb.VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     String.format("Invalid or readonly file path %s (%s).",filePath, featureName.value()));
             return false;
         }

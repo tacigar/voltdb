@@ -17,13 +17,18 @@
 
 package org.voltdb.utils;
 
-import com.google_voltpatches.common.base.Throwables;
+
+import static org.voltdb.utils.HTTPAdminListener.HTML_CONTENT_TYPE;
+
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.voltdb.client.ClientResponse;
-import static org.voltdb.utils.HTTPAdminListener.HTML_CONTENT_TYPE;
+
+import com.google.common.base.Throwables;
 
 /**
  *
@@ -38,7 +43,9 @@ public class LogoutServlet extends VoltBaseServlet {
             throws IOException, ServletException {
         super.doGet(request, response);
         String target = request.getPathInfo();
-        if (target == null) target = "/";
+        if (target == null) {
+            target = "/";
+        }
         try {
             unauthenticate(request);
             response.setContentType(HTML_CONTENT_TYPE);

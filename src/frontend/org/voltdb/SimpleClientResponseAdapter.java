@@ -35,6 +35,7 @@ import org.voltcore.network.WriteStream;
 import org.voltcore.utils.DeferredSerialization;
 import org.voltcore.utils.Pair;
 import org.voltdb.client.ClientResponse;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
@@ -65,7 +66,7 @@ public class SimpleClientResponseAdapter implements Connection, WriteStream {
             } catch (TimeoutException e) {
                 return null;
             } catch (ExecutionException e) {
-                VoltDB.crashLocalVoltDB("Should never happen", true, e);
+                Poisoner.crashLocalVoltDB("Should never happen", true, e);
                 return null;
             }
         }
@@ -189,7 +190,7 @@ public class SimpleClientResponseAdapter implements Connection, WriteStream {
             }
             enqueue(buf);
         } catch (IOException e) {
-            VoltDB.crashLocalVoltDB("enqueue() in SimpleClientResponseAdapter throw an exception", true, e);
+            Poisoner.crashLocalVoltDB("enqueue() in SimpleClientResponseAdapter throw an exception", true, e);
         }
     }
 

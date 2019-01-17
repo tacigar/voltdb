@@ -44,6 +44,7 @@ import org.voltdb.rejoin.StreamSnapshotSink;
 import org.voltdb.rejoin.StreamSnapshotSink.RestoreWork;
 import org.voltdb.rejoin.TaskLog;
 import org.voltdb.utils.CatalogUtil;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Manages the lifecycle of snapshot serialization to a site
@@ -135,7 +136,7 @@ public class RejoinProducer extends JoinProducerBase {
         @Override
         public void run()
         {
-            VoltDB.crashLocalVoltDB(String.format(
+            Poisoner.crashLocalVoltDB(String.format(
                     "Rejoin process timed out due to no data sent from active nodes for %d seconds  Terminating rejoin.",
                     StreamSnapshotDataTarget.DEFAULT_WRITE_TIMEOUT_MS / 1000),
                     false,
@@ -171,7 +172,7 @@ public class RejoinProducer extends JoinProducerBase {
             doInitiation(message);
         }
         else {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Unknown rejoin message type: " + message.getType(), false,
                     null);
         }
@@ -398,10 +399,10 @@ public class RejoinProducer extends JoinProducerBase {
                             m_mailbox.getHSId(), Type.SNAPSHOT_FINISHED);
                     m_mailbox.send(m_coordinatorHsId, snap_complete);
                 } catch (InterruptedException crashme) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Interrupted awaiting snapshot completion.", true, crashme);
                 } catch (ExecutionException e) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Unexpected exception awaiting snapshot completion.", true,
                             e);
                 }
@@ -421,7 +422,7 @@ public class RejoinProducer extends JoinProducerBase {
         try {
             finishingTask.runForRejoin(siteConnection, null);
         } catch (IOException e) {
-            VoltDB.crashLocalVoltDB("Unexpected IOException in rejoin", true, e);
+            Poisoner.crashLocalVoltDB("Unexpected IOException in rejoin", true, e);
         }
     }
 }

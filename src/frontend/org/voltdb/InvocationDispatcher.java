@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -73,10 +72,11 @@ import org.voltdb.settings.NodeSettings;
 import org.voltdb.sysprocs.saverestore.SnapshotPathType;
 import org.voltdb.sysprocs.saverestore.SnapshotUtil;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 import org.voltdb.utils.VoltTrace;
 
-import com.google_voltpatches.common.base.Throwables;
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 
@@ -531,7 +531,9 @@ public final class InvocationDispatcher {
 
     private final boolean shouldLoadSchemaFromSnapshot() {
         CatalogMap<Table> tables = m_catalogContext.get().database.getTables();
-        if(tables.size() == 0) return true;
+        if(tables.size() == 0) {
+            return true;
+        }
         for(Table t : tables) {
             if(!t.getSignature().startsWith("VOLTDB_AUTOGEN_XDCR")) {
                 return false;
@@ -571,7 +573,9 @@ public final class InvocationDispatcher {
         }
 
         if (voltdb.isPreparingShuttingdown()) {
-            if (procedure.getAllowedinshutdown()) return null;
+            if (procedure.getAllowedinshutdown()) {
+                return null;
+            }
 
             return serverUnavailableResponse(
                     SHUTDOWN_MSG,
@@ -790,8 +794,8 @@ public final class InvocationDispatcher {
 
            // shutdown partition leader migration
            MigratePartitionLeaderMessage message = new MigratePartitionLeaderMessage(ihid, Integer.MIN_VALUE);
-           for (Iterator<Integer> it = liveHids.iterator(); it.hasNext();) {
-               m_mailbox.send(CoreUtils.getHSIdFromHostAndSite(it.next(),
+           for (Integer integer : liveHids) {
+               m_mailbox.send(CoreUtils.getHSIdFromHostAndSite(integer,
                            HostMessenger.CLIENT_INTERFACE_SITE_ID), message);
            }
 
@@ -1009,12 +1013,12 @@ public final class InvocationDispatcher {
                 try {
                     Stat stat = zk.exists(VoltZK.operationMode, false);
                     if (stat == null) {
-                        VoltDB.crashLocalVoltDB("cluster operation mode zookeeper node does not exist");
+                        Poisoner.crashLocalVoltDB("cluster operation mode zookeeper node does not exist");
                         return Long.MIN_VALUE;
                     }
                     return stat.getMzxid();
                 } catch (KeeperException | InterruptedException e) {
-                    VoltDB.crashLocalVoltDB("Failed to stat the cluster operation zookeeper node", true, e);
+                    Poisoner.crashLocalVoltDB("Failed to stat the cluster operation zookeeper node", true, e);
                     return Long.MIN_VALUE;
                 }
             }
@@ -1028,7 +1032,7 @@ public final class InvocationDispatcher {
                         task.clientHandle);
             }
         } catch (InterruptedException | ExecutionException e1) {
-            VoltDB.crashLocalVoltDB("Failed to stat the cluster operation zookeeper node", true, e1);
+            Poisoner.crashLocalVoltDB("Failed to stat the cluster operation zookeeper node", true, e1);
             return null;
         }
 
@@ -1042,7 +1046,7 @@ public final class InvocationDispatcher {
                     .endObject()
                     .toString();
         } catch (JSONException e) {
-            VoltDB.crashLocalVoltDB("Failed to create startup snapshot save command", true, e);
+            Poisoner.crashLocalVoltDB("Failed to create startup snapshot save command", true, e);
             return null;
         }
         log.info("Saving startup snapshot");
@@ -1102,7 +1106,7 @@ public final class InvocationDispatcher {
                 } catch (NodeExistsException itIsOk) {
                     return false;
                 } catch (InterruptedException | KeeperException e) {
-                    VoltDB.crashLocalVoltDB("Failed to create shutdown save guard zookeeper node", true, e);
+                    Poisoner.crashLocalVoltDB("Failed to create shutdown save guard zookeeper node", true, e);
                     return false;
                 }
                 return true;
@@ -1112,7 +1116,7 @@ public final class InvocationDispatcher {
         try {
             created = guardFuture.get().booleanValue();
         } catch (InterruptedException | ExecutionException e) {
-            VoltDB.crashLocalVoltDB("Failed to create shutdown save guard zookeeper node", true, e);
+            Poisoner.crashLocalVoltDB("Failed to create shutdown save guard zookeeper node", true, e);
             return null;
         }
         if (!created) {
@@ -1216,7 +1220,7 @@ public final class InvocationDispatcher {
                     try {
                         r = onRestoreComplete.get();
                     } catch (ExecutionException|InterruptedException e) {
-                        VoltDB.crashLocalVoltDB("Should never happen", true, e);
+                        Poisoner.crashLocalVoltDB("Should never happen", true, e);
                         return;
                     }
                     transmitResponseMessage(r, ccxn, sourceHandle);
@@ -1238,7 +1242,7 @@ public final class InvocationDispatcher {
                     try {
                         r = onCatalogUpdateComplete.get();
                     } catch (ExecutionException|InterruptedException e) {
-                        VoltDB.crashLocalVoltDB("Should never happen", true, e);
+                        Poisoner.crashLocalVoltDB("Should never happen", true, e);
                         return;
                     }
                     if (r.getStatus() != ClientResponse.SUCCESS) {

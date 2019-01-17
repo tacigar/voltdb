@@ -31,7 +31,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import org.voltdb.BackendTarget;
-import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This class gives an abstract interface for processes run using valgrind.  It has two
@@ -111,7 +111,7 @@ public class EEProcess {
                 }
             });
         } catch (final IOException e) {
-            VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+            Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
         }
 
         final BufferedReader stderr = new BufferedReader(new InputStreamReader(
@@ -195,7 +195,7 @@ public class EEProcess {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    VoltDB.crashLocalVoltDB("[ipc=" + m_eePID
+                    Poisoner.crashLocalVoltDB("[ipc=" + m_eePID
                             + "] Returned end of stream and exit value "
                             + m_eeProcess.exitValue(), false, null);
                 }

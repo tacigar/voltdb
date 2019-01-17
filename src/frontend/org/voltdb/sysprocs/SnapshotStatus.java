@@ -23,9 +23,9 @@ import java.util.Map;
 import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 public class SnapshotStatus extends VoltSystemProcedure {
 
@@ -44,7 +44,7 @@ public class SnapshotStatus extends VoltSystemProcedure {
 
     public void run(SystemProcedureExecutionContext ctx) throws VoltAbortException
     {
-        VoltDB.crashLocalVoltDB("The old SnapshotStatus system procedure code should never be possible to run.",
+        Poisoner.crashLocalVoltDB("The old SnapshotStatus system procedure code should never be possible to run.",
                false, null);
     }
 }

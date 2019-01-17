@@ -51,6 +51,7 @@ import org.voltdb.catalog.ConnectorTableInfo;
 import org.voltdb.catalog.Database;
 import org.voltdb.sysprocs.ExportControl.OperationMode;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.base.Preconditions;
@@ -531,7 +532,7 @@ public class ExportManager
                 m_generation.set(gen);
             } catch (IOException crash) {
                 //This means durig UAC we had a bad disk on a node or bad directory.
-                VoltDB.crashLocalVoltDB("Error creating export generation", true, crash);
+                Poisoner.crashLocalVoltDB("Error creating export generation", true, crash);
                 return;
             }
         }
@@ -623,7 +624,7 @@ public class ExportManager
             m_processor.getAndSet(newProcessor);
             newProcessor.readyForData();
         } catch (Exception crash) {
-            VoltDB.crashLocalVoltDB("Error creating next export processor", true, crash);
+            Poisoner.crashLocalVoltDB("Error creating next export processor", true, crash);
         }
 
         for (int partitionId : m_masterOfPartitions) {
@@ -691,7 +692,9 @@ public class ExportManager
             ByteBuffer buffer,
             boolean sync) {
         //For validating that the memory is released
-        if (bufferPtr != 0) DBBPool.registerUnsafeMemory(bufferPtr);
+        if (bufferPtr != 0) {
+            DBBPool.registerUnsafeMemory(bufferPtr);
+        }
         ExportManager instance = instance();
         try {
             ExportGeneration generation = instance.m_generation.get();

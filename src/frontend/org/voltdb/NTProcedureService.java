@@ -41,6 +41,7 @@ import org.voltdb.SystemProcedureCatalog.Config;
 import org.voltdb.catalog.CatalogMap;
 import org.voltdb.catalog.Procedure;
 import org.voltdb.messaging.InitiateResponseMessage;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.util.concurrent.ThreadFactoryBuilder;
@@ -276,18 +277,18 @@ public class NTProcedureService {
                     if (sysProc.commercial) {
                         continue;
                     }
-                    VoltDB.crashLocalVoltDB("Missing Java class for NT System Procedure: " + procName);
+                    Poisoner.crashLocalVoltDB("Missing Java class for NT System Procedure: " + procName);
                 }
 
                 if (startup) {
                     // This is a startup-time check to make sure we can instantiate
                     try {
                         if ((procClass.newInstance() instanceof VoltNTSystemProcedure) == false) {
-                            VoltDB.crashLocalVoltDB("NT System Procedure is incorrect class type: " + procName);
+                            Poisoner.crashLocalVoltDB("NT System Procedure is incorrect class type: " + procName);
                         }
                     }
                     catch (InstantiationException | IllegalAccessException e) {
-                        VoltDB.crashLocalVoltDB("Unable to instantiate NT System Procedure: " + procName);
+                        Poisoner.crashLocalVoltDB("Unable to instantiate NT System Procedure: " + procName);
                     }
                 }
 
@@ -328,11 +329,11 @@ public class NTProcedureService {
             } catch (ClassNotFoundException e) {
                 if (className.startsWith("org.voltdb.")) {
                     String msg = String.format(LoadedProcedureSet.ORGVOLTDB_PROCNAME_ERROR_FMT, className);
-                    VoltDB.crashLocalVoltDB(msg, false, null);
+                    Poisoner.crashLocalVoltDB(msg, false, null);
                 }
                 else {
                     String msg = String.format(LoadedProcedureSet.UNABLETOLOAD_ERROR_FMT, className);
-                    VoltDB.crashLocalVoltDB(msg, false, null);
+                    Poisoner.crashLocalVoltDB(msg, false, null);
                 }
             }
 

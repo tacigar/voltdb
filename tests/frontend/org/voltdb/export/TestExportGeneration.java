@@ -66,7 +66,7 @@ import org.voltdb.export.processors.GuestProcessor;
 import org.voltdb.messaging.LocalMailbox;
 import org.voltdb.utils.MiscUtils;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.ImmutableList;
 
 public class TestExportGeneration {
@@ -262,7 +262,7 @@ public class TestExportGeneration {
             try {
                 Thread.sleep(2);
             } catch (InterruptedException iex) {
-                Throwables.propagate(iex);
+                throw new RuntimeException(iex);
             }
         }
         assertTrue("timeout on data source size poll", retries >= 0);
@@ -283,7 +283,7 @@ public class TestExportGeneration {
             try {
                 Thread.sleep(2);
             } catch (InterruptedException iex) {
-                Throwables.propagate(iex);
+                throw new RuntimeException(iex);
             }
         }
         assertTrue("timeout on data source size poll", retries >= 0);

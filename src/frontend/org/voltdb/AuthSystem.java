@@ -64,8 +64,8 @@ import org.voltdb.common.Permission;
 import org.voltdb.security.AuthenticationRequest;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableList;
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSet;
@@ -269,8 +269,8 @@ public class AuthSystem {
          * @return true if the user has permission and false otherwise
          */
         public boolean hasPermission(Permission... perms) {
-            for (int i = 0; i < perms.length;i++) {
-                if (m_permissions.contains(perms[i])) {
+            for (Permission perm : perms) {
+                if (m_permissions.contains(perm)) {
                     return true;
                 }
             }
@@ -381,7 +381,7 @@ public class AuthSystem {
             try {
                 loginContext = new LoginContext(VOLTDB_SERVICE_LOGIN_MODULE);
             } catch (LoginException|SecurityException ex) {
-                VoltDB.crashGlobalVoltDB(
+                Poisoner.crashGlobalVoltDB(
                         "Cannot initialize JAAS LoginContext", true, ex);
             }
             try {
@@ -393,21 +393,19 @@ public class AuthSystem {
                         .getName();
                 gssManager = GSSManager.getInstance();
             } catch (AccountExpiredException ex) {
-                VoltDB.crashGlobalVoltDB(
+                Poisoner.crashGlobalVoltDB(
                         "VoltDB assigned service principal has expired", true, ex);
             } catch(CredentialExpiredException ex) {
-                VoltDB.crashGlobalVoltDB(
+                Poisoner.crashGlobalVoltDB(
                         "VoltDB assigned service principal credentials have expired", true, ex);
             } catch(FailedLoginException ex) {
-                VoltDB.crashGlobalVoltDB(
+                Poisoner.crashGlobalVoltDB(
                         "VoltDB failed to authenticate against kerberos", true, ex);
-            }
-            catch (LoginException ex) {
-                VoltDB.crashGlobalVoltDB(
+            } catch (LoginException ex) {
+                Poisoner.crashGlobalVoltDB(
                         "VoltDB service principal failed to login", true, ex);
-            }
-            catch (Exception ex) {
-                VoltDB.crashGlobalVoltDB(
+            } catch (Exception ex) {
+                Poisoner.crashGlobalVoltDB(
                         "Unexpected exception occured during service authentication", true, ex);
             }
         }
@@ -434,7 +432,7 @@ public class AuthSystem {
                 /*
                  * If not 40 should be 60 since it is bcrypt
                  */
-                VoltDB.crashGlobalVoltDB(
+                Poisoner.crashGlobalVoltDB(
                         "Found a shadowPassword in the catalog that was in an unrecogized format", true, null);
             }
 
@@ -513,7 +511,7 @@ public class AuthSystem {
         }
 
         if (principal != null && m_users.containsKey(principal)) {
-            VoltDB.crashGlobalVoltDB("Kerberos service principal " + principal + " must not correspond to a database user", true, null);
+            Poisoner.crashGlobalVoltDB("Kerberos service principal " + principal + " must not correspond to a database user", true, null);
         }
     }
 
@@ -710,7 +708,7 @@ public class AuthSystem {
                 try {
                     md = MessageDigest.getInstance(ClientAuthScheme.getDigestScheme(scheme));
                 } catch (NoSuchAlgorithmException e) {
-                    VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                    Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
                 }
                 byte passwordHash[] = md.digest(m_password);
 
@@ -830,7 +828,9 @@ public class AuthSystem {
                             // read in the next packet size
                             bb.clear().limit(4);
                             while (bb.hasRemaining()) {
-                                if (m_socket.read(bb) == -1) throw new EOFException();
+                                if (m_socket.read(bb) == -1) {
+                                    throw new EOFException();
+                                }
                             }
                             bb.flip();
 
@@ -842,7 +842,9 @@ public class AuthSystem {
                             // read the initiator (client) context token
                             bb.clear().limit(msgSize);
                             while (bb.hasRemaining()) {
-                                if (m_socket.read(bb) == -1) throw new EOFException();
+                                if (m_socket.read(bb) == -1) {
+                                    throw new EOFException();
+                                }
                             }
                             bb.flip();
 
@@ -890,7 +892,9 @@ public class AuthSystem {
                             // read in the next packet size
                             bb.clear().limit(4);
                             while (bb.hasRemaining()) {
-                                if (m_socket.read(bb) == -1) throw new EOFException();
+                                if (m_socket.read(bb) == -1) {
+                                    throw new EOFException();
+                                }
                             }
 
                             bb.flip();
@@ -902,7 +906,9 @@ public class AuthSystem {
                             // read the initiator (client) context token
                             bb.clear().limit(msgSize);
                             while (bb.hasRemaining()) {
-                                if (m_socket.read(bb) == -1) throw new EOFException();
+                                if (m_socket.read(bb) == -1) {
+                                    throw new EOFException();
+                                }
                             }
                             bb.flip();
 
@@ -932,16 +938,18 @@ public class AuthSystem {
                         return authenticateUserName;
 
                     } catch (IOException|GSSException ex) {
-                        Throwables.propagate(ex);
+                        throw new RuntimeException(ex);
                     } finally {
-                        if (context != null) try { context.dispose(); } catch (Exception ignoreIt) {}
+                        if (context != null) {
+                            try { context.dispose(); } catch (Exception ignoreIt) {}
+                        }
                     }
-                    return null;
                 }
             });
 
-            if (authenticatedUser == null)
+            if (authenticatedUser == null) {
                 return false;
+            }
 
             final AuthUser user = m_users.get(authenticatedUser);
             if (user == null) {

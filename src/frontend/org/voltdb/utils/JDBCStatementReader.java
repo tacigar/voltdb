@@ -40,7 +40,7 @@ import org.voltdb.types.TimestampType;
 import au.com.bytecode.opencsv_voltpatches.CSVWriter;
 
 import com.google_voltpatches.common.base.Predicate;
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.collect.FluentIterable;
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.reflect.TypeToken;
@@ -131,7 +131,7 @@ class JDBCStatementReader extends SusceptibleRunnable {
         } catch (Exception ex) {
             m_log.error("database query initialization failed" , ex);
             forceClose(conn,stmt,rslt);
-            Throwables.propagate(ex);
+            throw new RuntimeException(ex);
         }
 
         StringWriter sw = new StringWriter(16384);
@@ -302,7 +302,7 @@ class JDBCStatementReader extends SusceptibleRunnable {
                 try {
                     token = TypeToken.of(Class.forName(clazzName));
                 } catch (ClassNotFoundException e) {
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
                 m_from = token;
             }

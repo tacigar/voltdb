@@ -49,7 +49,7 @@ import org.voltdb.export.ExportManager;
 import org.voltdb.exportclient.ExportDecoderBase.RestartBlockException;
 import org.voltdb.exportclient.decode.CSVStringDecoder;
 
-import com.google_voltpatches.common.base.Throwables;
+
 import com.google_voltpatches.common.net.HostAndPort;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
 
@@ -141,7 +141,7 @@ public class SocketExporter extends ExportClientBase {
         try {
             m_executorService.awaitTermination(365, TimeUnit.DAYS);
         } catch( InterruptedException iex) {
-            Throwables.propagate(iex);
+            throw new RuntimeException(iex);
         }
     }
 
@@ -208,7 +208,7 @@ public class SocketExporter extends ExportClientBase {
             try {
                 m_es.awaitTermination(365, TimeUnit.DAYS);
             } catch (InterruptedException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
 

@@ -58,6 +58,7 @@ import org.voltdb.sysprocs.saverestore.SnapshotPredicates;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ListMultimap;
@@ -212,8 +213,9 @@ public class SnapshotSiteProcessor {
     public static void populateSequenceNumbersForExecutionSite(SystemProcedureExecutionContext context) {
         Database database = context.getDatabase();
         for (Table t : database.getTables()) {
-            if (!CatalogUtil.isTableExportOnly(database, t))
+            if (!CatalogUtil.isTableExportOnly(database, t)) {
                 continue;
+            }
 
             Map<Integer, Pair<Long,Long>> sequenceNumbers = m_exportSequenceNumbers.get(t.getTypeName());
             if (sequenceNumbers == null) {
@@ -409,7 +411,7 @@ public class SnapshotSiteProcessor {
             TableStreamer streamer =
                     new TableStreamer(tableId, format.getStreamType(), m_snapshotTableTasks.get(tableId));
             if (!streamer.activate(context, tablePredicates.getValue())) {
-                VoltDB.crashLocalVoltDB("Failed to activate snapshot stream on table " +
+                Poisoner.crashLocalVoltDB("Failed to activate snapshot stream on table " +
                                         CatalogUtil.getTableNameFromId(context.getDatabase(), tableId), false, null);
             }
             m_streamers.put(tableId, streamer);
@@ -511,7 +513,9 @@ public class SnapshotSiteProcessor {
             if (desired > available) {
                 return null;
             }
-            if (m_availableSnapshotBuffers.compareAndSet(available, available - desired)) break;
+            if (m_availableSnapshotBuffers.compareAndSet(available, available - desired)) {
+                break;
+            }
         }
 
         List<BBContainer> outputBuffers = new ArrayList<BBContainer>(tableTasks.size());
@@ -618,7 +622,7 @@ public class SnapshotSiteProcessor {
                                     //This error is already logged by the watchdog when it generates the exception
                                 } else {
                                     if (m_isTruncation) {
-                                        VoltDB.crashLocalVoltDB("Unexpected exception while attempting to create truncation snapshot",
+                                        Poisoner.crashLocalVoltDB("Unexpected exception while attempting to create truncation snapshot",
                                                 true, t);
                                     }
                                     SNAP_LOG.error("Error while attempting to write snapshot data", t);
@@ -660,7 +664,7 @@ public class SnapshotSiteProcessor {
             boolean IamLast = false;
             synchronized (ExecutionSitesCurrentlySnapshotting) {
                 if (!ExecutionSitesCurrentlySnapshotting.contains(this)) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Currently snapshotting site didn't find itself in set of snapshotting sites", true, null);
                 }
                 IamLast = ExecutionSitesCurrentlySnapshotting.size() == 1;
@@ -732,7 +736,7 @@ public class SnapshotSiteProcessor {
                             } catch (NoNodeException e) {
                                 SNAP_LOG.warn("Expect the snapshot node to already exist during deletion", e);
                             } catch (Exception e) {
-                                VoltDB.crashLocalVoltDB(e.getMessage(), true, e);
+                                Poisoner.crashLocalVoltDB(e.getMessage(), true, e);
                             } finally {
                                 /**
                                  * Remove this last site from the set here after the terminator has run
@@ -784,7 +788,7 @@ public class SnapshotSiteProcessor {
         boolean success = false;
         while (!success) {
             if (System.currentTimeMillis() > endTime) {
-                VoltDB.crashLocalVoltDB("Timed out logging snapshot completion to ZK");
+                Poisoner.crashLocalVoltDB("Timed out logging snapshot completion to ZK");
             }
 
             Stat stat = new Stat();
@@ -796,16 +800,16 @@ public class SnapshotSiteProcessor {
                 // if the node doesn't exist yet, retry
                 continue;
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("This ZK get should never fail", true, e);
+                Poisoner.crashLocalVoltDB("This ZK get should never fail", true, e);
             }
             if (data == null) {
-                VoltDB.crashLocalVoltDB("Data should not be null if the node exists", false, null);
+                Poisoner.crashLocalVoltDB("Data should not be null if the node exists", false, null);
             }
 
             try {
                 JSONObject jsonObj = new JSONObject(new String(data, "UTF-8"));
                 if (jsonObj.getLong("txnId") != txnId) {
-                    VoltDB.crashLocalVoltDB("TxnId should match", false, null);
+                    Poisoner.crashLocalVoltDB("TxnId should match", false, null);
                 }
                 int remainingHosts = jsonObj.getInt("hostCount") - 1;
                 jsonObj.put("hostCount", remainingHosts);
@@ -824,7 +828,7 @@ public class SnapshotSiteProcessor {
             } catch (KeeperException.BadVersionException e) {
                 continue;
             } catch (Exception e) {
-                VoltDB.crashLocalVoltDB("This ZK call should never fail", true, e);
+                Poisoner.crashLocalVoltDB("This ZK call should never fail", true, e);
             }
             success = true;
         }
@@ -840,13 +844,13 @@ public class SnapshotSiteProcessor {
                     zk.delete(VoltZK.completed_snapshots + "/" + snapshots.first(), -1);
                 } catch (NoNodeException e) {}
                 catch (Exception e) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Deleting a snapshot completion record from ZK should only fail with NoNodeException", true, e);
                 }
                 snapshots.remove(snapshots.first());
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Retrieving list of completed snapshots from ZK should never fail", true, e);
+            Poisoner.crashLocalVoltDB("Retrieving list of completed snapshots from ZK should never fail", true, e);
         }
     }
 

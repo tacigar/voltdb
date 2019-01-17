@@ -23,9 +23,9 @@ import java.util.Map;
 import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 public class SnapshotDelete extends VoltSystemProcedure {
 
@@ -45,7 +45,7 @@ public class SnapshotDelete extends VoltSystemProcedure {
     public VoltTable[] run(SystemProcedureExecutionContext ctx,
             String paths[], String nonces[]) throws VoltAbortException
     {
-        VoltDB.crashLocalVoltDB("SnapshotDelete sysproc run should never be called", false, null);
+        Poisoner.crashLocalVoltDB("SnapshotDelete sysproc run should never be called", false, null);
         return null;
     }
 }

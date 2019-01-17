@@ -41,6 +41,7 @@ import org.voltdb.VoltZK;
 import org.voltdb.iv2.RepairAlgo.RepairResult;
 import org.voltdb.messaging.DumpMessage;
 import org.voltdb.messaging.Iv2InitiateTaskMessage;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Subclass of Initiator to manage multi-partition operations.
@@ -187,7 +188,7 @@ public class MpInitiator extends BaseInitiator implements Promotable
                 }
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Terminally failed leader promotion.", true, e);
+            Poisoner.crashLocalVoltDB("Terminally failed leader promotion.", true, e);
         }
     }
 

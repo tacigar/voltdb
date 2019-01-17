@@ -88,7 +88,7 @@ public final class Throwables {
    * } catch (Throwable t) {
    *   Throwables.propagateIfInstanceOf(t, IOException.class);
    *   Throwables.propagateIfInstanceOf(t, SQLException.class);
-   *   throw Throwables.propagate(t);
+   *   throw throw new RuntimeException(t);
    * }
    * </pre>
    *
@@ -220,7 +220,7 @@ public final class Throwables {
    *   } catch (IKnowWhatToDoWithThisException e) {
    *     return handle(e);
    *   } catch (Throwable t) {
-   *     throw Throwables.propagate(t);
+   *     throw throw new RuntimeException(t);
    *   }
    * }
    * </pre>

@@ -107,6 +107,7 @@ import org.voltdb.sysprocs.SysProcFragmentId;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.LogKeys;
 import org.voltdb.utils.MinimumRatioMaintainer;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Charsets;
 import com.google_voltpatches.common.base.Preconditions;
@@ -800,7 +801,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
         catch (final Exception ex) {
             hostLog.l7dlog( Level.FATAL, LogKeys.host_ExecutionSite_FailedConstruction.name(),
                             new Object[] { m_siteId, m_siteIndex }, ex);
-            VoltDB.crashLocalVoltDB(ex.getMessage(), true, ex);
+            Poisoner.crashLocalVoltDB(ex.getMessage(), true, ex);
         }
         return eeTemp;
     }
@@ -874,7 +875,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
             // sure VoltDB crashes.
             String errmsg = "Site: " + org.voltcore.utils.CoreUtils.hsIdToString(m_siteId) +
                 " ran out of Java memory. " + "This node will shut down.";
-            VoltDB.crashLocalVoltDB(errmsg, true, e);
+            Poisoner.crashLocalVoltDB(errmsg, true, e);
         }
         catch (Throwable t) {
 
@@ -888,7 +889,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
                     hostLog.error(ste.toString());
                 }
 
-                VoltDB.crashLocalVoltDB(errmsg, true, t);
+                Poisoner.crashLocalVoltDB(errmsg, true, t);
             }
         }
 
@@ -927,7 +928,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
                     global_replay_mpTxn = new ParticipantTransactionState(m.getTxnId(), m);
                 }
                 else if (global_replay_mpTxn.txnId != m.getTxnId()) {
-                    VoltDB.crashLocalVoltDB("Started a MP transaction during replay before completing " +
+                    Poisoner.crashLocalVoltDB("Started a MP transaction during replay before completing " +
                             " open transaction.", false, null);
                 }
 
@@ -960,7 +961,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
                 }
             }
             else {
-                VoltDB.crashLocalVoltDB("Can not replay message type " +
+                Poisoner.crashLocalVoltDB("Can not replay message type " +
                         tibm + " during live rejoin. Unexpected error.",
                         false, null);
             }
@@ -1175,7 +1176,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
     private void setLastCommittedSpHandle(long spHandle)
     {
         if (TxnEgo.getPartitionId(m_lastCommittedSpHandle) != m_partitionId) {
-            VoltDB.crashLocalVoltDB("Mismatch SpHandle partitiond id " +
+            Poisoner.crashLocalVoltDB("Mismatch SpHandle partitiond id " +
                                     TxnEgo.getPartitionId(m_lastCommittedSpHandle) + ", " +
                                     TxnEgo.getPartitionId(spHandle), true, null);
         }
@@ -1460,7 +1461,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
         for (Map.Entry<String, Map<Integer, Pair<Long,Long>>> tableEntry : exportSequenceNumbers.entrySet()) {
             final Table catalogTable = m_context.tables.get(tableEntry.getKey());
             if (catalogTable == null) {
-                VoltDB.crashLocalVoltDB(
+                Poisoner.crashLocalVoltDB(
                         "Unable to find catalog entry for table named " + tableEntry.getKey(),
                         true,
                         null);
@@ -1469,7 +1470,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
 
             if (sequenceNumbers == null) {
                 if (requireExistingSequenceNumbers) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Could not find export sequence numbers for partition " +
                                     m_partitionId + " table " +
                                     tableEntry.getKey() + " have " + exportSequenceNumbers, false, null);
@@ -1498,7 +1499,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
                 VoltDB.instance().getNodeDRGateway().cacheRejoinStartDRSNs(drSequenceNumbers);
             }
         } else if (requireExistingSequenceNumbers) {
-            VoltDB.crashLocalVoltDB("Could not find DR sequence number for partition " + m_partitionId);
+            Poisoner.crashLocalVoltDB("Could not find DR sequence number for partition " + m_partitionId);
         }
 
         if (allConsumerSiteTrackers != null) {
@@ -1641,7 +1642,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
                         CoreUtils.getSiteIdFromHSId(m_siteId)));
             }
             catch (InterruptedException e) {
-                VoltDB.crashLocalVoltDB("Unexpected Interrupted Exception while finishing a snapshot for a catalog update.", true, e);
+                Poisoner.crashLocalVoltDB("Unexpected Interrupted Exception while finishing a snapshot for a catalog update.", true, e);
             }
         }
 
@@ -1679,7 +1680,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
         for (long txnId : perPartitionTxnIds) {
             if (TxnEgo.getPartitionId(txnId) == m_partitionId) {
                 if (foundSinglepartTxnId != -1) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Found multiple transactions ids (" + TxnEgo.txnIdToString(txnId) + " and " +
                             TxnEgo.txnIdToString(foundSinglepartTxnId) + ")during restore for a partition",
                             false, null);
@@ -1690,7 +1691,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
             }
             if (!skipMultiPart && TxnEgo.getPartitionId(txnId) == MpInitiator.MP_INIT_PID) {
                 if (foundMultipartTxnId != -1) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Found multiple transactions ids (" + TxnEgo.txnIdToString(txnId) + " and " +
                             TxnEgo.txnIdToString(foundMultipartTxnId) + ") during restore for a multipart txnid",
                             false, null);
@@ -1700,7 +1701,7 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
             }
         }
         if (!skipMultiPart && foundMultipartTxnId == -1) {
-            VoltDB.crashLocalVoltDB("Didn't find a multipart txnid on restore", false, null);
+            Poisoner.crashLocalVoltDB("Didn't find a multipart txnid on restore", false, null);
         }
     }
 

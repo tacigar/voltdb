@@ -73,6 +73,7 @@ import org.voltdb.types.TimestampType;
 import org.voltdb.utils.CompressionService;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTrace;
 
 import com.google_voltpatches.common.base.Charsets;
@@ -1137,7 +1138,7 @@ public class ProcedureRunner {
                         true);
             } catch (Exception e) {
                 // shouldn't happen here because it passed the compiler
-                VoltDB.crashLocalVoltDB("getValidSQLStmts threw exception during ProcedureRunner loading", true, e);
+                Poisoner.crashLocalVoltDB("getValidSQLStmts threw exception during ProcedureRunner loading", true, e);
             }
         }
 

@@ -23,16 +23,16 @@ import java.util.Map;
 import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 public class SnapshotScan extends VoltSystemProcedure {
 
     public VoltTable[] run(SystemProcedureExecutionContext ctx,
             String path) throws VoltAbortException
     {
-        VoltDB.crashLocalVoltDB("Old SnapshotScan sysproc should never be run()", false, null);
+        Poisoner.crashLocalVoltDB("Old SnapshotScan sysproc should never be run()", false, null);
         return null;
     }
 

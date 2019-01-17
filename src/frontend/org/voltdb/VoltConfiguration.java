@@ -24,6 +24,7 @@ import org.voltdb.settings.Settings;
 import org.voltdb.settings.SettingsException;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltFile;
 
 import com.google_voltpatches.common.collect.ImmutableList;
@@ -638,8 +639,8 @@ public class VoltConfiguration {
         }
         // Get command
         if (m_startAction == StartAction.GET) {
-            // We dont want crash file created.
-            VoltDB.exitAfterMessage = true;
+            // We don't want crash file created.
+            Poisoner.verboseCrash = false;
             inspectGetCommand();
             return;
         }

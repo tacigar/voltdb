@@ -48,13 +48,12 @@ import org.voltdb.types.GeographyValue;
 import org.voltdb.types.TimestampType;
 import org.voltdb.types.VoltDecimalHelper;
 
+import com.google.common.base.Throwables;
 import com.google_voltpatches.common.base.Predicates;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSet;
 import com.google_voltpatches.common.collect.Maps;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
-import static org.voltdb.exportclient.ExportClientBase.rateLimitedLogError;
 
 public class JDBCExportClient extends ExportClientBase {
     private static final VoltLogger m_logger = new VoltLogger("ExportClient");
@@ -122,20 +121,26 @@ public class JDBCExportClient extends ExportClientBase {
         }
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             RefCountedDS other = (RefCountedDS) obj;
             if (ds == null) {
-                if (other.ds != null)
+                if (other.ds != null) {
                     return false;
-            } else if (!ds.equals(other.ds))
+                }
+            } else if (!ds.equals(other.ds)) {
                 return false;
-            if (refCount != other.refCount)
+            }
+            if (refCount != other.refCount) {
                 return false;
+            }
             return true;
         }
         @Override
@@ -257,7 +262,7 @@ public class JDBCExportClient extends ExportClientBase {
             try {
                 stmt = conn.createStatement();
             } catch (SQLException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             int totalRowSize = 0;
             for (int ii = firstField; ii < columnLengths.size(); ii++) {
@@ -415,20 +420,20 @@ public class JDBCExportClient extends ExportClientBase {
                 try {
                     conn.rollback();
                 } catch (SQLException e1) {
-                    Throwables.propagate(e1);
+                    throw new RuntimeException(e1);
                 }
                 if (!e.getSQLState().equals(SQLSTATE_UNIQUE_VIOLATION) &&
                         //Todo, this predicate is broken, the regex doesn't work
                         !(dbType == DatabaseType.NETEZZA && !e.getMessage().matches(".+Relation\\s+'[^']+'\\s+already\\s+exists.+")) &&
                         (dbType == DatabaseType.ORACLE && !e.getMessage().contains("ORA-00955"))) {
                     //Crappy hack around the fact that create if not exists is racy in postgres
-                    Throwables.propagate(e);
+                    throw new RuntimeException(e);
                 }
             }
             try {
                 stmt.close();
             } catch (SQLException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
         private void appendStringColumn(DatabaseType dbType, StringBuilder createTableQuery, int columnLength, boolean jumboRow) {
@@ -697,7 +702,7 @@ public class JDBCExportClient extends ExportClientBase {
             try {
                 m_es.awaitTermination(356, TimeUnit.DAYS);
             } catch (InterruptedException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
             closeConnection();
         }
@@ -784,10 +789,11 @@ public class JDBCExportClient extends ExportClientBase {
                 + maxStatementsCachedVal + ")");
 
         m_poolProperties.setTestOnBorrow(true);
-        if (url.startsWith("jdbc:oracle"))
+        if (url.startsWith("jdbc:oracle")) {
             m_poolProperties.setValidationQuery("SELECT 1 FROM DUAL");
-        else
+        } else {
             m_poolProperties.setValidationQuery("SELECT 1");
+        }
 
         /*
          * If the user didn't specify a jdbcdriver class name, set it to
@@ -822,7 +828,7 @@ public class JDBCExportClient extends ExportClientBase {
             Class.forName(jdbcdriver);
         } catch (ClassNotFoundException e) {
             m_logger.warn("Exception attempting to load JDBC driver \"" + jdbcdriver + "\"", e);
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
 
         //Dont do actual config in check mode.

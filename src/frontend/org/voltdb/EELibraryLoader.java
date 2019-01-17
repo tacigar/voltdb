@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.common.Constants;
+import org.voltdb.utils.Poisoner;
 
 public class EELibraryLoader {
 
@@ -88,7 +89,7 @@ public class EELibraryLoader {
                             msg += "\nOr the library may have failed to load because java.io.tmpdir should be set to a different directory. " +
                                    "Use VOLTDB_OPTS='-Djava.io.tmpdir=<dirpath>' to set it.";
                         }
-                        VoltDB.crashLocalVoltDB(msg, false, null);
+                        Poisoner.crashLocalVoltDB(msg, false, null);
                     } else {
                         hostLog.info("Library VOLTDB JNI shared library loading failed. Library path "
                                 + System.getProperty("java.library.path"));

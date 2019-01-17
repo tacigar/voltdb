@@ -20,10 +20,13 @@ package org.voltcore.zk;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google_voltpatches.common.collect.ImmutableList;
 import org.apache.zookeeper_voltpatches.KeeperException;
 import org.apache.zookeeper_voltpatches.WatchedEvent;
 import org.apache.zookeeper_voltpatches.Watcher;
@@ -32,7 +35,9 @@ import org.apache.zookeeper_voltpatches.data.Stat;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.Pair;
-import org.voltdb.VoltDB;
+import org.voltdb.utils.Poisoner;
+
+import com.google_voltpatches.common.collect.ImmutableList;
 
 /**
  * BabySitter watches a zookeeper node and alerts on appearances
@@ -179,8 +184,10 @@ public class BabySitter
             try {
                 m_es.submit(m_eventHandler);
             } catch (RejectedExecutionException e) {
-                if (m_shutdown.get()) return;
-                VoltDB.crashLocalVoltDB("Unexpected rejected execution exception", true, e);
+                if (m_shutdown.get()) {
+                    return;
+                }
+                Poisoner.crashLocalVoltDB("Unexpected rejected execution exception", true, e);
             }
         }
     };

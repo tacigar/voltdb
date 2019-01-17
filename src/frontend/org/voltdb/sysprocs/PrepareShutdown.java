@@ -33,6 +33,7 @@ import org.voltdb.SystemProcedureExecutionContext;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 /**
  *The system stored procedure will pause the cluster and set a flag indicating that
@@ -91,7 +92,7 @@ public class PrepareShutdown extends Pause {
 
         } else {
 
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Received unrecognized plan fragment id " + fragmentId + " in PrepareShutdown",
                     false,
                     null);

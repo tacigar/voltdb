@@ -55,13 +55,13 @@ import org.voltdb.common.Constants;
 import org.voltdb.common.NodeState;
 import org.voltdb.utils.Digester;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Joiner;
 import com.google_voltpatches.common.base.Predicate;
 import com.google_voltpatches.common.base.Splitter;
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.base.Suppliers;
-import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.ImmutableSortedSet;
 import com.google_voltpatches.common.collect.Maps;
@@ -146,7 +146,7 @@ public class MeshProber implements JoinAcceptor {
         final HostAndPort parsedHost = HostAndPort
                 .fromString(specifier)
                 .withDefaultPort(Constants.DEFAULT_INTERNAL_PORT);
-        final String host = parsedHost.getHostText();
+        final String host = parsedHost.getHost();
         if (host.isEmpty()) {
             return true;
         }
@@ -583,7 +583,7 @@ public class MeshProber implements JoinAcceptor {
         }
 
         if (terminusNonces.size() > 1) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Detected multiple startup snapshots, cannot "
+            Poisoner.crashLocalVoltDB("Detected multiple startup snapshots, cannot "
                     + "proceed with cluster startup. Snapshot IDs " + terminusNonces);
         }
 
@@ -609,7 +609,7 @@ public class MeshProber implements JoinAcceptor {
                 hostCount = hostCount + ksafety; // kfactor + 1
                 determination = StartAction.JOIN;
             } else {
-                org.voltdb.VoltDB.crashLocalVoltDB("Node is not allowed to rejoin an already complete cluster");
+                Poisoner.crashLocalVoltDB("Node is not allowed to rejoin an already complete cluster");
                 return;
             }
         } else if (operational == 0 && bare == unmeshed) {
@@ -617,7 +617,7 @@ public class MeshProber implements JoinAcceptor {
         } else if (operational == 0 && bare < ksafety /* kfactor + 1 */) {
             determination = safemode ? StartAction.SAFE_RECOVER : StartAction.RECOVER;
         } else if (operational == 0 && bare >= ksafety  /* kfactor + 1 */) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Cluster has incomplete command logs: "
+            Poisoner.crashLocalVoltDB("Cluster has incomplete command logs: "
                     + bare + " nodes have no command logs, while "
                     + (unmeshed - bare) + " nodes have them");
             return;
@@ -635,7 +635,7 @@ public class MeshProber implements JoinAcceptor {
             return m_probedDetermination.get();
         } catch (ExecutionException notThrownBecauseItIsASettableFuture) {
         } catch (InterruptedException e) {
-            org.voltdb.VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "interrupted while waiting to determine the cluster start action",
                     false, e);
         }
@@ -683,7 +683,7 @@ public class MeshProber implements JoinAcceptor {
         try {
             appendTo(js);
         } catch (JSONException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         return js.toString();
     }

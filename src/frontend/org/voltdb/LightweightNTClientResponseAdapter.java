@@ -37,6 +37,7 @@ import org.voltdb.client.BatchTimeoutOverrideType;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcedureCallback;
 import org.voltdb.utils.MiscUtils;
+import org.voltdb.utils.Poisoner;
 
 /**
  * This is a fork of InternalClientResponseAdapter that removes a lot of extra code like
@@ -127,7 +128,7 @@ public class LightweightNTClientResponseAdapter implements Connection, WriteStre
             }
             enqueue(buf);
         } catch (IOException e) {
-            VoltDB.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, e);
+            Poisoner.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, e);
         }
     }
 
@@ -138,7 +139,7 @@ public class LightweightNTClientResponseAdapter implements Connection, WriteStre
         try {
             resp.initFromBuffer(b);
         } catch (IOException ex) {
-            VoltDB.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, ex);
+            Poisoner.crashLocalVoltDB("enqueue() in InternalClientResponseAdapter throw an exception", true, ex);
         }
 
         final ProcedureCallback callback = m_callbacks.remove(resp.getClientHandle());

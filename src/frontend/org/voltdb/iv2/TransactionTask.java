@@ -19,11 +19,11 @@ package org.voltdb.iv2;
 
 import org.voltcore.logging.VoltLogger;
 import org.voltdb.SiteProcedureConnection;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltTable.ColumnInfo;
 import org.voltdb.VoltType;
 import org.voltdb.dtxn.TransactionState;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.util.concurrent.ListenableFuture;
 
@@ -66,7 +66,7 @@ public abstract class TransactionTask extends SiteTasker
             try {
                 m_durabilityBackpressureFuture.get();
             } catch (Throwable t) {
-                VoltDB.crashLocalVoltDB("Unexpected exception waiting for durability future", true, t);
+                Poisoner.crashLocalVoltDB("Unexpected exception waiting for durability future", true, t);
             }
             durabilityTraceEnd();
         }

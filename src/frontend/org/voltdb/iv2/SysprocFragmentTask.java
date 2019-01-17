@@ -45,6 +45,7 @@ import org.voltdb.rejoin.TaskLog;
 import org.voltdb.sysprocs.SysProcFragmentId;
 import org.voltdb.utils.Encoder;
 import org.voltdb.utils.LogKeys;
+import org.voltdb.utils.Poisoner;
 import org.voltdb.utils.VoltTableUtil;
 import org.voltdb.utils.VoltTrace;
 
@@ -163,7 +164,7 @@ public class SysprocFragmentTask extends FragmentTaskBase
     {
         // special case @UpdateCore to die die die during rejoin
         if (SysProcFragmentId.isCatalogUpdateFragment(m_fragmentMsg.getPlanHash(0))) {
-            VoltDB.crashLocalVoltDB("@UpdateCore is not supported during a rejoin. " +
+            Poisoner.crashLocalVoltDB("@UpdateCore is not supported during a rejoin. " +
                     "The rejoining node's VoltDB process will now exit.", false, null);
         }
         //If this is a snapshot creation we have the nonce of the snapshot
@@ -336,6 +337,7 @@ public class SysprocFragmentTask extends FragmentTaskBase
         return sb.toString();
     }
 
+    @Override
     public boolean needCoordination() {
         return !(m_txnState.isReadOnly() || isBorrowedTask() || m_isNPartition);
     }

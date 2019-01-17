@@ -44,13 +44,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.voltdb.common.Constants;
 import org.voltcore.zk.CoreZK;
 import org.voltdb.StartAction;
-import org.voltdb.VoltDB;
+import org.voltdb.common.Constants;
 import org.voltdb.common.NodeState;
 import org.voltdb.probe.MeshProber;
 import org.voltdb.probe.MeshProber.Determination;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 
@@ -79,9 +79,9 @@ public class TestHostMessenger {
 
     @After
     public void tearDown() throws Exception {
-        VoltDB.crashMessage = null;
-        VoltDB.ignoreCrash  = false;
-        VoltDB.wasCrashCalled = false;
+        Poisoner.crashMessage = null;
+        Poisoner.ignoreCrash  = false;
+        Poisoner.wasCrashCalled = false;
 
         for (HostMessenger hm : createdMessengers) {
             hm.shutdown();
@@ -801,7 +801,7 @@ public class TestHostMessenger {
 
     @Test
     public void testProbedRejoinOnWholeCluster() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         NodeStateRef upNodesState = new NodeStateRef(NodeState.INITIALIZING);
         MeshProber.Builder jcb = MeshProber.builder()
@@ -851,13 +851,13 @@ public class TestHostMessenger {
             hm4.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
+            assertTrue(Poisoner.wasCrashCalled);
         }
     }
 
     @Test
     public void testProbedRejoinWithMismatchedStartAction() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         NodeStateRef upNodesState = new NodeStateRef(NodeState.INITIALIZING);
         MeshProber.Builder jcb = MeshProber.builder()
@@ -910,8 +910,8 @@ public class TestHostMessenger {
             hm4.start();
             fail("did not crash on mismatched start actions");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("use init and start to join this cluster"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("use init and start to join this cluster"));
         }
     }
 
@@ -1097,7 +1097,7 @@ public class TestHostMessenger {
 
     @Test
     public void testProbedConfigMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1135,14 +1135,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("deployment options that do not match"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("deployment options that do not match"));
         }
     }
 
     @Test
     public void testProbedMeshMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1180,14 +1180,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("Mismatched list of hosts"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("Mismatched list of hosts"));
         }
     }
 
     @Test
     public void testProbedTerminusNonceMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1226,14 +1226,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("have different startup snapshots nonces"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("have different startup snapshots nonces"));
         }
     }
 
     @Test
     public void testProbedHostCountMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1271,14 +1271,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("Mismatched host count"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("Mismatched host count"));
         }
     }
 
     @Test
     public void testProbedJoinerAcceptorMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1330,14 +1330,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("is incompatible with this node verion"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("is incompatible with this node verion"));
         }
     }
 
     @Test
     public void testProbedEditionMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1376,14 +1376,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("cannot contain both enterprise and community editions"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("cannot contain both enterprise and community editions"));
         }
     }
 
     @Test
     public void testStartActionMismatchCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1421,14 +1421,14 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("Start action CREATE does not match PROBE"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("Start action CREATE does not match PROBE"));
         }
     }
 
     @Test
     public void testMultipleMismatchesCrash() throws Exception {
-        VoltDB.ignoreCrash = true;
+        Poisoner.ignoreCrash = true;
 
         MeshProber.Builder jcb = MeshProber.builder()
                 .coordinators(coordinators(2))
@@ -1472,10 +1472,10 @@ public class TestHostMessenger {
             hm3.start();
             fail("did not crash on whole cluster rejoin attempt");
         } catch (AssertionError pass) {
-            assertTrue(VoltDB.wasCrashCalled);
-            assertTrue(VoltDB.crashMessage.contains("Start action CREATE does not match PROBE"));
-            assertTrue(VoltDB.crashMessage.contains("Mismatched host count"));
-            assertTrue(VoltDB.crashMessage.contains("deployment options that do not match"));
+            assertTrue(Poisoner.wasCrashCalled);
+            assertTrue(Poisoner.crashMessage.contains("Start action CREATE does not match PROBE"));
+            assertTrue(Poisoner.crashMessage.contains("Mismatched host count"));
+            assertTrue(Poisoner.crashMessage.contains("deployment options that do not match"));
         }
     }
 

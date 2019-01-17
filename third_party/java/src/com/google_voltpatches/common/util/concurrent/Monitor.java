@@ -16,14 +16,15 @@ package com.google_voltpatches.common.util.concurrent;
 
 import static com.google_voltpatches.common.base.Preconditions.checkNotNull;
 
-import com.google_voltpatches.common.annotations.Beta;
-import com.google_voltpatches.common.annotations.GwtIncompatible;
-import com.google_voltpatches.common.base.Throwables;
-import com.google_voltpatches.j2objc.annotations.Weak;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.annotation_voltpatches.concurrent.GuardedBy;
+
+import com.google_voltpatches.common.annotations.Beta;
+import com.google_voltpatches.common.annotations.GwtIncompatible;
+import com.google_voltpatches.j2objc.annotations.Weak;
 
 /**
  * A synchronization abstraction supporting waiting on arbitrary boolean conditions.
@@ -1016,7 +1017,7 @@ public final class Monitor {
       return guard.isSatisfied();
     } catch (Throwable throwable) {
       signalAllWaiters();
-      throw Throwables.propagate(throwable);
+      throw new RuntimeException(throwable);
     }
   }
 

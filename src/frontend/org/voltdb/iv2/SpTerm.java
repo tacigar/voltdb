@@ -31,6 +31,7 @@ import org.voltcore.zk.BabySitter.Callback;
 import org.voltcore.zk.LeaderElector;
 import org.voltdb.VoltDB;
 import org.voltdb.VoltZK;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.base.Supplier;
 import com.google_voltpatches.common.collect.ImmutableList;
@@ -136,9 +137,9 @@ public class SpTerm implements Term
             m_babySitter = pair.getFirst();
         }
         catch (ExecutionException ee) {
-            VoltDB.crashLocalVoltDB("Unable to create babysitter starting term.", true, ee);
+            Poisoner.crashLocalVoltDB("Unable to create babysitter starting term.", true, ee);
         } catch (InterruptedException e) {
-            VoltDB.crashLocalVoltDB("Unable to create babysitter starting term.", true, e);
+            Poisoner.crashLocalVoltDB("Unable to create babysitter starting term.", true, e);
         }
     }
 

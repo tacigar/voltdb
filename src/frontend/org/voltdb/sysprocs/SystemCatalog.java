@@ -24,9 +24,9 @@ import org.voltcore.logging.VoltLogger;
 import org.voltdb.DependencyPair;
 import org.voltdb.ParameterSet;
 import org.voltdb.SystemProcedureExecutionContext;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltSystemProcedure;
 import org.voltdb.VoltTable;
+import org.voltdb.utils.Poisoner;
 
 /**
  * Return VoltTable results that correspond to JDBC result sets for selected
@@ -62,7 +62,7 @@ public class SystemCatalog extends VoltSystemProcedure
     public VoltTable[] run(SystemProcedureExecutionContext ctx,
                            String selector) throws VoltAbortException
     {
-        VoltDB.crashLocalVoltDB("This should never be called.", false, null);
+        Poisoner.crashLocalVoltDB("This should never be called.", false, null);
         return null;
     }
 

@@ -21,8 +21,8 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.Properties;
 
-import org.voltdb.VoltDB;
 import org.voltdb.importer.formatter.builtin.VoltCSVFormatterFactory;
+import org.voltdb.utils.Poisoner;
 
 /**
  * FormatterBuilder will delegate the formatter creation to concrete formatter factory to
@@ -107,7 +107,7 @@ public class FormatterBuilder {
                         return (Formatter) ctor.newInstance(ctorParms);
                     }
                     catch (Exception e) {
-                        VoltDB.crashLocalVoltDB("Failed to create formatter " + formatName);
+                        Poisoner.crashLocalVoltDB("Failed to create formatter " + formatName);
                         return null;
                     }
 

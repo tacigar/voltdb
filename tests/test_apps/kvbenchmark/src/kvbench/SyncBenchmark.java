@@ -60,7 +60,7 @@ import org.voltdb.client.ClientStatsContext;
 import org.voltdb.client.NullCallback;
 
 import com.google_voltpatches.common.base.Preconditions;
-import com.google_voltpatches.common.base.Throwables;
+
 
 public class SyncBenchmark {
 
@@ -204,7 +204,7 @@ public class SyncBenchmark {
                 m_socket.connect(addr,2000);
                 pw = new PrintWriter(m_socket.getOutputStream(),true);
             } catch (IOException ioex) {
-                Throwables.propagate(ioex);
+                throw new RuntimeException(ioex);
             }
             m_writer = pw;
         }
@@ -241,7 +241,7 @@ public class SyncBenchmark {
                 // 'true' to flush the buffer every println/printf
                 pw = new PrintWriter(new FileWriter(fh), true);
             } catch (IOException ioex) {
-                Throwables.propagate(ioex);
+                throw new RuntimeException(ioex);
             }
             m_writer = pw;
             pw.println("TIMESTAMP,TSMILLIS,COMPLETED,ABORTS,ERRORS,TIMEOUTS,THROUGHPUT,AVERAGE_LATENCY,TWO9S_LATENCY,THREE9S_LATENCY,FOUR9S_LATENCY,FIVE9S_LATENCY");

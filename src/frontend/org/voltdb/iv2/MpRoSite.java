@@ -46,7 +46,6 @@ import org.voltdb.SystemProcedureExecutionContext;
 import org.voltdb.TableStreamType;
 import org.voltdb.TheHashinator;
 import org.voltdb.TupleStreamStateInfo;
-import org.voltdb.VoltDB;
 import org.voltdb.VoltProcedure.VoltAbortException;
 import org.voltdb.VoltTable;
 import org.voltdb.catalog.Cluster;
@@ -62,6 +61,7 @@ import org.voltdb.messaging.FastDeserializer;
 import org.voltdb.settings.ClusterSettings;
 import org.voltdb.settings.NodeSettings;
 import org.voltdb.sysprocs.LowImpactDeleteNT.ComparisonOperation;
+import org.voltdb.utils.Poisoner;
 
 /**
  * An implementation of Site which provides only the functionality
@@ -400,13 +400,13 @@ public class MpRoSite implements Runnable, SiteProcedureConnection
             // sure VoltDB crashes.
             String errmsg = "Site: " + org.voltcore.utils.CoreUtils.hsIdToString(m_siteId) +
                 " ran out of Java memory. " + "This node will shut down.";
-            VoltDB.crashLocalVoltDB(errmsg, true, e);
+            Poisoner.crashLocalVoltDB(errmsg, true, e);
         }
         catch (Throwable t)
         {
             String errmsg = "Site: " + org.voltcore.utils.CoreUtils.hsIdToString(m_siteId) +
                 " encountered an " + "unexpected error and will die, taking this VoltDB node down.";
-            VoltDB.crashLocalVoltDB(errmsg, true, t);
+            Poisoner.crashLocalVoltDB(errmsg, true, t);
         }
     }
 

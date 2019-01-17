@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +59,7 @@ import org.voltdb.exportclient.ExportClientBase;
 import org.voltdb.iv2.SpInitiator;
 import org.voltdb.messaging.LocalMailbox;
 import org.voltdb.sysprocs.ExportControl.OperationMode;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableList;
 import com.google_voltpatches.common.collect.Sets;
@@ -161,7 +161,7 @@ public class ExportGeneration implements Generation {
                     try {
                         addDataSource(ad, localPartitionsToSites, onDiskPartitions, processor);
                     } catch (IOException e) {
-                        VoltDB.crashLocalVoltDB("Error intializing export datasource " + ad, true, e);
+                        Poisoner.crashLocalVoltDB("Error intializing export datasource " + ad, true, e);
                     }
                 } else {
                     //Delete ads that have no data
@@ -213,8 +213,7 @@ public class ExportGeneration implements Generation {
     // mark a DataSource as dropped if its connector is dropped.
     private void updateDataSources( List<String> exportSignatures) {
         synchronized(m_dataSourcesByPartition) {
-            for (Iterator<Map<String, ExportDataSource>> it = m_dataSourcesByPartition.values().iterator(); it.hasNext();) {
-                Map<String, ExportDataSource> sources = it.next();
+            for (Map<String, ExportDataSource> sources : m_dataSourcesByPartition.values()) {
                 for (String signature : sources.keySet()) {
                     ExportDataSource src = sources.get(signature);
                     if (!exportSignatures.contains(signature)) {
@@ -441,7 +440,9 @@ public class ExportGeneration implements Generation {
                     ImmutableList.Builder<Long> mailboxes = ImmutableList.builder();
 
                     for (String child : children) {
-                        if (child.equals(Long.toString(m_mbox.getHSId()))) continue;
+                        if (child.equals(Long.toString(m_mbox.getHSId()))) {
+                            continue;
+                        }
                         mailboxes.add(Long.valueOf(child));
                     }
                     ImmutableList<Long> mailboxHsids = mailboxes.build();
@@ -472,7 +473,7 @@ public class ExportGeneration implements Generation {
                         try {
                             handleChildUpdate(event, messenger);
                         } catch (Throwable t) {
-                            VoltDB.crashLocalVoltDB("Error in export ack handling", true, t);
+                            Poisoner.crashLocalVoltDB("Error in export ack handling", true, t);
                         }
                     }
                 });
@@ -482,7 +483,9 @@ public class ExportGeneration implements Generation {
     }
 
     private void handleChildUpdate(final WatchedEvent event, final HostMessenger messenger) {
-        if (shutdown) return;
+        if (shutdown) {
+            return;
+        }
         messenger.getZK().getChildren(event.getPath(), constructMailboxChildWatcher(messenger), constructChildRetrievalCallback(), null);
     }
 
@@ -498,7 +501,9 @@ public class ExportGeneration implements Generation {
                     @Override
                     public void run() {
                         try {
-                            if (shutdown) return;
+                            if (shutdown) {
+                                return;
+                            }
                             KeeperException.Code code = KeeperException.Code.get(rc);
                             //Other node must have drained so ignore.
                             if (code == KeeperException.Code.NONODE) {
@@ -513,7 +518,9 @@ public class ExportGeneration implements Generation {
                             final int partition = Integer.valueOf(split[split.length - 1]);
                             ImmutableList.Builder<Long> mailboxes = ImmutableList.builder();
                             for (String child : children) {
-                                if (child.equals(Long.toString(m_mbox.getHSId()))) continue;
+                                if (child.equals(Long.toString(m_mbox.getHSId()))) {
+                                    continue;
+                                }
                                 mailboxes.add(Long.valueOf(child));
                             }
                             ImmutableList<Long> mailboxHsids = mailboxes.build();
@@ -528,7 +535,7 @@ public class ExportGeneration implements Generation {
                             m_replicasHSIds.put(partition, mailboxHsids);
                             updateAckMailboxes(partition, newHSIds);
                         } catch (Throwable t) {
-                            VoltDB.crashLocalVoltDB("Error in export ack handling", true, t);
+                            Poisoner.crashLocalVoltDB("Error in export ack handling", true, t);
                         }
                     }
                 });
@@ -548,8 +555,9 @@ public class ExportGeneration implements Generation {
         for (Map<String, ExportDataSource> dataSources : dataSourcesByPartition.values()) {
             for (ExportDataSource source : dataSources.values()) {
                 ListenableFuture<ExportStatsRow> syncFuture = source.getImmutableStatsRow(interval);
-                if (syncFuture != null)
+                if (syncFuture != null) {
                     tasks.add(syncFuture);
+                }
             }
         }
 
@@ -666,7 +674,7 @@ public class ExportGeneration implements Generation {
                         }
                     }
                 } catch (IOException e) {
-                    VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Error creating datasources for table " +
                             table.getTypeName() + " host id " + hostId, true, e);
                 }
@@ -764,7 +772,7 @@ public class ExportGeneration implements Generation {
                 Futures.allAsList(tasks).get();
             }
         } catch (Exception e) {
-            VoltDB.crashLocalVoltDB("Unexpected exception truncating export data during snapshot restore. " +
+            Poisoner.crashLocalVoltDB("Unexpected exception truncating export data during snapshot restore. " +
                                     "You can back up export overflow data and start the " +
                                     "DB without it to get past this error", true, e);
         }
@@ -776,15 +784,17 @@ public class ExportGeneration implements Generation {
             for (Map<String, ExportDataSource> dataSources : m_dataSourcesByPartition.values()) {
                 for (ExportDataSource source : dataSources.values()) {
                     ListenableFuture<?> syncFuture = source.sync(nofsync);
-                    if (syncFuture != null)
+                    if (syncFuture != null) {
                         tasks.add(syncFuture);
+                    }
                 }
             }
         }
 
         try {
-            if (!tasks.isEmpty())
+            if (!tasks.isEmpty()) {
                 Futures.allAsList(tasks).get();
+            }
         } catch (Exception e) {
             exportLog.error("Unexpected exception syncing export data during snapshot save.", e);
         }
@@ -895,16 +905,13 @@ public class ExportGeneration implements Generation {
         exportLog.info("Export " + operation + " source:" + exportSource + " targets:" + exportTargets);
         synchronized (m_dataSourcesByPartition) {
             RealVoltDB volt = (RealVoltDB) VoltDB.instance();
-            for (Iterator<Integer> partitionIt = m_dataSourcesByPartition.keySet().iterator(); partitionIt.hasNext();) {
-                // apply to partition leaders only
-                Integer partition = partitionIt.next();
+            for (Integer partition : m_dataSourcesByPartition.keySet()) {
                 boolean isLeader = ((SpInitiator)volt.getInitiator(partition)).isLeader();
                 if (!isLeader) {
                     continue;
                 }
                 Map<String, ExportDataSource> sources = m_dataSourcesByPartition.get(partition);
-                for (Iterator<ExportDataSource> it = sources.values().iterator(); it.hasNext();) {
-                    ExportDataSource eds = it.next();
+                for (ExportDataSource eds : sources.values()) {
                     if (!StringUtil.isEmpty(exportSource) && !eds.getTableName().equalsIgnoreCase(exportSource)) {
                         continue;
                     }

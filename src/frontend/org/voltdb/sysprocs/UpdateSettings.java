@@ -40,7 +40,8 @@ import org.voltdb.VoltZK;
 import org.voltdb.dtxn.DtxnConstants;
 import org.voltdb.settings.ClusterSettings;
 import org.voltdb.settings.SettingsException;
-import org.voltdb.utils.VoltTableUtil;
+import org.voltdb.utils.Poisoner;
+import org.voltdb.utils.VoltTableUtil;;
 
 public class UpdateSettings extends VoltSystemProcedure {
 
@@ -138,7 +139,7 @@ public class UpdateSettings extends VoltSystemProcedure {
             return new DependencyPair.TableDependencyPair(DEP_updateSettingsAggregate, result);
 
         } else {
-            VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Received unrecognized plan fragment id " + fragmentId + " in UpdateSettings",
                     false,
                     null);

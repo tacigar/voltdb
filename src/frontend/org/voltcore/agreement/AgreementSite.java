@@ -57,6 +57,7 @@ import org.voltcore.messaging.TransactionInfoBaseMessage;
 import org.voltcore.messaging.VoltMessage;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.RateLimitedLogger;
+import org.voltdb.utils.Poisoner;
 
 import com.google_voltpatches.common.collect.ImmutableSet;
 
@@ -258,7 +259,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                     if (ot.txnId < m_minTxnIdAfterRecovery) {
                         String errMsg = "Transaction queue released a transaction from before this " +
                         " node was recovered was complete";
-                        org.voltdb.VoltDB.crashLocalVoltDB(errMsg, false, null);
+                        Poisoner.crashLocalVoltDB(errMsg, false, null);
                     }
                     m_transactionsById.remove(ot.txnId);
 
@@ -317,7 +318,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                 }
             }
         } catch (Throwable e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Error in agreement site", true, e);
+            Poisoner.crashLocalVoltDB("Error in agreement site", true, e);
         } finally {
             try {
                 shutdownInternal();
@@ -428,7 +429,9 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                  */
                 if (!isRead) {
                     for (long initiatorHSId : m_hsIds) {
-                        if (initiatorHSId == m_hsId) continue;
+                        if (initiatorHSId == m_hsId) {
+                            continue;
+                        }
                         AgreementTaskMessage atm =
                             new AgreementTaskMessage(
                                     r,
@@ -495,12 +498,12 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                 assert(m_recovering);
                 assert(m_recoveryStage == RecoveryStage.SENT_PROPOSAL);
                 if (m_recoveryStage != RecoveryStage.SENT_PROPOSAL) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Received a recovery snapshot in stage " + m_recoveryStage.toString(), true, null);
                 }
                 long selectedRecoverBeforeTxn = metadata.getLong();
                 if (selectedRecoverBeforeTxn < m_recoverBeforeTxn) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Selected recover before txn was earlier than the  proposed recover before txn", true, null);
                 }
                 m_recoverBeforeTxn = selectedRecoverBeforeTxn;
@@ -508,7 +511,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                 try {
                     m_recoverySnapshot = org.xerial.snappy.Snappy.uncompress(bpm.m_payload);
                 } catch (IOException e) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Unable to decompress ZK snapshot", true, e);
+                    Poisoner.crashLocalVoltDB("Unable to decompress ZK snapshot", true, e);
                 }
                 m_recoveryStage = RecoveryStage.RECEIVED_SNAPSHOT;
 
@@ -530,7 +533,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                 final long lastSafeTxnId = jsObj.getLong("lastSafeTxnId");
                 final long joiningHSId = jsObj.getLong("joiningHSId");
                 if (m_recovering) {
-                    org.voltdb.VoltDB.crashLocalVoltDB(
+                    Poisoner.crashLocalVoltDB(
                             "Received a join request during recovery for " +
                             CoreUtils.hsIdToString(joiningHSId)  +
                             " from " + CoreUtils.hsIdToString(initiatorHSId), true, null);
@@ -572,7 +575,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
             m_server.getZKDatabase().deserializeSnapshot(bia);
             m_server.createSessionTracker();
         } catch (Exception e) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Error loading agreement database", false, e);
+            Poisoner.crashLocalVoltDB("Error loading agreement database", false, e);
         }
         m_recoverySnapshot = null;
         m_recoveryStage = RecoveryStage.RECOVERED;
@@ -614,7 +617,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
     private void discoverGlobalFaultData(FaultMessage faultMessage) {
         //Keep it simple and don't try to recover on the recovering node.
         if (m_recovering) {
-            org.voltdb.VoltDB.crashLocalVoltDB(
+            Poisoner.crashLocalVoltDB(
                     "Aborting recovery due to a remote node (" + CoreUtils.hsIdToString(faultMessage.failedSite) +
                     ") failure. Retry again.",
                     true,
@@ -743,7 +746,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                         lom.m_sourceHSId = m_hsId;
                         processMessage(lom);
                     } catch (Exception e) {
-                        org.voltdb.VoltDB.crashLocalVoltDB(
+                        Poisoner.crashLocalVoltDB(
                                 "Unexpected exception processing AgreementSite message", true, e);
                     }
                 } finally {
@@ -775,7 +778,7 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
         // this timeout is totally arbitrary
         // 30s is pretty long in general, but sometimes localcluster may need this long :-(
         if (!m_recoveryComplete.await(30, TimeUnit.SECONDS)) {
-            org.voltdb.VoltDB.crashLocalVoltDB("Timed out waiting for the agreement site to recover", false, null);
+            Poisoner.crashLocalVoltDB("Timed out waiting for the agreement site to recover", false, null);
         }
     }
 
@@ -791,7 +794,9 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                     final long txnId = m_idManager.getNextUniqueTransactionId();
 
                     for (long initiatorHSId : m_hsIds) {
-                        if (initiatorHSId == m_hsId) continue;
+                        if (initiatorHSId == m_hsId) {
+                            continue;
+                        }
                         JSONObject jsObj = new JSONObject();
                         jsObj.put("txnId", txnId);
                         jsObj.put("initiatorHSId", m_hsId);
@@ -812,11 +817,11 @@ public class AgreementSite implements org.apache.zookeeper_voltpatches.server.Zo
                         new AgreementRejoinTransactionState( txnId, m_hsId, joiningSite, cdl );
 
                     if (!m_txnQueue.add(arts)) {
-                        org.voltdb.VoltDB.crashLocalVoltDB("Shouldn't have failed to add txn", true, null);
+                        Poisoner.crashLocalVoltDB("Shouldn't have failed to add txn", true, null);
                     }
                     m_transactionsById.put(arts.txnId, arts);
                 } catch (Throwable e) {
-                    org.voltdb.VoltDB.crashLocalVoltDB("Error constructing JSON", false, e);
+                    Poisoner.crashLocalVoltDB("Error constructing JSON", false, e);
                 }
             }
         };
