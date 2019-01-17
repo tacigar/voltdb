@@ -30,6 +30,30 @@ import org.voltdb.utils.Poisoner;
  */
 public class VoltDB {
 
+    /**
+     * Entry point for the VoltDB server process.
+     * @param args Requires catalog and deployment file locations.
+     */
+    public static void main(String[] args) {
+        VoltConfiguration config = new VoltConfiguration(args);
+        try {
+            if (!config.validate()) {
+                System.exit(-1);
+            } else {
+                if (config.m_startAction == StartAction.GET) {
+                    cli(config);
+                } else {
+                    initialize(config);
+                    instance().run();
+                }
+            }
+        }
+        catch (OutOfMemoryError e) {
+            String errmsg = "VoltDB Main thread: ran out of Java memory. This node will shut down.";
+            Poisoner.crashLocalVoltDB(errmsg, false, e);
+        }
+    }
+
     /** Whatever the default time zone was for this locale before we replaced it. */
     public static final TimeZone REAL_DEFAULT_TIMEZONE;
 
@@ -51,31 +75,6 @@ public class VoltDB {
 
     public static BackendTarget getEEBackendType() {
         return m_config.m_backend;
-    }
-
-    /**
-     * Entry point for the VoltDB server process.
-     * @param args Requires catalog and deployment file locations.
-     */
-    public static void main(String[] args) {
-        //Thread.setDefaultUncaughtExceptionHandler(new VoltUncaughtExceptionHandler());
-        VoltConfiguration config = new VoltConfiguration(args);
-        try {
-            if (!config.validate()) {
-                System.exit(-1);
-            } else {
-                if (config.m_startAction == StartAction.GET) {
-                    cli(config);
-                } else {
-                    initialize(config);
-                    instance().run();
-                }
-            }
-        }
-        catch (OutOfMemoryError e) {
-            String errmsg = "VoltDB Main thread: ran out of Java memory. This node will shut down.";
-            Poisoner.crashLocalVoltDB(errmsg, false, e);
-        }
     }
 
     /**

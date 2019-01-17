@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.voltcore.logging.Level;
 import org.voltcore.logging.VoltLogger;
 
-import com.google.common.base.Throwables;
+import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.common.cache.Cache;
 import com.google_voltpatches.common.cache.CacheBuilder;
 

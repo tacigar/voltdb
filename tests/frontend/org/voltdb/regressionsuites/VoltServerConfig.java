@@ -52,7 +52,7 @@ public abstract class VoltServerConfig {
         return m_initialCatalog;
     }
 
-    private static Set<VoltServerConfig> s_instanceSet= null;
+    private static Set<VoltServerConfig> s_instanceSet = null;
 
     /**
      * Build a catalog jar with the required topology according to the

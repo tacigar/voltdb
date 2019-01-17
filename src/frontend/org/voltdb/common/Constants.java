@@ -21,8 +21,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.TimeZone;
 
-import org.voltdb.iv2.UniqueIdGenerator;
-
 /** Constants used by VoltDB */
 public class Constants {
 
@@ -57,7 +55,7 @@ public class Constants {
 
     /**
      * For generating the unique ID.
-     * @see UniqueIdGenerator#getNextUniqueId()
+     * @see org.voltdb.iv2.UniqueIdGenerator#getNextUniqueId()
      */
     public static final int BACKWARD_TIME_FORGIVENESS_WINDOW_MS = 3000;
 

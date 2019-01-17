@@ -32,7 +32,7 @@ import org.voltcore.logging.VoltNullLogger.CoreNullLogger;
 import org.voltcore.utils.EstTime;
 import org.voltcore.utils.RateLimitedLogger;
 
-import com.google.common.base.Throwables;
+import com.google_voltpatches.common.base.Throwables;
 
 
 

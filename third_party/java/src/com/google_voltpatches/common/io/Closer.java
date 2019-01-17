@@ -25,10 +25,10 @@ import java.util.logging.Level;
 
 import javax.annotation_voltpatches.Nullable;
 
-import com.google.common.base.Throwables;
 import com.google_voltpatches.common.annotations.Beta;
 import com.google_voltpatches.common.annotations.GwtIncompatible;
 import com.google_voltpatches.common.annotations.VisibleForTesting;
+import com.google_voltpatches.common.base.Throwables;
 import com.google_voltpatches.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
