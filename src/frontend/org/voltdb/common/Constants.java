@@ -36,6 +36,9 @@ public class Constants {
      */
     public static final String ODBC_DATE_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss.SSS";
 
+    /** Whatever the default time zone was for this locale before we replaced it. */
+    public static final TimeZone REAL_DEFAULT_TIMEZONE = TimeZone.getDefault();
+
     /** Default heart beat timeout value */
     public static final int DEFAULT_HEARTBEAT_TIMEOUT_SECONDS = 90;
     public static final String VOLT_TMP_DIR = "volt.tmpdir";

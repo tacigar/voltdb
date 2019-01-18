@@ -37,7 +37,6 @@ import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB;
 import org.voltdb.common.Constants;
 import org.voltdb.export.AdvertisedDataSource;
 import org.voltdb.export.ExportDataProcessor;
@@ -79,7 +78,7 @@ public class KafkaExportClient extends ExportClientBase {
 
     //Keep this default to false as people out there might depend on index in csv
     boolean m_skipInternals = false;
-    TimeZone m_timeZone = VoltDB.REAL_DEFAULT_TIMEZONE;
+    TimeZone m_timeZone = Constants.REAL_DEFAULT_TIMEZONE;
     BinaryEncoding m_binaryEncoding = BinaryEncoding.HEX;
     Map<String, String> m_tablePartitionColumns;
     boolean m_pollFutures = false;

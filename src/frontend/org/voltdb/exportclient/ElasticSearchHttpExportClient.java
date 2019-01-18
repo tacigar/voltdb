@@ -49,7 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.json_voltpatches.JSONException;
 import org.json_voltpatches.JSONObject;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB;
+import org.voltdb.common.Constants;
 import org.voltdb.export.AdvertisedDataSource;
 import org.voltdb.export.ExportManager;
 import org.voltdb.exportclient.decode.BatchDecoder.BulkException;
@@ -57,7 +57,6 @@ import org.voltdb.exportclient.decode.ElasticSearchJsonEntityDecoder;
 import org.voltdb.exportclient.decode.EndpointExpander;
 import org.voltdb.exportclient.decode.EntityDecoder;
 import org.voltdb.exportclient.decode.JsonStringDecoder;
-
 
 import com.google_voltpatches.common.collect.ImmutableMap;
 import com.google_voltpatches.common.collect.Lists;
@@ -167,7 +166,7 @@ public class ElasticSearchHttpExportClient extends ExportClientBase
     }
 
     String m_endpoint = null;
-    TimeZone m_timeZone = VoltDB.REAL_DEFAULT_TIMEZONE;
+    TimeZone m_timeZone = Constants.REAL_DEFAULT_TIMEZONE;
     ContentType m_contentType = ContentType.APPLICATION_JSON;
     DecodeType m_decodeType = DecodeType.JSONEntity;
     boolean m_batchMode = true;

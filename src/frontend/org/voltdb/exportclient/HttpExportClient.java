@@ -86,7 +86,7 @@ import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
-import org.voltdb.VoltDB;
+import org.voltdb.common.Constants;
 import org.voltdb.export.AdvertisedDataSource;
 import org.voltdb.export.ExportManager;
 import org.voltdb.exportclient.decode.AvroEntityDecoder;
@@ -212,7 +212,7 @@ public class HttpExportClient extends ExportClientBase {
 
     String m_endpoint = null;
     String m_avroSchemaLocation = null;
-    TimeZone m_timeZone = VoltDB.REAL_DEFAULT_TIMEZONE;
+    TimeZone m_timeZone = Constants.REAL_DEFAULT_TIMEZONE;
     HttpMethod m_method = null;
     DecodeType m_decodeType = DecodeType.FORM;
     ContentType m_contentType = null;

@@ -54,16 +54,12 @@ public class VoltDB {
         }
     }
 
-    /** Whatever the default time zone was for this locale before we replaced it. */
-    public static final TimeZone REAL_DEFAULT_TIMEZONE;
-
     /** If VoltDB is running in your process, prepare to use UTC (GMT) time zone. */
     public synchronized static void setDefaultTimeZone() {
         TimeZone.setDefault(Constants.GMT_TIMEZONE);
     }
 
     static {
-        REAL_DEFAULT_TIMEZONE = TimeZone.getDefault();
         setDefaultTimeZone();
         ClientFactory.increaseClientCountToOne();
     }

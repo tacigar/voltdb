@@ -1670,7 +1670,7 @@ public class SnapshotUtil {
 
     public static String getShutdownSaveNonce(final long zkTxnId) {
         SimpleDateFormat dfmt = new SimpleDateFormat("'SHUTDOWN_'yyyyMMdd'T'HHmmss'_'");
-        dfmt.setTimeZone(VoltDB.REAL_DEFAULT_TIMEZONE);
+        dfmt.setTimeZone(Constants.REAL_DEFAULT_TIMEZONE);
         StringBuilder sb = new StringBuilder(64).append(dfmt.format(new Date()))
                 .append(Long.toString(zkTxnId, Character.MAX_RADIX));
         return sb.toString();

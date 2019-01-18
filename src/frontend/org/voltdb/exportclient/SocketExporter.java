@@ -42,13 +42,11 @@ import org.voltcore.logging.Level;
 import org.voltcore.logging.VoltLogger;
 import org.voltcore.utils.CoreUtils;
 import org.voltcore.utils.Pair;
-import org.voltdb.VoltDB;
 import org.voltdb.common.Constants;
 import org.voltdb.export.AdvertisedDataSource;
 import org.voltdb.export.ExportManager;
 import org.voltdb.exportclient.ExportDecoderBase.RestartBlockException;
 import org.voltdb.exportclient.decode.CSVStringDecoder;
-
 
 import com.google_voltpatches.common.net.HostAndPort;
 import com.google_voltpatches.common.util.concurrent.ListeningExecutorService;
@@ -58,7 +56,7 @@ public class SocketExporter extends ExportClientBase {
     private static final VoltLogger m_logger = new VoltLogger("ExportClient");
     String host;
     boolean m_skipInternals = false;
-    TimeZone m_timeZone = VoltDB.REAL_DEFAULT_TIMEZONE;
+    TimeZone m_timeZone = Constants.REAL_DEFAULT_TIMEZONE;
     ExportDecoderBase.BinaryEncoding m_binaryEncoding = ExportDecoderBase.BinaryEncoding.HEX;
     final Map<HostAndPort, OutputStream> haplist = new HashMap<HostAndPort, OutputStream>();
     private String[] serverArray;
