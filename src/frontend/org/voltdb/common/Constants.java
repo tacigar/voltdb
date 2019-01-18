@@ -134,4 +134,8 @@ public class Constants {
 
     /** The time zone VoltDB is actually using, currently always GMT. */
     public static final TimeZone VOLT_TIMEZONE = GMT_TIMEZONE;
+
+    static {
+        TimeZone.setDefault(GMT_TIMEZONE);
+    }
 }
