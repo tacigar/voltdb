@@ -330,21 +330,22 @@ public class SnapshotRestore extends VoltSystemProcedure {
     {
         if (fragmentId == SysProcFragmentId.PF_restoreDistributeExportAndPartitionSequenceNumbers)
         {
-            assert(params.toArray()[0] != null);
-            assert(params.toArray().length == 6);
-            assert(params.toArray()[0] instanceof byte[]);
-            assert(params.toArray()[2] instanceof long[]);
-            assert(params.toArray()[3] instanceof Long);
-            assert(params.toArray()[4] instanceof Long);
-            assert(params.toArray()[5] instanceof Integer);
+            Object[] paramsArr = params.toArray();
+            assert(paramsArr[0] != null);
+            assert(paramsArr.length == 6);
+            assert(paramsArr[0] instanceof byte[]);
+            assert(paramsArr[2] instanceof long[]);
+            assert(paramsArr[3] instanceof Long);
+            assert(paramsArr[4] instanceof Long);
+            assert(paramsArr[5] instanceof Integer);
             VoltTable result = new VoltTable(new VoltTable.ColumnInfo("RESULT", VoltType.STRING));
-            byte[] jsonDigest = (byte[])params.toArray()[0];
-            long snapshotTxnId = ((Long)params.toArray()[1]).longValue();
-            long perPartitionTxnIds[] = (long[])params.toArray()[2];
-            long clusterCreateTime = (Long)params.toArray()[3];
-            long drVersion = (Long)params.toArray()[4];
+            byte[] jsonDigest = (byte[])paramsArr[0];
+            long snapshotTxnId = ((Long)paramsArr[1]).longValue();
+            long perPartitionTxnIds[] = (long[])paramsArr[2];
+            long clusterCreateTime = (Long)paramsArr[3];
+            long drVersion = (Long)paramsArr[4];
             // Hack-ish because ParameterSet don't allow us to pass Boolean
-            boolean isRecover = (Integer)params.toArray()[5] == 1;
+            boolean isRecover = (Integer)paramsArr[5] == 1;
 
             /*
              * Use the per partition txn ids to set the initial txnid value from the snapshot
@@ -360,6 +361,9 @@ public class SnapshotRestore extends VoltSystemProcedure {
                 @SuppressWarnings("unchecked")
                 Map<String, Map<Integer, Pair<Long, Long>>> exportSequenceNumbers =
                         (Map<String, Map<Integer, Pair<Long, Long>>>)ois.readObject();
+                
+                @SuppressWarnings("unchecked")
+                Map<Integer, Boolean> externalStreamsStates = (Map<Integer, Boolean>) ois.readObject();
 
                 @SuppressWarnings("unchecked")
                 Map<Integer, Long> drSequenceNumbers = (Map<Integer, Long>)ois.readObject();
@@ -373,7 +377,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
 
                 if (isRecover) {
                     performRecoverDigestState(context, snapshotTxnId, perPartitionTxnIds, clusterCreateTime,
-                            drVersion, drSequenceNumbers, drMixedClusterSizeConsumerState);
+                            drVersion, drSequenceNumbers, drMixedClusterSizeConsumerState, externalStreamsStates);
                 }
             } catch (Exception e) {
                 e.printStackTrace();//l4j doesn't print the stack trace
@@ -1165,38 +1169,24 @@ public class SnapshotRestore extends VoltSystemProcedure {
         }
         savefile_data[0].resetRowPosition();
 
-        List<JSONObject> digests;
-        Map<String, Map<Integer, Pair<Long, Long>>> exportSequenceNumbers;
-        Map<Integer, Long> drSequenceNumbers;
-        long perPartitionTxnIds[];
-        Map<Integer, Map<Integer, Map<Integer, DRSiteDrIdTracker>>> remoteDCLastSeenIds;
-        long clusterCreateTime;
-        long drVersion;
+        DigestScanResult digestScanResult = null;
         try {
             // Digest scan.
-            DigestScanResult digestScanResult =
-                    performRestoreDigestScanWork(isRecover);
-            digests = digestScanResult.digests;
-            exportSequenceNumbers = digestScanResult.exportSequenceNumbers;
-            drSequenceNumbers = digestScanResult.drSequenceNumbers;
-            perPartitionTxnIds = digestScanResult.perPartitionTxnIds;
-            remoteDCLastSeenIds = digestScanResult.remoteDCLastSeenIds;
-            clusterCreateTime = digestScanResult.clusterCreateTime;
-            drVersion = digestScanResult.drVersion;
+            digestScanResult = performRestoreDigestScanWork(isRecover);
 
-            if (!isRecover || perPartitionTxnIds.length == 0) {
-                perPartitionTxnIds = new long[] {
+            if (!isRecover || digestScanResult.perPartitionTxnIds.length == 0) {
+                digestScanResult.perPartitionTxnIds = new long[] {
                         DeprecatedProcedureAPIAccess.getVoltPrivateRealTransactionId(this)
                 };
             }
 
             // Hashinator scan and distribution.
             // Missing digests will be officially handled later.
-            if (useHashinatorData && !digests.isEmpty()) {
+            if (useHashinatorData && !digestScanResult.digests.isEmpty()) {
                 // Need the instance ID for sanity checks.
                 InstanceId iid = null;
-                if (digests.get(0).has("instanceId")) {
-                    iid = new InstanceId(digests.get(0).getJSONObject("instanceId"));
+                if (digestScanResult.digests.get(0).has("instanceId")) {
+                    iid = new InstanceId(digestScanResult.digests.get(0).getJSONObject("instanceId"));
                 }
                 byte[] hashConfig = performRestoreHashinatorScanWork(iid);
                 if (hashConfig != null) {
@@ -1232,10 +1222,10 @@ public class SnapshotRestore extends VoltSystemProcedure {
 
         HashSet<String> relevantTableNames = new HashSet<String>();
         try {
-            if (digests.isEmpty()) {
+            if (digestScanResult.digests.isEmpty()) {
                 throw new Exception("No snapshot related digests files found");
             }
-            for (JSONObject obj : digests) {
+            for (JSONObject obj : digestScanResult.digests) {
                 JSONArray tables = obj.getJSONArray("tables");
                 for (int ii = 0; ii < tables.length(); ii++) {
                     relevantTableNames.add(tables.getString(ii));
@@ -1321,7 +1311,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
          * partitions that are no longer present
          */
         try {
-            updatePerPartitionTxnIdsToZK(perPartitionTxnIds);
+            updatePerPartitionTxnIdsToZK(digestScanResult.perPartitionTxnIds);
         } catch (Exception e) {
             ColumnInfo[] result_columns = new ColumnInfo[2];
             int i = 0;
@@ -1338,7 +1328,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
         // that touch the new partitions will be in the command log and we need to truncate
         // the DR log for the new partitions completely before replaying the command log.
         for (int i = partitionCount; i < newPartitionCount; ++i) {
-            drSequenceNumbers.put(i, -1L);
+            digestScanResult.drSequenceNumbers.put(i, -1L);
         }
 
         /*
@@ -1353,9 +1343,10 @@ public class SnapshotRestore extends VoltSystemProcedure {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(exportSequenceNumbers);
-            oos.writeObject(drSequenceNumbers);
-            oos.writeObject(remoteDCLastSeenIds);
+            oos.writeObject(digestScanResult.exportSequenceNumbers);
+            oos.writeObject(digestScanResult.externalStreamsStates);
+            oos.writeObject(digestScanResult.drSequenceNumbers);
+            oos.writeObject(digestScanResult.remoteDCLastSeenIds);
             oos.flush();
             byte exportSequenceNumberBytes[] = baos.toByteArray();
             oos.close();
@@ -1364,14 +1355,14 @@ public class SnapshotRestore extends VoltSystemProcedure {
              * Also set the perPartitionTxnIds locally at the multi-part coordinator.
              * The coord will have to forward this value to all the idle coordinators.
              */
-            ctx.getSiteProcedureConnection().setPerPartitionTxnIds(perPartitionTxnIds, false);
+            ctx.getSiteProcedureConnection().setPerPartitionTxnIds(digestScanResult.perPartitionTxnIds, false);
 
             results =
                     performDistributeDigestState(
                             exportSequenceNumberBytes,
-                            digests.get(0).getLong("txnId"),
-                            perPartitionTxnIds,
-                            clusterCreateTime, drVersion, isRecover);
+                            digestScanResult.digests.get(0).getLong("txnId"),
+                            digestScanResult.perPartitionTxnIds,
+                            digestScanResult.clusterCreateTime, digestScanResult.drVersion, isRecover);
         } catch (IOException e) {
             throw new VoltAbortException(e);
         } catch (JSONException e) {
@@ -1607,7 +1598,8 @@ public class SnapshotRestore extends VoltSystemProcedure {
             long clusterCreateTime,
             long drVersion,
             Map<Integer, Long> drSequenceNumbers,
-            Map<Integer, Map<Integer, Map<Integer, DRSiteDrIdTracker>>> drMixedClusterSizeConsumerState) {
+            Map<Integer, Map<Integer, Map<Integer, DRSiteDrIdTracker>>> drMixedClusterSizeConsumerState,
+            Map<Integer, Boolean> externalStreamsStates) {
         // If this is a truncation snapshot restored during recover, try to set DR protocol version
         if (drVersion != 0) {
             context.getSiteProcedureConnection().setDRProtocolVersion((int)drVersion);
@@ -1632,6 +1624,10 @@ public class SnapshotRestore extends VoltSystemProcedure {
         context.getSiteProcedureConnection().setDRSequenceNumbers(drSequenceNumber, mpDRSequenceNumber);
         if (VoltDB.instance().getNodeDRGateway() != null && context.isLowestSiteId()) {
             VoltDB.instance().getNodeDRGateway().cacheSnapshotRestoreTruncationPoint(drSequenceNumbers);
+        }
+        
+        if (externalStreamsStates.containsKey(myPartitionId) && !externalStreamsStates.get(myPartitionId)) {
+            context.getSiteProcedureConnection().disableExternalStreams();
         }
     }
 
@@ -1781,6 +1777,7 @@ public class SnapshotRestore extends VoltSystemProcedure {
     private static class DigestScanResult {
         List<JSONObject> digests;
         Map<String, Map<Integer, Pair<Long, Long>>> exportSequenceNumbers;
+        Map<Integer, Boolean> externalStreamsStates;
         Map<Integer, Long> drSequenceNumbers;
         long perPartitionTxnIds[];
         Map<Integer, Map<Integer, Map<Integer, DRSiteDrIdTracker>>> remoteDCLastSeenIds;
@@ -1809,11 +1806,10 @@ public class SnapshotRestore extends VoltSystemProcedure {
         pfs[1].multipartition = false;
         pfs[1].parameters = ParameterSet.emptyParameterSet();
 
-        VoltTable[] results;
-        results = executeSysProcPlanFragments(pfs, DEP_restoreDigestScanResults);
+        VoltTable[] results = executeSysProcPlanFragments(pfs, DEP_restoreDigestScanResults);
 
-        HashMap<String, Map<Integer, Pair<Long, Long>>> exportSequenceNumbers =
-                new HashMap<String, Map<Integer, Pair<Long, Long>>>();
+        HashMap<String, Map<Integer, Pair<Long, Long>>> exportSequenceNumbers = new HashMap<>();
+        Map<Integer, Boolean> externalStreamsStates = new HashMap<>();
         Map<Integer, Long> drSequenceNumbers = new HashMap<>();
 
         Long digestTxnId = null;
@@ -1871,6 +1867,8 @@ public class SnapshotRestore extends VoltSystemProcedure {
                 if (digest.has("drVersion")) {
                     drVersion = digest.getLong("drVersion");
                 }
+                
+                externalStreamsStatesFromDigest(digest, externalStreamsStates);
 
                 /*
                  * Snapshots from pre 1.3 VoltDB won't have sequence numbers
@@ -1963,19 +1961,37 @@ public class SnapshotRestore extends VoltSystemProcedure {
                     }
                 }
             }
+
+            DigestScanResult result = new DigestScanResult();
+            result.digests = digests;
+            result.exportSequenceNumbers = exportSequenceNumbers;
+            result.externalStreamsStates = externalStreamsStates;
+            result.drSequenceNumbers = drSequenceNumbers;
+            result.perPartitionTxnIds = Longs.toArray(perPartitionTxnIds);
+            result.remoteDCLastSeenIds = remoteDCLastSeenIds;
+            result.clusterCreateTime = clusterCreateTime;
+            result.drVersion = drVersion;
+            return result;
         } catch (JSONException e) {
             throw new VoltAbortException(e);
         }
-
-        DigestScanResult result = new DigestScanResult();
-        result.digests = digests;
-        result.exportSequenceNumbers = exportSequenceNumbers;
-        result.drSequenceNumbers = drSequenceNumbers;
-        result.perPartitionTxnIds = Longs.toArray(perPartitionTxnIds);
-        result.remoteDCLastSeenIds = remoteDCLastSeenIds;
-        result.clusterCreateTime = clusterCreateTime;
-        result.drVersion = drVersion;
-        return result;
+    }
+    
+    private void externalStreamsStatesFromDigest(JSONObject digest, Map<Integer, Boolean> externalStreamStates)
+            throws JSONException {
+        if (digest.has(ExtensibleSnapshotDigestData.EXTERNAL_STREAMS_STATES)) {
+            JSONArray streamStates = digest.getJSONArray(ExtensibleSnapshotDigestData.EXTERNAL_STREAMS_STATES);
+            for (int i = 0; i < streamStates.length(); i++) {
+                JSONObject partitionState = streamStates.getJSONObject(i);
+                int partition = partitionState.getInt(ExtensibleSnapshotDigestData.PARTITION);
+                boolean enabled = partitionState.getBoolean(ExtensibleSnapshotDigestData.EXTERNAL_STREAMS_ENABLED);
+                if (externalStreamStates.containsKey(partition)) {
+                    externalStreamStates.put(partition, enabled & externalStreamStates.get(partition));
+                } else {
+                    externalStreamStates.put(partition, enabled);
+                }
+            }
+        }
     }
 
     private final byte[] performRestoreHashinatorScanWork(InstanceId iid)

@@ -1867,6 +1867,11 @@ public class Site implements Runnable, SiteProcedureConnection, SiteSnapshotConn
     public void disableExternalStreams() {
         m_ee.disableExternalStreams();
     }
+    
+    @Override
+    public boolean externalStreamsEnabled() {
+        return m_ee.externalStreamsEnabled();
+    }
 
     @Override
     public SystemProcedureExecutionContext getSystemProcedureExecutionContext() {

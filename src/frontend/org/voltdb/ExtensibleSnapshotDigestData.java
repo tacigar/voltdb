@@ -40,6 +40,9 @@ public class ExtensibleSnapshotDigestData {
     public static final String PARTITION = "partition";
     public static final String EXPORT_SEQUENCE_NUMBER = "exportSequenceNumber";
     public static final String EXPORT_USO = "exportUso";
+    
+    public static final String EXTERNAL_STREAMS_STATES = "externalStreamsStates";
+    public static final String EXTERNAL_STREAMS_ENABLED = "externalStreamsEnabled";
 
     /**
      * This field is the same values as m_exportSequenceNumbers once they have been extracted
@@ -54,6 +57,12 @@ public class ExtensibleSnapshotDigestData {
      * Same as m_exportSequenceNumbersToLogOnCompletion, but for m_drTupleStreamInfo
      */
     private final Map<Integer, TupleStreamStateInfo> m_drTupleStreamInfo;
+    
+    /**
+     * Map from partition id to boolean indicating whether external streams (DR, export)
+     * are enabled for that partition.
+     */
+    private Map<Integer, Boolean> m_partitionExternalStreamsEnabled;
 
     /**
      * Used to pass the last seen unique ids from remote datacenters into the snapshot
@@ -80,6 +89,10 @@ public class ExtensibleSnapshotDigestData {
         m_drMixedClusterSizeConsumerState = drMixedClusterSizeConsumerState;
         m_terminus = jsData != null ? jsData.optLong(SnapshotUtil.JSON_TERMINUS, 0L) : 0L;
         m_elasticOperationMetadata = elasticOperationMetadata;
+    }
+    
+    void setPartitionExternalStreamsEnabled(Map<Integer, Boolean> streamsEnabled) {
+        m_partitionExternalStreamsEnabled = streamsEnabled;
     }
 
     private void writeExportSequencesToSnapshot(JSONStringer stringer) throws JSONException {
@@ -156,6 +169,31 @@ public class ExtensibleSnapshotDigestData {
                     newObj.put("ackOffset", ackOffset);
                     sequenceNumbers.put(partitionIdString, newObj);
                 }
+            }
+        }
+    }
+    
+    private void mergeExternalStreamStatesToZK(JSONObject jsonObj, VoltLogger log) throws JSONException {
+        JSONObject jsonStates;
+        if (jsonObj.has(EXTERNAL_STREAMS_STATES)) {
+            jsonStates = jsonObj.getJSONObject(EXTERNAL_STREAMS_STATES);
+        } else {
+            jsonStates = new JSONObject();
+            jsonObj.put(EXTERNAL_STREAMS_STATES, jsonStates);
+        }
+
+        for (Map.Entry<Integer, Boolean> tableEntry : m_partitionExternalStreamsEnabled.entrySet()) {
+            final String partitionStr = tableEntry.getKey().toString();
+            if (!jsonStates.has(partitionStr)) {
+                jsonStates.put(partitionStr, tableEntry.getValue());
+            } else {
+                boolean existing = jsonStates.getBoolean(EXTERNAL_STREAMS_ENABLED);
+                if (log.isDebugEnabled() && existing != tableEntry.getValue()) {
+                    // This should not happen. If it does, use false if it is false anywhere.
+                    log.debug("Found different external stream states on different hosts for partition " + partitionStr +
+                              ". This host has " + tableEntry.getValue());
+                }
+                jsonStates.put(partitionStr, tableEntry.getValue() & existing);
             }
         }
     }
@@ -317,15 +355,31 @@ public class ExtensibleSnapshotDigestData {
     public void writeToSnapshotDigest(JSONStringer stringer) throws IOException {
         try {
             writeExportSequencesToSnapshot(stringer);
+            writeExternalStreamStates(stringer);
             writeDRStateToSnapshot(stringer);
             stringer.key(SnapshotUtil.JSON_ELASTIC_OPERATION).value(m_elasticOperationMetadata);
         } catch (JSONException e) {
             throw new IOException(e);
         }
     }
+    
+    /**
+     * Writes external streams state for partitions into snapshot digest.
+     */
+    private void writeExternalStreamStates(JSONStringer stringer) throws JSONException {
+            stringer.key(EXTERNAL_STREAMS_STATES).array();
+            for (Map.Entry<Integer, Boolean> entry : m_partitionExternalStreamsEnabled.entrySet()) {
+                stringer.object();
+                stringer.keySymbolValuePair(PARTITION, entry.getKey());
+                stringer.keySymbolValuePair(EXTERNAL_STREAMS_ENABLED, entry.getValue());
+                stringer.endObject();
+            }
+            stringer.endArray();
+    }
 
     public void mergeToZooKeeper(JSONObject jsonObj, VoltLogger log) throws JSONException {
         mergeExportSequenceNumbersToZK(jsonObj, log);
+        mergeExternalStreamStatesToZK(jsonObj, log);
         mergeDRTupleStreamInfoToZK(jsonObj, log);
         mergeConsumerDrIdTrackerToZK(jsonObj);
         mergeTerminusToZK(jsonObj);

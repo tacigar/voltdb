@@ -872,6 +872,11 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
      * All streams are enabled by default.
      */
     public abstract void disableExternalStreams();
+    
+    /**
+     * Return the EE state that indicates if external streams are enabled for this Site or not.
+     */
+    public abstract boolean externalStreamsEnabled();
 
     /*
      * Declare the native interface. Structurally, in Java, it would be cleaner to
@@ -879,7 +884,6 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
      * jni_class instances in the execution engine. From the EE perspective, a single
      * JNI class is better.  So put this here with the backend->frontend api definition.
      */
-
     protected native byte[] nextDependencyTest(int dependencyId);
 
     /**
@@ -1162,9 +1166,14 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
     protected native void nativeSetViewsEnabled(long pointer, byte[] viewNamesAsBytes, boolean enabled);
 
     /**
-     * @see ExecutionEngine#setExternalStreamsEnabled(boolean)
+     * @see ExecutionEngine#disableExternalStreams()
      */
     protected native void nativeDisableExternalStreams(long pointer);
+    
+    /**
+     * @see ExecutionEngine#externalStreamsEnabled()
+     */
+    protected native boolean nativeExternalStreamsEnabled(long pointer);
 
     /**
      * Get the USO for an export table. This is primarily used for recovery.
