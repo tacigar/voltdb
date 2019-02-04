@@ -143,18 +143,27 @@ public class LeaderElector {
      */
     public void start(boolean block) throws KeeperException, InterruptedException, ExecutionException
     {
-        node = createParticipantNode(zk, dir, prefix, data);
-        Future<?> task = es.submit(electionEventHandler);
+        Future<?> task = start();
         if (block) {
             task.get();
         }
-        //Only do the extra work for watching children if a callback is registered
-        if (cb != null) {
-            task = es.submit(childrenEventHandler);
-            if (block) {
-                task.get();
-            }
-        }
+    }
+
+    /**
+     * Start leader election.
+     *
+     * Creates an ephemeral sequential node under the given directory and check if we are the first one who created it.
+     *
+     * For details about the leader election algorithm,
+     * <a href= "http://zookeeper.apache.org/doc/trunk/recipes.html#sc_leaderElection" >Zookeeper Leader Election</a>
+     *
+     * @return {@link Future} which is completed after the leader election has been performed
+     * @throws KeeperException      If there is an error creating election nodes
+     * @throws InterruptedException If this thread was interrupted
+     */
+    public Future<?> start() throws KeeperException, InterruptedException {
+        node = createParticipantNode(zk, dir, prefix, data);
+        return es.submit(electionEventHandler);
     }
 
     public boolean isLeader() {
